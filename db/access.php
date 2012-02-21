@@ -1,4 +1,5 @@
 <?php
+
 // This file is part of Moodle - http://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
@@ -14,18 +15,13 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-/**
- * Version information
- *
- * @package    repository_demo
- * @category   repository
- * @copyright  2012 Dongsheng Cai
- * @author     Dongsheng Cai {@link http://dongsheng.org}
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- */
+$capabilities = array(
 
-defined('MOODLE_INTERNAL') || die();
-
-$plugin->version   = 2012012501;        // The current plugin version (Date: YYYYMMDDXX)
-$plugin->requires  = 2012012501;        // Requires this Moodle version
-$plugin->component = 'repository_demo'; // Full name of the plugin (used for diagnostics)
+    'repository/demo:view' => array(
+        'captype' => 'read',
+        'contextlevel' => CONTEXT_MODULE,
+        'archetypes' => array(
+            'user' => CAP_ALLOW
+        )
+    )
+);
