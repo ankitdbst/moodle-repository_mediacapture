@@ -84,11 +84,12 @@ class repository_demo extends repository {
      */
     public function check_login() {
         global $SESSION;
-        if (!empty($SESSION->logged)) {
-            return true;
-        } else {
-            return false;
-        }
+        //if (!empty($SESSION->logged)) {
+            //return true;
+        //} else {
+            //return false;
+        //}
+        return true;
     }
 
     /**
@@ -96,13 +97,13 @@ class repository_demo extends repository {
      * this function will be called to print a login form.
      */
     public function print_login() {
-        $user_field->label = get_string('username', 'repository_demo').': ';
+        $user_field->label = get_string('username').': ';
         $user_field->id    = 'demo_username';
         $user_field->type  = 'text';
         $user_field->name  = 'demousername';
-        $user_field->value = $ret->username;
+        $user_field->value = '';
         
-        $passwd_field->label = get_string('password', 'repository_demo').': ';
+        $passwd_field->label = get_string('password').': ';
         $passwd_field->id    = 'demo_password';
         $passwd_field->type  = 'password';
         $passwd_field->name  = 'demopassword';
@@ -195,6 +196,9 @@ class repository_demo extends repository {
      * @return int
      */
     public function supported_returntypes() {
+        // From moodle 2.3, we support file reference
+        // see moodle docs for more information
+        //return FILE_INTERNAL | FILE_EXTERNAL | FILE_REFERENCE;
         return FILE_INTERNAL | FILE_EXTERNAL;
     }
 }

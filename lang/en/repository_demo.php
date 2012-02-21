@@ -19,7 +19,7 @@
  */
 $string['pluginname_help'] = 'Demo repository';
 $string['pluginname'] = 'Demo';
-$string['boxnet:view'] = 'View demo repository';
+$string['demo:view'] = 'View demo repository';
 $string['configplugin'] = 'Demo repository configuration';
 $string['account'] = 'Account information';
 $string['configplugin'] = 'Configuration for this plugin';
