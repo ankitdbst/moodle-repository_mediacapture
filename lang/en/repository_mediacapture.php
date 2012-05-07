@@ -15,12 +15,10 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * This file contains demo repository plugin language strings
+ * This file contains 'repository_mediacapture' repository plugin language strings
  */
-$string['pluginname_help'] = 'Demo repository';
-$string['pluginname'] = 'Demo';
-$string['demo:view'] = 'View demo repository';
-$string['configplugin'] = 'Demo repository configuration';
+$string['pluginname'] = 'Media Capture';
+$string['mediacapture:view'] = 'Use Media Capture in file picker';
+$string['configplugin'] = 'Media Capture repository configuration';
 $string['account'] = 'Account information';
-$string['configplugin'] = 'Configuration for this plugin';
 $string['api_key'] = 'API Key';

@@ -17,7 +17,7 @@
 /**
  * Version information
  *
- * @package    repository_demo
+ * @package    repository_mediacapture
  * @category   repository
  * @copyright  2012 Dongsheng Cai
  * @author     Dongsheng Cai {@link http://dongsheng.org}
@@ -26,6 +26,6 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->version   = 2012012501;        // The current plugin version (Date: YYYYMMDDXX)
-$plugin->requires  = 2012012501;        // Requires this Moodle version
-$plugin->component = 'repository_demo'; // Full name of the plugin (used for diagnostics)
+$plugin->version   = 2012052100;                // The current plugin version (Date: YYYYMMDDXX)
+$plugin->requires  = 2012052100;                // Requires this Moodle version
+$plugin->component = 'repository_mediacapture'; // Full name of the plugin (used for diagnostics)

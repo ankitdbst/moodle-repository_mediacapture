@@ -15,15 +15,15 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * repository_demo class
+ * repository_mediacapture class
  * This is a subclass of repository class
  *
- * @package    repository_demo
+ * @package    repository_mediacapture
  * @category   repository
  * @copyright  2012 Dongsheng Cai {@link http://dongsheng.org}
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class repository_demo extends repository {
+class repository_mediacapture extends repository {
 
     /**
      * Constructor
@@ -102,7 +102,7 @@ class repository_demo extends repository {
         $user_field->type  = 'text';
         $user_field->name  = 'demousername';
         $user_field->value = '';
-        
+
         $passwd_field->label = get_string('password').': ';
         $passwd_field->id    = 'demo_password';
         $passwd_field->type  = 'password';
@@ -120,7 +120,7 @@ class repository_demo extends repository {
      */
     public function search($text) {
         $search_result = array();
-        // search result listing's format is the same as 
+        // search result listing's format is the same as
         // file listing
         $search_result['list'] = array();
         return $search_result;
@@ -139,7 +139,7 @@ class repository_demo extends repository {
     */
 
     /**
-     * when logout button on file picker is clicked, this function will be 
+     * when logout button on file picker is clicked, this function will be
      * called.
      */
     public function logout() {
@@ -161,7 +161,7 @@ class repository_demo extends repository {
      * Instance config form
      */
     public function instance_config_form(&$mform) {
-        $mform->addElement('text', 'account', get_string('account', 'repository_demo'), array('value'=>'','size' => '40'));
+        $mform->addElement('text', 'account', get_string('account', 'repository_mediacapture'), array('value'=>'','size' => '40'));
     }
 
     /**
@@ -177,7 +177,7 @@ class repository_demo extends repository {
      * Type config form
      */
     public function type_config_form(&$mform) {
-        $mform->addElement('text', 'api_key', get_string('api_key', 'repository_demo'), array('value'=>'','size' => '40'));
+        $mform->addElement('text', 'api_key', get_string('api_key', 'repository_mediacapture'), array('value'=>'','size' => '40'));
     }
     /**
      * will be called when installing a new plugin in admin panel

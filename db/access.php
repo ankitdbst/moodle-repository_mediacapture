@@ -17,7 +17,7 @@
 
 $capabilities = array(
 
-    'repository/demo:view' => array(
+    'repository/mediacapture:view' => array(
         'captype' => 'read',
         'contextlevel' => CONTEXT_MODULE,
         'archetypes' => array(
