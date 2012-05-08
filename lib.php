@@ -20,7 +20,7 @@
  *
  * @package    repository_mediacapture
  * @category   repository
- * @copyright  2012 Dongsheng Cai {@link http://dongsheng.org}
+ * @copyright  2012 Ankit Gupta
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class repository_mediacapture extends repository {
