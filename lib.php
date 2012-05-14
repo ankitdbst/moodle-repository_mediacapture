@@ -33,172 +33,127 @@ class repository_mediacapture extends repository {
      * @param array $options
      */
     public function __construct($repositoryid, $context = SITEID, $options = array()) {
+        global $action, $itemid;
         parent::__construct($repositoryid, $context, $options);
     }
 
+    public static function get_type_option_names() {
+        return array('audio_format', 'sampling_rate');
+    }
+
+    public static function type_config_form($mform, $classname = 'repository') {
+        parent::type_config_form($mform);
+        $audio_format_options = array(
+            get_string('audio_format_imaadpcm', 'repository_mediacapture'),
+            get_string('audio_format_speex', 'repository_mediacapture'),
+        );
+        $sampling_rate_options = array(
+            get_string('sampling_rate_low', 'repository_mediacapture'),
+            get_string('sampling_rate_medium', 'repository_mediacapture'),
+            get_string('sampling_rate_normal', 'repository_mediacapture'),
+            get_string('sampling_rate_high', 'repository_mediacapture'),
+        );
+
+        $mform->addElement('select', 'audio_format', get_string('audio_format', 'repository_mediacapture'), $audio_format_options);
+        $mform->addElement('select', 'sampling_rate', get_string('sampling_rate', 'repository_mediacapture'), $sampling_rate_options);
+    }
+
     /**
-     * Get file listing
+     * Method to get the repository content.
      *
-     * @param string $path
-     * @param string $page
+     * @param string $path current path in the repository
+     * @param string $page current page in the repository path
+     * @return array structure of listing information
      */
     public function get_listing($path = '', $page = '') {
+        global $CFG, $PAGE, $action;
+
         $list = array();
-        $list['list'] = array();
-        // the management interface url
-        $list['manage'] = false;
-        // dynamically loading
-        $list['dynload'] = true;
-        // the current path of this list.
-        $list['path'] = array(
-            array('name'=>'root', 'path'=>''),
-            array('name'=>'sub_dir', 'path'=>'/sub_dir')
-            );
-        // set to true, the login link will be removed
-        $list['nologin'] = false;
-        // set to true, the search button will be removed
-        $list['nosearch'] = false;
-        // a file in listing
-        $list['list'][] = array('title'=>'file.txt',
-            'size'=>'1kb',
-            'date'=>'2008.1.12',
-            'thumbnail'=>'http://localhost/xx.png',
-            'thumbnail_wodth'=>32,
-            // plugin-dependent unique path to the file (id, url, path, etc.)
-            'source'=>'',
-            // the accessible url of the file
-            'url'=>''
-        );
-        // a folder in listing
-        $list['list'][] = array('title'=>'foler',
-            'size'=>'0',
-            'date'=>'2008.1.12',
-            'childre'=>array(),
-            'thumbnail'=>'http://localhost/xx.png',
-        );
+        $list['page'] = (int)$page;
+        if ($list['page'] < 1) {
+            $list['page'] = 1;
+        }
+        $list['nologin'] = true;
+        $list['nosearch'] = true;
+
         return $list;
     }
 
     /**
-     * Check if user logged in
-     */
-    public function check_login() {
-        global $SESSION;
-        //if (!empty($SESSION->logged)) {
-            //return true;
-        //} else {
-            //return false;
-        //}
-        return true;
-    }
-
-    /**
-     * if check_login returns false,
-     * this function will be called to print a login form.
-     */
-    public function print_login() {
-        $user_field->label = get_string('username').': ';
-        $user_field->id    = 'demo_username';
-        $user_field->type  = 'text';
-        $user_field->name  = 'demousername';
-        $user_field->value = '';
-
-        $passwd_field->label = get_string('password').': ';
-        $passwd_field->id    = 'demo_password';
-        $passwd_field->type  = 'password';
-        $passwd_field->name  = 'demopassword';
-
-        $form = array();
-        $form['login'] = array($user_field, $passwd_field);
-        return $form;
-    }
-
-    /**
-     * Search in external repository
+     * Returns the suported file types
      *
-     * @param string $text
+     * @return array of supported file types and extensions.
      */
-    public function search($text) {
-        $search_result = array();
-        // search result listing's format is the same as
-        // file listing
-        $search_result['list'] = array();
-        return $search_result;
-    }
-    /**
-     * move file to local moodle
-     * the default implementation will download the file by $url using curl,
-     * that file will be saved as $file_name.
-     *
-     * @param string $url
-     * @param string $filename
-     */
-    /**
-    public function get_file($url, $file_name = '') {
-    }
-    */
-
-    /**
-     * when logout button on file picker is clicked, this function will be
-     * called.
-     */
-    public function logout() {
-        global $SESSION;
-        unset($SESSION->logged);
-        return true;
+    public function supported_filetypes() {
+        return array('web_audio');
     }
 
-    /**
-     * this function must be static
-     *
-     * @return array
+    /*
+     * Main function for audio/video recording
      */
-    public static function get_instance_option_names() {
-        return array('account');
+    public function audio_video_recorder($media = 'audio') {
+        // browser support
+        // os support
+        record();
+        // record
+        // format
+        // upload
+        // save
     }
 
-    /**
-     * Instance config form
-     */
-    public function instance_config_form(&$mform) {
-        $mform->addElement('text', 'account', get_string('account', 'repository_mediacapture'), array('value'=>'','size' => '40'));
+    public function record($media) {
+        if ($media == 'audio') {
+            print_record_audio();
+        } else if ($media == 'video') {
+            print_record_video();
+        }
     }
 
-    /**
-     * Type option names
-     *
-     * @return array
-     */
-    public static function get_type_option_names() {
-        return array('api_key');
+    public function print_record_audio() {
+        global $CFG, $PAGE;
+
+        $sampling_rates = array(
+            array(8000, 11025, 22050, 44100),
+            array(8000, 16000, 32000, 44100)
+        );
+        $audio_formats = array('ImaADPCM', 'Speex');
+
+        $audio_format = get_config('mediacapture', 'audio_format');
+        $sampling_rate = get_config('mediacapture', 'sampling_rate');
+
+        $sampling_rate = $sampling_rates[$audio_format][$sampling_rate];
+        $audio_format = $audio_formats[$audio_format];
+
+        // we need some JS libraries for AJAX
+        require_js(array('yui_yahoo', 'yui_dom', 'yui_event', 'yui_element', 'yui_connection', 'yui_json'));
+
+        $PAGE->requires->js('repository/mediacapture/record.js');
+        $PAGE->requires->data_for_js('mediacapture', array(
+            'unexpectedevent' => get_string('unexpectedevent', 'repository_mediacapture'),
+            'appletnotfound' => get_string('appletnotfound', 'repository_mediacapture'),
+            'norecordingfound' => get_string('norecordingfound', 'repository_mediacapture'),
+            'nonamefound' => get_string('nonamefound', 'repository_mediacapture')
+        ));
+
+        $record_html =
+                    '<div class="nanogong_container">
+                        <form onsubmit="nanogongSubmit(); return false;">
+                            <input type="hidden" id="repo_id" name="repo_id" value="' . $this->id . '" />
+                            <label for="filename">' . get_string('name', 'repository_mediacapture') . ':</label>
+                            <input type="text" name="filename" id="filename" /><br />
+                            <applet id="nanogong_recorder" name="nanogong_recorder" code="gong.NanoGong" width="180" height="40" archive="' . $CFG->httpswwwroot . '/repository/mediacapture/nanogong.jar">
+                                <param name="AudioFormat" value="' . $audio_format . '" />
+                                <param name="SamplingRate" value="' . $sampling_rate . '" />
+                                <p>' . get_string('javanotfound', 'repository_mediacapture') . '</p>
+                            </applet><br /><br />
+                            <input type="submit" value="' . get_string('save', 'repository_mediacapture') . '" />
+                        </form>
+                    </div>';
+        echo $record_html;
     }
 
-    /**
-     * Type config form
-     */
-    public function type_config_form(&$mform) {
-        $mform->addElement('text', 'api_key', get_string('api_key', 'repository_mediacapture'), array('value'=>'','size' => '40'));
-    }
-    /**
-     * will be called when installing a new plugin in admin panel
-     *
-     * @return bool
-     */
-    public static function plugin_init() {
-        $result = true;
-        // do nothing
-        return $result;
+    public function print_record_video() {
+        // video options
     }
 
-    /**
-     * Supports file linking and copying
-     *
-     * @return int
-     */
-    public function supported_returntypes() {
-        // From moodle 2.3, we support file reference
-        // see moodle docs for more information
-        //return FILE_INTERNAL | FILE_EXTERNAL | FILE_REFERENCE;
-        return FILE_INTERNAL | FILE_EXTERNAL;
-    }
 }
