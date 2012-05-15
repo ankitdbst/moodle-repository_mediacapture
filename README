@@ -1,0 +1,20 @@
+Introduction
+------------
+This is a Audio/Video recording plugin for recording audio/video streams directly using the filepicker.
+
+Requirement
+-----------
+ Moodle 2.3 onward
+
+Installation
+------------
+- Copy to MOODLEROOT/repository/
+- Trigger moodle upgrade script
+
+Copyright
+---------
+Ankit Gupta
+
+License
+-------
+GPL v2
