@@ -66,17 +66,7 @@ class repository_mediacapture extends repository {
      * @return array structure of listing information
      */
     public function get_listing($path = '', $page = '') {
-        global $CFG, $PAGE, $action;
-
-        $list = array();
-        $list['page'] = (int)$page;
-        if ($list['page'] < 1) {
-            $list['page'] = 1;
-        }
-        $list['nologin'] = true;
-        $list['nosearch'] = true;
-
-        return $list;
+        $this->audio_video_recorder('audio');
     }
 
     /**
@@ -91,21 +81,11 @@ class repository_mediacapture extends repository {
     /*
      * Main function for audio/video recording
      */
-    public function audio_video_recorder($media = 'audio') {
-        // browser support
-        // os support
-        record();
-        // record
-        // format
-        // upload
-        // save
-    }
-
-    public function record($media) {
+    public function audio_video_recorder($media) {
         if ($media == 'audio') {
-            print_record_audio();
+            $this->print_record_audio();
         } else if ($media == 'video') {
-            print_record_video();
+            $this->print_record_video();
         }
     }
 
@@ -124,32 +104,19 @@ class repository_mediacapture extends repository {
         $sampling_rate = $sampling_rates[$audio_format][$sampling_rate];
         $audio_format = $audio_formats[$audio_format];
 
-        // we need some JS libraries for AJAX
-        require_js(array('yui_yahoo', 'yui_dom', 'yui_event', 'yui_element', 'yui_connection', 'yui_json'));
-
-        $PAGE->requires->js('repository/mediacapture/record.js');
-        $PAGE->requires->data_for_js('mediacapture', array(
-            'unexpectedevent' => get_string('unexpectedevent', 'repository_mediacapture'),
-            'appletnotfound' => get_string('appletnotfound', 'repository_mediacapture'),
-            'norecordingfound' => get_string('norecordingfound', 'repository_mediacapture'),
-            'nonamefound' => get_string('nonamefound', 'repository_mediacapture')
-        ));
-
-        $record_html =
-                    '<div class="nanogong_container">
-                        <form onsubmit="nanogongSubmit(); return false;">
-                            <input type="hidden" id="repo_id" name="repo_id" value="' . $this->id . '" />
-                            <label for="filename">' . get_string('name', 'repository_mediacapture') . ':</label>
-                            <input type="text" name="filename" id="filename" /><br />
-                            <applet id="nanogong_recorder" name="nanogong_recorder" code="gong.NanoGong" width="180" height="40" archive="' . $CFG->httpswwwroot . '/repository/mediacapture/nanogong.jar">
-                                <param name="AudioFormat" value="' . $audio_format . '" />
-                                <param name="SamplingRate" value="' . $sampling_rate . '" />
-                                <p>' . get_string('javanotfound', 'repository_mediacapture') . '</p>
-                            </applet><br /><br />
-                            <input type="submit" value="' . get_string('save', 'repository_mediacapture') . '" />
-                        </form>
-                    </div>';
-        echo $record_html;
+        echo '<div class="audio_container">';
+        echo '<form onsubmit="">';
+        echo '<input type="hidden" id="repo_id" name="repo_id" value="' . $this->id . '" />';
+        echo '<label for="filename">' . get_string('name', 'repository_medicapture') . ':</label>';
+        echo '<input type="text" name="filename" id="filename" /><br />';
+        echo '<applet id="audio_recorder" name="audio_recorder" code="gong.NanoGong" width="180" height="40" archive="' . $CFG->httpswwwroot . '/repository/medicapture/nanogong.jar">';
+        echo '<param name="AudioFormat" value="' . $audio_format . '" />';
+        echo '<param name="SamplingRate" value="' . $sampling_rate . '" />';
+        echo '<p>' . get_string('javanotfound', 'repository_medicapture') . '</p>';
+        echo '</applet><br /><br />';
+        echo '<input type="submit" value="' . get_string('save', 'repository_medicapture') . '" />';
+        echo '</form>';
+        echo '</div>';
     }
 
     public function print_record_video() {
