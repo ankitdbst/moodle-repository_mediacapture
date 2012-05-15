@@ -78,8 +78,11 @@ class repository_mediacapture extends repository {
         return array('web_audio');
     }
 
-    /*
-     * Main function for audio/video recording
+    /**
+     * This is the main function that would record the audio/video
+     * stream and upload it to the server.
+     *
+     * @param string $media type of the recording for the media
      */
     public function audio_video_recorder($media) {
         if ($media == 'audio') {
@@ -89,6 +92,10 @@ class repository_mediacapture extends repository {
         }
     }
 
+    /**
+     * Prints the audio recording applet html in the filepicker instance
+     * of the plugin
+     */
     public function print_record_audio() {
         global $CFG, $PAGE;
 
@@ -119,6 +126,9 @@ class repository_mediacapture extends repository {
         echo '</div>';
     }
 
+    /**
+     * Prints the video recording applet html in the filepicker instance
+     */
     public function print_record_video() {
         // video options
     }
