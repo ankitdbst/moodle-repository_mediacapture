@@ -66,7 +66,7 @@ class repository_mediacapture extends repository {
      * @return array structure of listing information
      */
     public function get_listing($path = '', $page = '') {
-        $this->audio_video_recorder('audio');
+        return array();
     }
 
     /**
@@ -79,25 +79,14 @@ class repository_mediacapture extends repository {
     }
 
     /**
-     * This is the main function that would record the audio/video
-     * stream and upload it to the server.
-     *
-     * @param string $media type of the recording for the media
-     */
-    public function audio_video_recorder($media) {
-        if ($media == 'audio') {
-            $this->print_record_audio();
-        } else if ($media == 'video') {
-            $this->print_record_video();
-        }
-    }
-
-    /**
      * Prints the audio recording applet html in the filepicker instance
      * of the plugin
      */
-    public function print_record_audio() {
+    public function print_login() {
         global $CFG, $PAGE;
+
+        $recorder = "";
+        $url = $CFG->wwwroot.'/repository/medicapture/nanogong.jar';
 
         $sampling_rates = array(
             array(8000, 11025, 22050, 44100),
@@ -111,26 +100,27 @@ class repository_mediacapture extends repository {
         $sampling_rate = $sampling_rates[$audio_format][$sampling_rate];
         $audio_format = $audio_formats[$audio_format];
 
-        echo '<div class="audio_container">';
-        echo '<form onsubmit="">';
-        echo '<input type="hidden" id="repo_id" name="repo_id" value="' . $this->id . '" />';
-        echo '<label for="filename">' . get_string('name', 'repository_medicapture') . ':</label>';
-        echo '<input type="text" name="filename" id="filename" /><br />';
-        echo '<applet id="audio_recorder" name="audio_recorder" code="gong.NanoGong" width="180" height="40" archive="' . $CFG->httpswwwroot . '/repository/medicapture/nanogong.jar">';
-        echo '<param name="AudioFormat" value="' . $audio_format . '" />';
-        echo '<param name="SamplingRate" value="' . $sampling_rate . '" />';
-        echo '<p>' . get_string('javanotfound', 'repository_medicapture') . '</p>';
-        echo '</applet><br /><br />';
-        echo '<input type="submit" value="' . get_string('save', 'repository_medicapture') . '" />';
-        echo '</form>';
-        echo '</div>';
-    }
+        $repo_name = get_string('name', 'repository_mediacapture');
+        $javanotfound = get_string('javanotfound', 'repository_mediacapture');
+        $save = get_string('save', 'repository_mediacapture');
 
-    /**
-     * Prints the video recording applet html in the filepicker instance
-     */
-    public function print_record_video() {
-        // video options
+        $recorder = '
+            <div class="audio_container">
+                <form onsubmit="">
+                    <input type="hidden" id="repo_id" name="repo_id" value="'. $this->id .'" />
+                    <label for="filename">'.$repo_name.'</label>
+                    <input type="text" name="filename" id="filename" /><br />
+                    <applet id="audio_recorder" name="audio_recorder" code="gong.NanoGong" width="180" height="40" archive="'. $url .'">
+                        <param name="AudioFormat" value="'. $audio_format .'" />
+                        <param name="SamplingRate" value="'. $sampling_rate .'" />
+                        <p>'.$javanotfound.'</p>
+                    </applet><br /><br />
+                    <input type="submit" value="'.$save.'" />
+                </form>
+            </div>';
+        $ret = array();
+        $ret['upload'] = array('label'=>$recorder, 'id'=>'repo-form');
+        return $ret;
     }
 
 }
