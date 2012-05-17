@@ -41,6 +41,14 @@ class repository_mediacapture extends repository {
         return array('audio_format', 'sampling_rate');
     }
 
+    /**
+     * Admin settings for the plugin
+     * Displays the Audio format and Sampling rate options
+     * at which the recording is to be done.
+     *
+     * @param object $mform
+     * @param string $classname
+     */
     public static function type_config_form($mform, $classname = 'repository') {
         parent::type_config_form($mform);
         $audio_format_options = array(
@@ -58,6 +66,16 @@ class repository_mediacapture extends repository {
         $mform->addElement('select', 'sampling_rate', get_string('sampling_rate', 'repository_mediacapture'), $sampling_rate_options);
     }
 
+    public function check_login() {
+        // Needs to return false so that the "login" form is displayed (print_login())
+        return false;
+    }
+
+    public function global_search() {
+        // Plugin doesn't support global search, since we don't have anything to search
+        return false;
+    }
+
     /**
      * Method to get the repository content.
      *
@@ -70,23 +88,14 @@ class repository_mediacapture extends repository {
     }
 
     /**
-     * Returns the suported file types
-     *
-     * @return array of supported file types and extensions.
-     */
-    public function supported_filetypes() {
-        return array('web_audio');
-    }
-
-    /**
-     * Prints the audio recording applet html in the filepicker instance
-     * of the plugin
+     * Prints the audio recording applet html
+     * in the filepicker instance of the plugin
      */
     public function print_login() {
         global $CFG, $PAGE;
 
         $recorder = "";
-        $url = $CFG->wwwroot.'/repository/medicapture/nanogong.jar';
+        $url = $CFG->wwwroot.'/repository/mediacapture/nanogong.jar';
 
         $sampling_rates = array(
             array(8000, 11025, 22050, 44100),
@@ -104,23 +113,31 @@ class repository_mediacapture extends repository {
         $javanotfound = get_string('javanotfound', 'repository_mediacapture');
         $save = get_string('save', 'repository_mediacapture');
 
+        $PAGE->requires->js( new moodle_url($CFG->wwwroot . '/repository/mediacapture/record.js') );
+
         $recorder = '
-            <div class="audio_container">
+            <div class="audio_container" id="audio_container">
                 <form onsubmit="">
                     <input type="hidden" id="repo_id" name="repo_id" value="'. $this->id .'" />
-                    <label for="filename">'.$repo_name.'</label>
-                    <input type="text" name="filename" id="filename" /><br />
                     <applet id="audio_recorder" name="audio_recorder" code="gong.NanoGong" width="180" height="40" archive="'. $url .'">
                         <param name="AudioFormat" value="'. $audio_format .'" />
                         <param name="SamplingRate" value="'. $sampling_rate .'" />
                         <p>'.$javanotfound.'</p>
                     </applet><br /><br />
-                    <input type="submit" value="'.$save.'" />
                 </form>
             </div>';
         $ret = array();
         $ret['upload'] = array('label'=>$recorder, 'id'=>'repo-form');
         return $ret;
+    }
+
+    /**
+     * Returns the suported file types
+     *
+     * @return array of supported file types and extensions.
+     */
+    public function supported_filetypes() {
+        return array('web_audio');
     }
 
 }
