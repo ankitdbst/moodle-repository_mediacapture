@@ -116,16 +116,24 @@ class repository_mediacapture extends repository {
         $PAGE->requires->js( new moodle_url($CFG->wwwroot . '/repository/mediacapture/record.js') );
 
         $recorder = '
-            <div class="audio_container" id="audio_container">
-                <form onsubmit="">
-                    <input type="hidden" id="repo_id" name="repo_id" value="'. $this->id .'" />
-                    <applet id="audio_recorder" name="audio_recorder" code="gong.NanoGong" width="180" height="40" archive="'. $url .'">
-                        <param name="AudioFormat" value="'. $audio_format .'" />
-                        <param name="SamplingRate" value="'. $sampling_rate .'" />
-                        <p>'.$javanotfound.'</p>
-                    </applet><br /><br />
-                </form>
-            </div>';
+            <div style="position: absolute; top:0;left:0;right:0;bottom:0; background-color:#f2f2f2;">
+                <div class="appletcontainer" id="appletcontainer" style="margin:20% auto; text-align:center;">
+                    <form onsubmit="">
+                        <input type="hidden" id="repo_id" name="repo_id" value="'. $this->id .'" />
+                        <applet id="audio_recorder" name="audio_recorder" code="gong.NanoGong" width="120" height="40" archive="'. $url .'">
+                            <param name="AudioFormat" value="'. $audio_format .'" />
+                            <param name="ShowSaveButton" value="false" />
+                            <param name="ShowTime" value="true" />
+                            <param name="SamplingRate" value="'. $sampling_rate .'" />
+                            <p>'.$javanotfound.'</p>
+                        </applet><br /><br />
+                        <label for="filename">File Name</label>
+                        <input type="text" id="filename" ""name="filename" />
+                        <input type="button" onclick="" value="Save" />
+                    </form>
+                </div>
+            </div>
+            ';
         $ret = array();
         $ret['upload'] = array('label'=>$recorder, 'id'=>'repo-form');
         return $ret;
