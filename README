@@ -9,9 +9,9 @@ Requirement
 Installation
 ------------
 - Copy to MOODLEROOT/repository/
-- Rename to 'mediacapture'
-- Enable the plugin from Site administration -> Plugins -> Repositories -> Manage Repositories
 - Trigger moodle upgrade script
+- Enable the plugin from Site administration -> Plugins -> Repositories -> Manage Repositories
+
 
 Copyright
 ---------
