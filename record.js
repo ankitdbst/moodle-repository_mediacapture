@@ -19,7 +19,6 @@ function submitAudio() {
         alert(mediacapture['unexpectedevent'] + ' (upload)');
         return;
     }
-
     alert(ret);
 }
 
