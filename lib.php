@@ -33,8 +33,23 @@ class repository_mediacapture extends repository {
      * @param array $options
      */
     public function __construct($repositoryid, $context = SITEID, $options = array()) {
-        global $action, $itemid;
+        global $PAGE, $CFG, $action, $itemid;
         parent::__construct($repositoryid, $context, $options);
+
+        // include record js file
+        $PAGE->requires->js( new moodle_url($CFG->wwwroot . '/repository/mediacapture/record.js') );
+
+        // strings for displaying js errors
+        $unexpectedevent = get_string('unexpectedevent', 'repository_mediacapture');
+        $appletnotfound = get_string('appletnotfound', 'repository_mediacapture');
+        $norecordingfound = get_string('norecordingfound', 'repository_mediacapture');
+        $nonamefound = get_string('nonamefound', 'repository_mediacapture');
+        $PAGE->requires->data_for_js('mediacapture', array(
+            'unexpectedevent' => $unexpectedevent,
+            'appletnotfound' => $appletnotfound,
+            'norecordingfound' => $norecordingfound,
+            'nonamefound' => $nonamefound
+        ));
     }
 
     public static function get_type_option_names() {
@@ -95,7 +110,8 @@ class repository_mediacapture extends repository {
         global $CFG, $PAGE;
 
         $recorder = "";
-        $url = $CFG->wwwroot.'/repository/mediacapture/nanogong.jar';
+        $url = new moodle_url($CFG->wwwroot.'/repository/mediacapture/nanogong.jar');
+        $posturl = urlencode(new moodle_url($CFG->wwwroot . '/repository/mediacapture/record.php'));
 
         $sampling_rates = array(
             array(8000, 11025, 22050, 44100),
@@ -113,13 +129,12 @@ class repository_mediacapture extends repository {
         $javanotfound = get_string('javanotfound', 'repository_mediacapture');
         $save = get_string('save', 'repository_mediacapture');
 
-        $PAGE->requires->js( new moodle_url($CFG->wwwroot . '/repository/mediacapture/record.js') );
-
         $recorder = '
             <div style="position: absolute; top:0;left:0;right:0;bottom:0; background-color:#f2f2f2;">
                 <div class="appletcontainer" id="appletcontainer" style="margin:20% auto; text-align:center;">
-                    <form onsubmit="">
+                    <form>
                         <input type="hidden" id="repo_id" name="repo_id" value="'. $this->id .'" />
+                        <input type="hidden" id="posturl" name="posturl" value="'.$posturl.'" />
                         <applet id="audio_recorder" name="audio_recorder" code="gong.NanoGong" width="120" height="40" archive="'. $url .'">
                             <param name="AudioFormat" value="'. $audio_format .'" />
                             <param name="ShowSaveButton" value="false" />
@@ -128,8 +143,8 @@ class repository_mediacapture extends repository {
                             <p>'.$javanotfound.'</p>
                         </applet><br /><br />
                         <label for="filename">File Name</label>
-                        <input type="text" id="filename" ""name="filename" />
-                        <input type="button" onclick="" value="Save" />
+                        <input type="text" id="filename" name="filename" />
+                        <input type="submit" onclick="submitAudio(); return false;" value="'. $save .'" />
                     </form>
                 </div>
             </div>
@@ -137,6 +152,62 @@ class repository_mediacapture extends repository {
         $ret = array();
         $ret['upload'] = array('label'=>$recorder, 'id'=>'repo-form');
         return $ret;
+    }
+
+    public function upload($filename, $filedata) {
+        global $USER, $CFG;
+
+        $record = new stdClass();
+        $record->filearea = 'draft';
+        $record->component = 'user';
+        $record->filepath = optional_param('savepath', '/', PARAM_PATH);
+        $record->itemid   = optional_param('itemid', 0, PARAM_INT);
+        $record->license  = optional_param('license', $CFG->sitedefaultlicense, PARAM_TEXT);
+        $record->author   = optional_param('author', '', PARAM_TEXT);
+
+        $context = get_context_instance(CONTEXT_USER, $USER->id);
+
+        $fs = get_file_storage();
+        $sm = get_string_manager();
+
+        if ($record->filepath !== '/') {
+            $record->filepath = file_correct_filepath($record->filepath);
+        }
+
+        $record->filename = $filename;
+
+        if (empty($record->itemid)) {
+            $record->itemid = 0;
+        }
+
+        $record->contextid = $context->id;
+        $record->userid    = $USER->id;
+        $record->source    = '';
+
+        if (repository::draftfile_exists($record->itemid, $record->filepath, $record->filename)) {
+            $existingfilename = $record->filename;
+            $unused_filename = repository::get_unused_filename($record->itemid, $record->filepath, $record->filename);
+            $record->filename = $unused_filename;
+            $stored_file = $fs->create_file_from_string($record, $filedata);
+            $event = array();
+            $event['event'] = 'fileexists';
+            $event['newfile'] = new stdClass;
+            $event['newfile']->filepath = $record->filepath;
+            $event['newfile']->filename = $unused_filename;
+            $event['newfile']->url = moodle_url::make_draftfile_url($record->itemid, $record->filepath, $unused_filename)->out();
+
+            $event['existingfile'] = new stdClass;
+            $event['existingfile']->filepath = $record->filepath;
+            $event['existingfile']->filename = $existingfilename;
+            $event['existingfile']->url      = moodle_url::make_draftfile_url($record->itemid, $record->filepath, $existingfilename)->out();;
+            return $event;
+        } else {
+            $stored_file = $fs->create_file_from_string($record, $filedata);
+            return array(
+                'url'=>moodle_url::make_draftfile_url($record->itemid, $record->filepath, $record->filename)->out(),
+                'id'=>$record->itemid,
+                'file'=>$record->filename);
+        }
     }
 
     /**
