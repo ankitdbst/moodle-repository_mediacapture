@@ -1,5 +1,8 @@
 <?php
 
+$filedata = $_FILES['repo_upload_audio']['tmp_name'];
+print $filedata;
+/*
 // include config file
 require_once(dirname(dirname(__FILE__)).'/../config.php');
 
@@ -21,6 +24,7 @@ if (isset($ret['existingfile'])) {
 } else {
     print 'File has been uploaded succesfully!' . $ret['url'];
 }
+*/
 
 ?>
 

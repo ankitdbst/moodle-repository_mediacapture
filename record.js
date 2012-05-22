@@ -7,28 +7,13 @@
 function submitAudio() {
     // locate the filename
     var filename;
-    if (!(filename = document.getElementById('filename')) || !(filename = filename.value)) {
+    if (!(filename = document.getElementById('audio_filename')) || !(filename = filename.value)) {
         filename = new Date().toGMTString().replace('+', ' ');
     }
-    // form post url
-    var postURL = document.getElementById('posturl').value;
-    // submit the sound file
-    var ret = uploadFile('audio_recorder', decodeURIComponent(postURL),
-        'repo_upload_audio', 'cookie=nanogong', filename);
-    if(!ret) {
-        alert(mediacapture['unexpectedevent'] + ' (upload)');
-        return;
-    }
-    alert(ret);
-}
 
-/**
- * Submits the recorded sound using function arguments
- */
-function uploadFile(applet_id, postURL, inputname, cookie, filename) {
     // find nanogong applet
     var recorder;
-    if (!(recorder = document.getElementById(applet_id)) || !(recorder.sendGongRequest)) {
+    if (!(recorder = document.getElementById('audio_recorder')) || !(recorder.sendGongRequest)) {
         alert(mediacapture['appletnotfound']);
         return;
     }
@@ -37,16 +22,31 @@ function uploadFile(applet_id, postURL, inputname, cookie, filename) {
     var duration = parseInt(recorder.sendGongRequest("GetMediaDuration", "audio")) || 0
     if (duration <= 0) {
         alert(mediacapture['norecordingfound']);
-        return
-    }
-
-    if (!filename) {
-        alert(mediacapture['nonamefound']);
         return;
     }
 
-    // upload the sound file to the server
-    console.log('PostToForm', postURL, inputname, cookie, filename);
-    var msg = recorder.sendGongRequest('PostToForm', postURL, inputname, cookie, filename);
-    return msg;
+    // form post url
+    var postURL = document.getElementById('posturl').value;
+    // submit the sound file
+    var filedata = recorder.sendGongRequest("PostToForm", decodeURIComponent(postURL), "repo_upload_audio", "cookie=nanogong", "myfile");
+    uploadFile(filename, filedata);
+}
+
+/**
+ * Uploads the audio file with the given filename
+ */
+function uploadFile(filename, filedata) {
+    f = document.getElementById('audio_filename');
+    g = document.getElementById('audio_loc');
+
+    f.value = filename;
+    g.value = filedata;
+
+    while(f.tagName != 'FORM') {
+        f = f.parentNode;
+    }
+
+    f.repo_upload_file.type = 'hidden';
+    f.repo_upload_file.value = 'bogus.mp3';
+    f.nextSibling.getElementsByTagName('button')[0].click();
 }

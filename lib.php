@@ -112,7 +112,6 @@ class repository_mediacapture extends repository {
         $recorder = "";
         $url = new moodle_url($CFG->wwwroot.'/repository/mediacapture/nanogong.jar');
         $posturl = urlencode(new moodle_url($CFG->wwwroot . '/repository/mediacapture/record.php'));
-
         $sampling_rates = array(
             array(8000, 11025, 22050, 44100),
             array(8000, 16000, 32000, 44100)
@@ -132,20 +131,19 @@ class repository_mediacapture extends repository {
         $recorder = '
             <div style="position: absolute; top:0;left:0;right:0;bottom:0; background-color:#f2f2f2;">
                 <div class="appletcontainer" id="appletcontainer" style="margin:20% auto; text-align:center;">
-                    <form>
-                        <input type="hidden" id="repo_id" name="repo_id" value="'. $this->id .'" />
-                        <input type="hidden" id="posturl" name="posturl" value="'.$posturl.'" />
-                        <applet id="audio_recorder" name="audio_recorder" code="gong.NanoGong" width="120" height="40" archive="'. $url .'">
-                            <param name="AudioFormat" value="'. $audio_format .'" />
-                            <param name="ShowSaveButton" value="false" />
-                            <param name="ShowTime" value="true" />
-                            <param name="SamplingRate" value="'. $sampling_rate .'" />
-                            <p>'.$javanotfound.'</p>
-                        </applet><br /><br />
-                        <label for="filename">File Name</label>
-                        <input type="text" id="filename" name="filename" />
-                        <input type="submit" onclick="submitAudio(); return false;" value="'. $save .'" />
-                    </form>
+                    <input type="hidden" id="repo_id" name="repo_id" value="'. $this->id .'" />
+                    <input type="hidden" id="posturl" name="posturl" value="'. $posturl .'" />
+                    <input type="hidden" id="audio_loc" name="audio_loc" />
+                    <applet id="audio_recorder" name="audio_recorder" code="gong.NanoGong" width="120" height="40" archive="'. $url .'">
+                        <param name="AudioFormat" value="'. $audio_format .'" />
+                        <param name="ShowSaveButton" value="false" />
+                        <param name="ShowTime" value="true" />
+                        <param name="SamplingRate" value="'. $sampling_rate .'" />
+                        <p>'.$javanotfound.'</p>
+                    </applet><br /><br />
+                    <label for="audio_filename">File Name</label>
+                    <input type="text" id="audio_filename" name="audio_filename" />
+                    <input type="submit" onclick="submitAudio(); return false;" value="'. $save .'" />
                 </div>
             </div>
             ';
@@ -154,7 +152,11 @@ class repository_mediacapture extends repository {
         return $ret;
     }
 
-    public function upload($filename, $filedata) {
+    /**
+     * Process uploaded file
+     * @return array|bool
+     */
+    public function upload($saveas_filename) {
         global $USER, $CFG;
 
         $record = new stdClass();
@@ -166,6 +168,8 @@ class repository_mediacapture extends repository {
         $record->author   = optional_param('author', '', PARAM_TEXT);
 
         $context = get_context_instance(CONTEXT_USER, $USER->id);
+        $filename = required_param('audio_filename', PARAM_FILE);
+        $filedata = required_param('audio_loc', PARAM_PATH);
 
         $fs = get_file_storage();
         $sm = get_string_manager();
@@ -188,7 +192,7 @@ class repository_mediacapture extends repository {
             $existingfilename = $record->filename;
             $unused_filename = repository::get_unused_filename($record->itemid, $record->filepath, $record->filename);
             $record->filename = $unused_filename;
-            $stored_file = $fs->create_file_from_string($record, $filedata);
+            $stored_file = $fs->create_file_from_pathname($record, $filedata);
             $event = array();
             $event['event'] = 'fileexists';
             $event['newfile'] = new stdClass;
@@ -202,7 +206,8 @@ class repository_mediacapture extends repository {
             $event['existingfile']->url      = moodle_url::make_draftfile_url($record->itemid, $record->filepath, $existingfilename)->out();;
             return $event;
         } else {
-            $stored_file = $fs->create_file_from_string($record, $filedata);
+            $stored_file = $fs->create_file_from_pathname($record, $filedata);
+
             return array(
                 'url'=>moodle_url::make_draftfile_url($record->itemid, $record->filepath, $record->filename)->out(),
                 'id'=>$record->itemid,
