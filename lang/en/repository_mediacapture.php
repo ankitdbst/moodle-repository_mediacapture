@@ -38,6 +38,7 @@ $string['appletnotfound'] = 'The applet was not detected. Please make sure that 
 $string['norecordingfound'] = 'There is no sound recorded. Please use the red disc button to start recording. Use the black square button to stop recording.';
 $string['nonamefound'] = 'Please provide a name for your recording.';
 $string['javanotfound'] = 'Your browser does not have Java support. Consider installing the latest version of <a href="http://www.java.com/en/download/">Java Runtime Engine</a>';
+$string['filenotfound'] = 'The file could not be saved! Please try again';
 
 $string['save'] = 'Save';
 $string['name'] = 'Name';

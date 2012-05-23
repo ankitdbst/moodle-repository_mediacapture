@@ -44,11 +44,13 @@ class repository_mediacapture extends repository {
         $appletnotfound = get_string('appletnotfound', 'repository_mediacapture');
         $norecordingfound = get_string('norecordingfound', 'repository_mediacapture');
         $nonamefound = get_string('nonamefound', 'repository_mediacapture');
+        $filenotsaved = get_string('filenotsaved', 'repository_mediacapture');
         $PAGE->requires->data_for_js('mediacapture', array(
             'unexpectedevent' => $unexpectedevent,
             'appletnotfound' => $appletnotfound,
             'norecordingfound' => $norecordingfound,
-            'nonamefound' => $nonamefound
+            'nonamefound' => $nonamefound,
+            'filenotsaved' => $filenotsaved
         ));
     }
 
@@ -143,7 +145,7 @@ class repository_mediacapture extends repository {
                     </applet><br /><br />
                     <label for="audio_filename">File Name</label>
                     <input type="text" id="audio_filename" name="audio_filename" />
-                    <input type="submit" onclick="submitAudio(); return false;" value="'. $save .'" />
+                    <input type="button" onclick="submitAudio()" value="'. $save .'" />
                 </div>
             </div>
             ';
@@ -156,7 +158,7 @@ class repository_mediacapture extends repository {
      * Process uploaded file
      * @return array|bool
      */
-    public function upload($saveas_filename) {
+    public function upload($saveas_filename, $maxbytes) {
         global $USER, $CFG;
 
         $record = new stdClass();
@@ -169,7 +171,7 @@ class repository_mediacapture extends repository {
 
         $context = get_context_instance(CONTEXT_USER, $USER->id);
         $filename = required_param('audio_filename', PARAM_FILE);
-        $filedata = required_param('audio_loc', PARAM_PATH);
+        $fileloc = required_param('audio_loc', PARAM_PATH);
 
         $fs = get_file_storage();
         $sm = get_string_manager();
@@ -192,7 +194,7 @@ class repository_mediacapture extends repository {
             $existingfilename = $record->filename;
             $unused_filename = repository::get_unused_filename($record->itemid, $record->filepath, $record->filename);
             $record->filename = $unused_filename;
-            $stored_file = $fs->create_file_from_pathname($record, $filedata);
+            $stored_file = $fs->create_file_from_pathname($record, $fileloc);
             $event = array();
             $event['event'] = 'fileexists';
             $event['newfile'] = new stdClass;
@@ -206,8 +208,9 @@ class repository_mediacapture extends repository {
             $event['existingfile']->url      = moodle_url::make_draftfile_url($record->itemid, $record->filepath, $existingfilename)->out();;
             return $event;
         } else {
-            $stored_file = $fs->create_file_from_pathname($record, $filedata);
-
+            $stored_file = $fs->create_file_from_pathname($record, $fileloc);
+            // removes the temporary file from the 'temp' dataroot
+            unlink($fileloc);
             return array(
                 'url'=>moodle_url::make_draftfile_url($record->itemid, $record->filepath, $record->filename)->out(),
                 'id'=>$record->itemid,
