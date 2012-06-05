@@ -1,7 +1,6 @@
 /**
  * @file Javascript file to handle the recording using nanogong applet
  */
-
 /**
  * Submits the recorded sound using default form elements
  */
@@ -28,7 +27,6 @@ function submitAudio() {
 
     // form post url
     var postURL = document.getElementById('posturl').value;
-    alert(postURL);
     // submit the sound file
     var fileloc = recorder.sendGongRequest("PostToForm", decodeURIComponent(postURL), "repo_upload_audio", "cookie=nanogong", "myfile");
 
@@ -38,8 +36,26 @@ function submitAudio() {
         return false;
     }
 
-    audio_loc = document.getElementById('audio_loc');
-    audio_loc.value = fileloc;
+    uploadFile(filename, fileloc);
 
     return true;
+}
+
+/**
+ * Triggers the 'upload form' submit with the function parameters
+ */
+function uploadFile(filename, fileloc) {
+    f = document.getElementById('audio_filename');
+    g = document.getElementById('audio_loc');
+
+    f.value = filename;
+    g.value = fileloc;
+
+    while(f.tagName != 'FORM') {
+        f = f.parentNode;
+    }
+
+    f.repo_upload_file.type = 'hidden';
+    f.repo_upload_file.value = 'temp.wav';
+    f.nextElementSibling.getElementsByTagName('button')[0].click();
 }

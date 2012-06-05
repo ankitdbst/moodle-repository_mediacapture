@@ -33,9 +33,25 @@ class repository_mediacapture extends repository {
      * @param array $options
      */
     public function __construct($repositoryid, $context = SITEID, $options = array()) {
-        global $CFG;
+        global $PAGE, $CFG, $action, $itemid;
         parent::__construct($repositoryid, $context, $options);
-        $this->include_js();
+
+        // include record js file
+        $PAGE->requires->js( new moodle_url($CFG->wwwroot . '/repository/mediacapture/record.js') );
+
+        // strings for displaying js errors
+        $unexpectedevent = get_string('unexpectedevent', 'repository_mediacapture');
+        $appletnotfound = get_string('appletnotfound', 'repository_mediacapture');
+        $norecordingfound = get_string('norecordingfound', 'repository_mediacapture');
+        $nonamefound = get_string('nonamefound', 'repository_mediacapture');
+        $filenotsaved = get_string('filenotsaved', 'repository_mediacapture');
+        $PAGE->requires->data_for_js('mediacapture', array(
+            'unexpectedevent' => $unexpectedevent,
+            'appletnotfound' => $appletnotfound,
+            'norecordingfound' => $norecordingfound,
+            'nonamefound' => $nonamefound,
+            'filenotsaved' => $filenotsaved
+        ));
     }
 
     public static function get_type_option_names() {
@@ -67,28 +83,6 @@ class repository_mediacapture extends repository {
         $mform->addElement('select', 'sampling_rate', get_string('sampling_rate', 'repository_mediacapture'), $sampling_rate_options);
     }
 
-    /**
-     * Method to include js and define lang strings
-     */
-    public function include_js() {
-        global $PAGE, $CFG;
-        // include record js file
-        $PAGE->requires->js(new moodle_url($CFG->wwwroot . '/repository/mediacapture/record.js'));
-        // strings for displaying js errors
-        $unexpectedevent = get_string('unexpectedevent', 'repository_mediacapture');
-        $appletnotfound = get_string('appletnotfound', 'repository_mediacapture');
-        $norecordingfound = get_string('norecordingfound', 'repository_mediacapture');
-        $nonamefound = get_string('nonamefound', 'repository_mediacapture');
-        $filenotsaved = get_string('filenotsaved', 'repository_mediacapture');
-        $PAGE->requires->data_for_js('mediacapture', array(
-            'unexpectedevent' => $unexpectedevent,
-            'appletnotfound' => $appletnotfound,
-            'norecordingfound' => $norecordingfound,
-            'nonamefound' => $nonamefound,
-            'filenotsaved' => $filenotsaved
-        ));
-    }
-
     public function check_login() {
         // Needs to return false so that the "login" form is displayed (print_login())
         return false;
@@ -117,6 +111,7 @@ class repository_mediacapture extends repository {
     public function print_login() {
         global $CFG, $PAGE;
 
+        $recorder = "";
         $url = new moodle_url($CFG->wwwroot.'/repository/mediacapture/nanogong.jar');
         $posturl = urlencode(new moodle_url($CFG->wwwroot . '/repository/mediacapture/record.php'));
         $sampling_rates = array(
@@ -136,55 +131,38 @@ class repository_mediacapture extends repository {
         $save = get_string('save', 'repository_mediacapture');
 
         $recorder = '
-                    <applet id="audio_recorder" name="audio_recorder" code="gong.NanoGong" width="120" height="40" archive="'. $url .'">
+                <style>
+                    .mdl-left, .fp-saveas, .fp-setauthor, .fp-setlicense, .fp-upload-btn {
+                        visibility:hidden;
+                    }
+                    .appletcontainer {
+                        position:absolute;
+                        left:50%;
+                        overflow: hidden;
+                        text-align:center;
+                    }
+                    #audio_filename {
+                        width:140px;
+                    }
+                </style>
+                <div class="appletcontainer" id="appletcontainer">
+                    <input type="hidden" id="repo_id" name="repo_id" value="'. $this->id .'" />
+                    <input type="hidden" id="posturl" name="posturl" value="'. $posturl .'" />
+                    <input type="hidden" id="audio_loc" name="audio_loc" />
+                    <applet id="audio_recorder" name="audio_recorder" code="gong.NanoGong" width="160" height="40" archive="'. $url .'">
                         <param name="AudioFormat" value="'. $audio_format .'" />
                         <param name="ShowSaveButton" value="false" />
                         <param name="ShowTime" value="true" />
                         <param name="SamplingRate" value="'. $sampling_rate .'" />
                         <p>'.$javanotfound.'</p>
-                    </applet>
+                    </applet><br /><br />
+                    <input type="text" id="audio_filename" name="audio_filename" onfocus="this.select()" value="untitled"/><br /><br />
+                    <input type="button" onclick="submitAudio()" value="'. $save .'" />
+                </div>
             ';
-        if ($this->options['ajax']) {
-            $rec = new stdClass();
-            $rec->label = $recorder;
-            $rec->id   = 'recorder';
-            $rec->type = 'hidden';
-            $rec->name = 'recorder';
-
-            $audio_filename = new stdClass();
-            $audio_filename->label = get_string('filename', 'repository_mediacapture');
-            $audio_filename->id = 'audio_filename';
-            $audio_filename->type = 'text';
-            $audio_filename->name = 'audio_filename';
-
-            $audio_loc = new stdClass();
-            $audio_loc->id = 'audio_loc';
-            $audio_loc->type = 'hidden';
-            $audio_loc->name = 'audio_loc';
-
-            $posturl = new stdClass();
-            $posturl->id = 'posturl';
-            $posturl->type = 'hidden';
-            $posturl->name = 'posturl';
-            $posturl->value = 'http://localhost/moodle-23/repository/mediacapture/record.php';
-
-            $action = new stdClass();
-            $action->id = 'action';
-            $action->type = 'hidden';
-            $action->name = 'action';
-            $action->value = 'upload';
-
-            $ret['login'] = array($rec, $audio_filename, $audio_loc, $posturl, $action);
-            $ret['login_btn_label'] = get_string('save', 'repository_mediacapture');
-            $ret['login_btn_click'] = 'submitAudio';
-            $ret['allowcaching'] = false; // indicates that login form can be cached in filepicker.js
-
-            return $ret;
-        } else {
-            // TODO : non-javascript mode
-            echo <<<EOD
-EOD;
-        }
+        $ret = array();
+        $ret['upload'] = array('label'=>$recorder, 'id'=>'repo-form');
+        return $ret;
     }
 
     /**
@@ -234,6 +212,7 @@ EOD;
             $event['newfile']->filepath = $record->filepath;
             $event['newfile']->filename = $unused_filename;
             $event['newfile']->url = moodle_url::make_draftfile_url($record->itemid, $record->filepath, $unused_filename)->out();
+
             $event['existingfile'] = new stdClass;
             $event['existingfile']->filepath = $record->filepath;
             $event['existingfile']->filename = $existingfilename;
@@ -243,11 +222,10 @@ EOD;
             $stored_file = $fs->create_file_from_pathname($record, $fileloc);
             // removes the temporary file from the 'temp' dataroot
             unlink($fileloc);
-            $result = array(
-                'url'=>moodle_url::make_draftfile_url($record->itemid, $record->filepath, $record->filename)->out(false),
+            return array(
+                'url'=>moodle_url::make_draftfile_url($record->itemid, $record->filepath, $record->filename)->out(),
                 'id'=>$record->itemid,
                 'file'=>$record->filename);
-            return $result;
         }
     }
 
