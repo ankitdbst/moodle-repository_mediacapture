@@ -43,3 +43,4 @@ $string['filenotfound'] = 'The file could not be saved! Please try again';
 $string['save'] = 'Save';
 $string['name'] = 'Name';
 $string['account'] = 'Account';
+$string['filename'] = 'Filename';

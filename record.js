@@ -1,6 +1,7 @@
 /**
  * @file Javascript file to handle the recording using nanogong applet
  */
+
 /**
  * Submits the recorded sound using default form elements
  */
@@ -36,26 +37,8 @@ function submitAudio() {
         return false;
     }
 
-    uploadFile(filename, fileloc);
+    audio_loc = document.getElementById('audio_loc');
+    audio_loc.value = fileloc;
 
     return true;
-}
-
-/**
- * Triggers the 'upload form' submit with the function parameters
- */
-function uploadFile(filename, fileloc) {
-    f = document.getElementById('audio_filename');
-    g = document.getElementById('audio_loc');
-
-    f.value = filename;
-    g.value = fileloc;
-
-    while(f.tagName != 'FORM') {
-        f = f.parentNode;
-    }
-
-    f.repo_upload_file.type = 'hidden';
-    f.repo_upload_file.value = 'temp.wav';
-    f.nextSibling.getElementsByTagName('button')[0].click();
 }
