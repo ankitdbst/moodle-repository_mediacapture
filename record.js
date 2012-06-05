@@ -28,6 +28,7 @@ function submitAudio() {
 
     // form post url
     var postURL = document.getElementById('posturl').value;
+    alert(postURL);
     // submit the sound file
     var fileloc = recorder.sendGongRequest("PostToForm", decodeURIComponent(postURL), "repo_upload_audio", "cookie=nanogong", "myfile");
 
