@@ -1,6 +1,8 @@
 Introduction
 ------------
 This is a Audio/Video recording plugin for recording audio/video streams directly using the filepicker.
+The audio recorder uses Nanogong applet to record and playback the recorded stream.
+More about Nanogong project : http://nanogong.ust.hk/
 
 Requirement
 -----------
@@ -15,8 +17,7 @@ Installation
 
 Copyright
 ---------
-Copyright 2002-2011 the Gong Project
-Copyright 2012 Ankit Gupta
+2012 Ankit Gupta
 
 License
 -------
