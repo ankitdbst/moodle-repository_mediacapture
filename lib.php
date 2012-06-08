@@ -118,7 +118,7 @@ class repository_mediacapture extends repository {
         $author = optional_param('author', '', PARAM_TEXT);
 
         $filename = required_param('audio_filename', PARAM_FILE);
-        $fileloc = required_param('audio_loc', PARAM_PATH);
+        $fileloc = urldecode(required_param('audio_loc', PARAM_PATH));
 
         return $this->process_upload($saveas_filename, $maxbytes, $types, $savepath, $itemid, $license, $author, $filename, $fileloc);
     }
@@ -138,7 +138,7 @@ class repository_mediacapture extends repository {
      */
     public function process_upload($saveas_filename, $maxbytes, $types = '*', $savepath = '/', $itemid = 0, $license = null, $author = '', $filename, $fileloc) {
         global $USER, $CFG;
-
+        //die($filename . ' ' . urldecode($fileloc));
         $record = new stdClass();
         $record->filearea = 'draft';
         $record->component = 'user';

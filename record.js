@@ -29,13 +29,13 @@ function submitAudio() {
         return false;
     }
 
-    fileloc.value = recorder.sendGongRequest("PostToForm", decodeURIComponent(posturl.value),
-                                        "repo_upload_audio", "cookie=nanogong", "myfile");
+    fileloc.value = encodeURIComponent(recorder.sendGongRequest("PostToForm", decodeURIComponent(posturl.value), "repo_upload_audio", "cookie=nanogong", "myfile"));
+    
     if (!fileloc) {
         alert(mediacapture['filenotsaved']);
         return false;
     }
-
+    
     simulateClick(recorder);
 
     return true;
