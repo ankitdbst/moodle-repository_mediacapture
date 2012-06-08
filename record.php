@@ -26,25 +26,11 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-// include config file
-require_once(dirname(dirname(__FILE__)).'/../config.php');
+require_once(dirname(__FILE__) . '/mediacapture.php');
 
-global $CFG;
+$mc = new mediacapture();
+$elname = 'repo_upload_audio';
 
-// temporary location to move the recorded audios
-$dir = $CFG->dataroot.'/temp';
-
-// builds a unique temp filename for the media file
-$i = 0;
-do {
-    if ($i > 0)
-        sleep(1);
-    $filename = $dir . '/' . time() . '.wav';
-    $i++;
-} while ($i < 3 && file_exists($filename)); // try 3 times for unique filename
-
-if (!move_uploaded_file($_FILES['repo_upload_audio']['tmp_name'], $filename)) {
-    print '';
-} else {
-    print $filename;
+if (isset($_FILES[$elname]['tmp_name'])) {
+    print $mc->save_temp_file($_FILES[$elname]['tmp_name']);
 }
