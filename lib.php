@@ -85,7 +85,7 @@ class repository_mediacapture extends repository {
      */
     private function include_js() {
         global $PAGE, $CFG;
-        $PAGE->requires->js( new moodle_url($CFG->wwwroot . '/repository/mediacapture/record.js') );
+        $PAGE->requires->js(new moodle_url($CFG->wwwroot . '/repository/mediacapture/assets/audio/record.js'));
         $client = new mediacapture();
         $string_js = $client->get_string_js();
         $PAGE->requires->data_for_js('mediacapture', $string_js);

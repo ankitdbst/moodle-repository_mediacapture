@@ -87,8 +87,8 @@ class mediacapture {
      */
     public function print_audio_recorder() {
         global $CFG, $PAGE;
-        $url = new moodle_url($CFG->wwwroot.'/repository/mediacapture/nanogong.jar');
-        $posturl = urlencode(new moodle_url($CFG->wwwroot . '/repository/mediacapture/record.php'));
+        $url = new moodle_url($CFG->wwwroot.'/repository/mediacapture/assets/audio/applet/nanogong.jar');
+        $posturl = urlencode(new moodle_url($CFG->wwwroot . '/repository/mediacapture/assets/audio/record.php'));
 
         // Get recorder settings from the config form
         $sampling_rates = array(
@@ -123,6 +123,13 @@ class mediacapture {
                         <input type="button" onclick="submitAudio()" value="'. $save .'" />
                     </div>';
         return $recorder;
+    }
+       
+    /**
+     * Prints the video recorder applet in the filepicker
+     */
+    public function print_video_recorder() {
+        
     }
 
     /**

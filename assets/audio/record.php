@@ -26,7 +26,7 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-require_once(dirname(__FILE__) . '/mediacapture.php');
+require_once(dirname(dirname(__FILE__)) . '/../mediacapture.php');
 
 $mc = new mediacapture();
 $elname = 'repo_upload_audio';
