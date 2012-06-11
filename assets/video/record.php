@@ -29,9 +29,8 @@
 require_once(dirname(dirname(__FILE__)) . '/../mediacapture.php');
 
 $mc = new mediacapture();
-$elname = 'repo_upload_audio';
+$elname = 'USERFILE';
 
 if (isset($_FILES[$elname]['tmp_name'])) {
-    $filename = $mc->get_unused_filename('.wav');
-    print $mc->save_temp_file($_FILES[$elname]['tmp_name'], $filename);
+    print $mc->save_temp_file($_FILES[$elname]['tmp_name'], $_FILES[$elname]['name']);
 }

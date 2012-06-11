@@ -37,10 +37,10 @@ class mediacapture {
     /**
      * Saves the temp file in dataroot->temp dir
      */
-    public function save_temp_file($tmp_file) {
+    public function save_temp_file($tmp_file, $filename) {
         global $CFG;
         $dir = $CFG->dataroot.'/temp';
-        $filename = $this->get_unused_filename($dir);
+        $filename = $dir . '/' . $filename;
 
         if (!move_uploaded_file($tmp_file, $filename)) {
             return '';
@@ -87,8 +87,9 @@ class mediacapture {
      */
     public function print_audio_recorder() {
         global $CFG, $PAGE;
+        
         $url = new moodle_url($CFG->wwwroot.'/repository/mediacapture/assets/audio/applet/nanogong.jar');
-        $posturl = urlencode(new moodle_url($CFG->wwwroot . '/repository/mediacapture/assets/audio/record.php'));
+        $post_url = urlencode(new moodle_url($CFG->wwwroot . '/repository/mediacapture/assets/audio/record.php'));
 
         // Get recorder settings from the config form
         $sampling_rates = array(
@@ -109,19 +110,20 @@ class mediacapture {
 
         // set the layout elements for the recorder applet
         $recorder = '<style>.mdl-left,.fp-saveas,.fp-setauthor,.fp-setlicense,.fp-upload-btn { visibility:hidden; }  .appletcontainer { position:absolute; left:47%; overflow:hidden; text-align:center; }  #audio_filename { width:140px; }</style>';
-        $recorder .= '<div class="appletcontainer" id="appletcontainer">
-                        <input type="hidden" id="posturl" name="posturl" value="' . $posturl . '" />
-                        <input type="hidden" id="audio_loc" name="audio_loc" />
-                        <applet id="audio_recorder" name="audio_recorder" code="gong.NanoGong" width="160" height="40" archive="' . $url . '">
-                            <param name="AudioFormat" value="' . $audio_format .'" />
-                            <param name="ShowSaveButton" value="false" />
-                            <param name="ShowTime" value="true" />
-                            <param name="SamplingRate" value="' . $sampling_rate . '" />
-                            <p>' . $javanotfound . '</p>
-                        </applet><br /><br />
-                        <input type="text" id="audio_filename" name="audio_filename" onfocus="this.select()" value="untitled"/><br /><br />
-                        <input type="button" onclick="submitAudio()" value="'. $save .'" />
-                    </div>';
+        $recorder .= '
+            <div class="appletcontainer" id="appletcontainer">
+                <input type="hidden" id="posturl" name="posturl" value="' . $post_url . '" />
+                <input type="hidden" id="audio_loc" name="audio_loc" />
+                <applet id="audio_recorder" name="audio_recorder" code="gong.NanoGong" width="160" height="40" archive="' . $url . '">
+                    <param name="AudioFormat" value="' . $audio_format .'" />
+                    <param name="ShowSaveButton" value="false" />
+                    <param name="ShowTime" value="true" />
+                    <param name="SamplingRate" value="' . $sampling_rate . '" />
+                    <p>' . $javanotfound . '</p>
+                </applet><br /><br />
+                <input type="text" id="audio_filename" name="audio_filename" onfocus="this.select()" value="untitled"/><br /><br />
+                <input type="button" onclick="submitAudio()" value="'. $save .'" />
+            </div>';
         return $recorder;
     }
        
@@ -129,7 +131,60 @@ class mediacapture {
      * Prints the video recorder applet in the filepicker
      */
     public function print_video_recorder() {
+        global $CFG, $PAGE;
         
+        $url = new moodle_url($CFG->wwwroot.'/repository/mediacapture/assets/video/applet/VideoApplet.jar');
+        $post_url = new moodle_url($CFG->wwwroot .'/repository/mediacapture/assets/video/record.php');
+        $img_dir = new moodle_url($CFG->wwwroot.'/repository/mediacapture/assets/video/img');
+        $tmp_loc = urlencode($CFG->dataroot. '/temp');
+        $save = get_string('save', 'repository_mediacapture');
+        
+        // set the layout elements for the recorder applet
+        $recorder = '<style>.mdl-left,.fp-saveas,.fp-setauthor,.fp-setlicense,.fp-upload-btn { visibility:hidden; }  .appletcontainer { position:absolute; top:17%; left:40%; overflow:hidden; text-align:center; } #video_filename { width:240px; }
+        #toolbar img { float:left; margin:10px 10px 0 0; height:15px; border:1px solid #acacac; } #Timer { width:140px; margin:10px 0 0 0; }
+        </style>';
+        $recorder .= '
+            <div class="appletcontainer" id="appletcontainer">
+                <applet  
+                  ID       = "applet"
+                  ARCHIVE  = "'.$url.'"
+                  codebase = "'.dirname($url).'"
+                  code     = "com.vimas.videoapplet.VimasVideoApplet.class"
+                  name     = "VimasVideoApplet"
+                  width    = "260"
+                  height   = "240"
+                  hspace   = "0"
+                  vspace   = "0"
+                  align    = "middle"
+                 MAYSCRIPT>
+                    <param name = "left"                value = "100">
+                    <param name = "top"                 value = "200">
+                    <param name = "Registration"        value = "demo">
+                    <param name = "LocalizationFile"    value = "localization.xml">
+                    <param name = "ServerScript"        value = "'.$post_url.'">
+                    <param name = "TimeLimit"           value = "30">
+                    <param name = "BlockSize"           value = "10240">
+                    <param name = "UserServerFolder"    value = "mp4">
+                    <param name = "LowQuality"          value = "96,24">
+                    <param name = "NormalQuality"       value = "160,32">
+                    <param name = "HighQuality"         value = "256,48">
+                    <param name = "FrameSize"           value = "large">
+                    <param name = "interface"           value = "compact">
+                    <param name = "showMenu"            value = "true">
+                </applet>
+                <div id="toolbar">
+                    <img src="'.$img_dir . '/rec.gif" onclick="record_rp()"/>
+                    <img src="'.$img_dir . '/play.gif" onclick="playback_rp()"/>
+                    <img src="'.$img_dir . '/pause.gif" onclick="pause_rp()"/>
+                    <img src="'.$img_dir . '/stop.gif" onclick="stop_rp()"/>
+                    <input type="text" name="Timer" id="Timer" disabled/>
+                </div><br />
+                <input type="hidden" id="Status" name="Status" value="" />
+                <input type="hidden" id="video_loc" name="video_loc" value="'.$tmp_loc.'"/>
+                <input type="text" id="video_filename" name="video_filename" onfocus="this.select()" value="*.mp4"/><br /><br />
+                <input type="button" onclick="upload_rp();" value="'. $save .'" />
+            </div>';
+        return $recorder;
     }
 
     /**
@@ -153,14 +208,15 @@ class mediacapture {
     /**
      * Creates a unique temp file name for the recording
      */
-    private function get_unused_filename($dir) {
+    public function get_unused_filename($type) {
+        $dir = $CFG->dataroot.'/temp';
         $i = 0;
         do {
             if ($i > 0)
                 sleep(1);
-            $filename = $dir . '/' . time() . '.wav';
+            $filename = time() . $type;
             $i++;
-        } while ($i < 3 && file_exists($filename)); // try 3 times for unique filename
+        } while ($i < 3 && file_exists($dir . '/' . $filename)); // try 3 times for unique filename
 
         return $filename;
     }

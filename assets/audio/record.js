@@ -1,5 +1,5 @@
 /**
- * @file Javascript file to handle the audio/video recording
+ * @file Javascript file to handle the audio recording
  */
 
 /**
