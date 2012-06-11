@@ -85,8 +85,7 @@ class repository_mediacapture extends repository {
      */
     private function include_js() {
         global $PAGE, $CFG;
-        //$PAGE->requires->js(new moodle_url($CFG->wwwroot . '/repository/mediacapture/assets/audio/record.js'));
-        $PAGE->requires->js(new moodle_url($CFG->wwwroot . '/repository/mediacapture/assets/video/record.js'));
+        $PAGE->requires->js(new moodle_url($CFG->wwwroot . '/repository/mediacapture/assets/recorder.js'));
         $client = new mediacapture();
         $string_js = $client->get_string_js();
         $PAGE->requires->data_for_js('mediacapture', $string_js);
@@ -119,13 +118,9 @@ class repository_mediacapture extends repository {
         $license = optional_param('license', $CFG->sitedefaultlicense, PARAM_TEXT);
         $author = optional_param('author', '', PARAM_TEXT);
 		
-		/*
-        $filename = required_param('audio_filename', PARAM_TEXT);
-        $fileloc = urldecode(required_param('audio_loc', PARAM_PATH));
-		*/
-		$filename = required_param('video_filename', PARAM_TEXT);
-		$fileloc = urldecode(required_param('video_loc', PARAM_PATH));
-        
+		$filename = required_param('filename', PARAM_TEXT);
+        $fileloc = urldecode(required_param('fileloc', PARAM_PATH));
+		        
         return $this->process_upload($saveas_filename, $maxbytes, $types, $savepath, $itemid, $license, $author, $filename, $fileloc);
     }
 
@@ -144,7 +139,6 @@ class repository_mediacapture extends repository {
      */
     public function process_upload($saveas_filename, $maxbytes, $types = '*', $savepath = '/', $itemid = 0, $license = null, $author = '', $filename, $fileloc) {
         global $USER, $CFG;
-        //die($filename . ' ' . urldecode($fileloc));
         $record = new stdClass();
         $record->filearea = 'draft';
         $record->component = 'user';
