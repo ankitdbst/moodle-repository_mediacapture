@@ -4,6 +4,9 @@ This is a Audio/Video recording plugin for recording audio/video streams directl
 The audio recorder uses Nanogong applet to record and playback the recorded stream.
 More about Nanogong project : http://nanogong.ust.hk/
 
+The video recorder uses the Vimas applet to record and playback the video stream.
+More about Vimas : http://www.vimas.com/video.php
+
 Requirement
 -----------
  Moodle 2.3 onward
@@ -13,6 +16,9 @@ Installation
 - Copy to MOODLEROOT/repository/
 - Trigger moodle upgrade script
 - Enable the plugin from Site administration -> Plugins -> Repositories -> Manage Repositories
+- Download patch add_attachment_label.txt from http://tracker.moodle.org/browse/CONTRIB-3649
+- Apply patch to filepicker.js
+- Purge Cache : Site administration -> Development -> Purge all Caches
 
 Copyright
 ---------
