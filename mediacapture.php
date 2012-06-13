@@ -50,6 +50,13 @@ class mediacapture {
     }
 
     /**
+     * Get details of the client 
+     */
+    public function get_client_details() {
+        // fetch user-agent string and parse values        
+    }
+
+    /**
      * Type option names for the audio recorder
      */
     public function get_audio_option_names() {
@@ -81,6 +88,21 @@ class mediacapture {
         $mform->addElement('select', 'audio_format', get_string('audio_format', 'repository_mediacapture'), $audio_format_options);
         $mform->addElement('select', 'sampling_rate', get_string('sampling_rate', 'repository_mediacapture'), $sampling_rate_options);
     }
+    
+    /**
+     * Initialize the plugin and load the start screen
+     */    
+    public function init() {
+        global $PAGE, $CFG;
+        $ajax_uri = urlencode(new moodle_url($CFG->wwwroot.'/repository/mediacapture/lib_ajax.php'));
+        $html = '
+            <input type="hidden" id="ajax_uri" name="ajax_uri" value="'.$ajax_uri.'" />
+            <div class="appletcontainer" id="appletcontainer">
+                <input type="button" onclick="return load_recorder(0)" value="Start Audio" />
+                <input type="button" onclick="return load_recorder(1)" value="Start Video" />
+            </div>';
+        return $html;
+    }
 
     /**
      * Prints the audio recorder applet in the filepicker
@@ -109,9 +131,7 @@ class mediacapture {
         $save = get_string('save', 'repository_mediacapture');
 
         // set the layout elements for the recorder applet
-        $recorder = '<style>.mdl-left,.fp-saveas,.fp-setauthor,.fp-setlicense,.fp-upload-btn { visibility:hidden; }  .appletcontainer { position:absolute; left:47%; overflow:hidden; text-align:center; }  #filename { width:140px; }</style>';
-        $recorder .= '
-            <div class="appletcontainer" id="appletcontainer">
+        $recorder = '            
                 <applet id="audio_recorder" name="audio_recorder" code="gong.NanoGong" width="160" height="40" archive="' . $url . '">
                     <param name="AudioFormat" value="' . $audio_format .'" />
                     <param name="ShowSaveButton" value="false" />
@@ -121,9 +141,9 @@ class mediacapture {
                 </applet><br /><br />
                 <input type="hidden" id="posturl" name="posturl" value="' . $post_url . '" />
                 <input type="hidden" id="fileloc" name="fileloc" />
-                <input type="text" id="filename" name="filename" onfocus="this.select()" value="*.wav"/><br /><br />
+                <input type="text" class="audio_filename" id="filename" name="filename" onfocus="this.select()" value="*.wav"/><br /><br />
                 <input type="button" onclick="submitAudio()" value="'. $save .'" />
-            </div>';
+                ';
         return $recorder;
     }
        
@@ -140,19 +160,15 @@ class mediacapture {
         $save = get_string('save', 'repository_mediacapture');
         
         // set the layout elements for the recorder applet
-        $recorder = '<style>.mdl-left,.fp-saveas,.fp-setauthor,.fp-setlicense,.fp-upload-btn { visibility:hidden; }  .appletcontainer { position:absolute; top:17%; left:40%; overflow:hidden; text-align:center; } #filename { width:240px; }
-        #toolbar img { float:left; margin:10px 10px 0 0; height:15px; border:1px solid #acacac; } #Timer { width:140px; margin:10px 0 0 0; }
-        </style>';
-        $recorder .= '
-            <div class="appletcontainer" id="appletcontainer">
+        $recorder = '
                 <applet  
                   ID       = "applet"
                   ARCHIVE  = "'.$url.'"
                   codebase = "'.dirname($url).'"
                   code     = "com.vimas.videoapplet.VimasVideoApplet.class"
                   name     = "VimasVideoApplet"
-                  width    = "260"
-                  height   = "240"
+                  width    = "322"
+                  height   = "300"
                   hspace   = "0"
                   vspace   = "0"
                   align    = "middle"
@@ -181,9 +197,9 @@ class mediacapture {
                 </div><br />
                 <input type="hidden" id="Status" name="Status" value="" />
                 <input type="hidden" id="fileloc" name="fileloc" value="'.$tmp_loc.'"/>
-                <input type="text" id="filename" name="filename" onfocus="this.select()" value="*.mp4"/><br /><br />
+                <input type="text" class="video_filename" id="filename" name="filename" onfocus="this.select()" value="*.mp4"/><br /><br />
                 <input type="button" onclick="upload_rp();" value="'. $save .'" />
-            </div>';
+                ';
         return $recorder;
     }
 

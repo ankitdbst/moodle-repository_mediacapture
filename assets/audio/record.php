@@ -15,23 +15,21 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * This file moves the temp audio file created through nanogong
+ * This file moves the temp audio file created through nanogong applet
  * to a temporary location.
- * TODO : nanogong should be modified to return the temp location
- * instead of using this file to extract & save it.
  *
  * @package    repository_mediacapture
  * @category   repository
- * @copyright  2012 Ankit Gupta
+ * @copyright  2012 Ankit Gupta <mailtoankitgupta@gmail.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 require_once(dirname(dirname(__FILE__)) . '/../mediacapture.php');
 
-$mc = new mediacapture();
+$client = new mediacapture();
 $elname = 'repo_upload_audio';
 
 if (isset($_FILES[$elname]['tmp_name'])) {
-    $filename = $mc->get_unused_filename('.wav');
-    print $mc->save_temp_file($_FILES[$elname]['tmp_name'], $filename);
+    $filename = $client->get_unused_filename('.wav');
+    print $client->save_temp_file($_FILES[$elname]['tmp_name'], $filename);
 }

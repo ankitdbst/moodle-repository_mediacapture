@@ -15,8 +15,8 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * This file moves the temp audio file created through Vimas applet
- * to a temporary location.
+ * This file returns the appropriate recorder audio/video using
+ * ajax request from the plugin interface
  *
  * @package    repository_mediacapture
  * @category   repository
@@ -24,11 +24,14 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-require_once(dirname(dirname(__FILE__)) . '/../mediacapture.php');
+require_once(dirname(__FILE__) . '/mediacapture.php');
 
 $client = new mediacapture();
-$elname = 'USERFILE';
 
-if (isset($_FILES[$elname]['tmp_name'])) {
-    print $client->save_temp_file($_FILES[$elname]['tmp_name'], $_FILES[$elname]['name']);
+if (isset($_REQUEST['type'])) {
+    if ($_REQUEST['type']) {
+        print $client->print_video_recorder();
+    } else {
+        print $client->print_audio_recorder();
+    }
 }

@@ -3,6 +3,33 @@
  * of the mediacapture plugin
  */
 
+ /**
+  * Start the appropriate audio/video recorder via ajax
+  * in response to user selection
+  */
+function load_recorder(type) {
+    // Create a YUI instance using io-base module.
+    YUI().use('node', 'io-base', function(Y) {
+        var uri = decodeURIComponent(Y.one('#ajax_uri').get('value')) +
+                 '?type=' + type;
+        var applet = Y.one('#appletcontainer');
+        // Define a function to handle the response data.
+        function complete(id, o) {
+            var id = id; // Transaction ID.
+            var data = o.responseText; // Response data.
+            applet.setContent(data);
+        };
+
+        // Subscribe to event "io:complete"
+        Y.on('io:complete', complete, Y);
+
+        // Make an HTTP request to posturl.
+        var request = Y.io(uri);
+    });
+
+    return false;
+}  
+ 
 /**
  * Method to validate the audio recording form and save
  * the recording to temp file
@@ -12,7 +39,7 @@ function submitAudio() {
         recorder    = document.getElementById('audio_recorder'),
         posturl     = document.getElementById('posturl'),
         fileloc     = document.getElementById('fileloc');
-
+        
     filename.value = filename.value.replace('*.wav', '');
     if (!filename.value) {
         alert(mediacapture['nonamefound']);
@@ -102,12 +129,13 @@ function stop_rp() {
  * a tmp location on server.
  */
 function upload_rp() {
-    filename = document.getElementById('filename');
+    var filename = document.getElementById('filename'),
+        fileloc = document.getElementById('fileloc');
+        
     filename.value = filename.value.replace('.mp4', '') + '.mp4';
     document.VimasVideoApplet.UPLOAD_VIDEO(String(filename.value));
-    fileloc = document.getElementById('fileloc');
     fileloc.value = encodeURIComponent(decodeURIComponent(fileloc.value) + '/' + filename.value);
-	simulateClick(filename, '.mp4');
+    simulateClick(filename, '.mp4');
 }
 
 /**

@@ -20,7 +20,7 @@
  *
  * @package    repository_mediacapture
  * @category   repository
- * @copyright  2012 Ankit Gupta
+ * @copyright  2012 Ankit Gupta <mailtoankitgupta@gmail.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 require_once(dirname(__FILE__) . '/mediacapture.php');
@@ -85,7 +85,7 @@ class repository_mediacapture extends repository {
      */
     private function include_js() {
         global $PAGE, $CFG;
-        $PAGE->requires->js(new moodle_url($CFG->wwwroot . '/repository/mediacapture/assets/recorder.js'));
+        $PAGE->requires->js(new moodle_url($CFG->wwwroot . '/repository/mediacapture/script.js'));
         $client = new mediacapture();
         $string_js = $client->get_string_js();
         $PAGE->requires->data_for_js('mediacapture', $string_js);
@@ -98,8 +98,8 @@ class repository_mediacapture extends repository {
         global $CFG, $PAGE;
 
         $client = new mediacapture();
-        //$recorder = $client->print_audio_recorder();
-        $recorder = $client->print_video_recorder();
+        $recorder = $client->init();
+        
         $ret = array();
         $ret['upload'] = array('label'=>$recorder, 'id'=>'repo-form');
         return $ret;

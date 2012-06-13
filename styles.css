@@ -1,0 +1,14 @@
+/**
+ * @file CSS file to manage the layout elements of the mediacapture plugin
+ */
+
+/* General layout rules  */
+.mdl-left,.fp-saveas,.fp-setauthor,.fp-setlicense,.fp-upload-btn {display:none;}
+.appletcontainer {overflow:hidden; text-align:center;}
+.buttons{-moz-border-radius:14px;-moz-box-shadow:inset 0 1px 0 0 #fff;-webkit-border-radius:14px;-webkit-box-shadow:inset 0 1px 0 0 #fff;background:0;background-color:#ededed;border:1px solid #b3b3b3;border-radius:14px;box-shadow:inset 0 1px 0 0 #fff;color:#555;cursor:pointer;display:inline-block;filter:progid:DXImageTransform.Microsoft.gradient(startColorstr="#ededed",endColorstr="#dfdfdf");font-size:15px;font-weight:500;margin:5px 0;padding:6px 24px;text-decoration:none;text-shadow:1px 1px 0 #fff;} 
+.buttons:hover{background:0;background-color:#dfdfdf;filter:progid:DXImageTransform.Microsoft.gradient(startColorstr="#dfdfdf",endColorstr="#ededed");} .buttons:active{position:relative;top:1px;}
+#toolbar img {float:left; margin:10px 10px 0 0; height:15px;border:1px solid #acacac;}
+#Timer {width:140px; margin:10px 0 0 0;}
+
+
+
