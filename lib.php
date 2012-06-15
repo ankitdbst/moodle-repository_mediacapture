@@ -58,6 +58,7 @@ class repository_mediacapture extends repository {
         parent::type_config_form($mform);
         $client = new mediacapture();
         $client->get_audio_config_form($mform);
+        $client->get_video_config_form($mform);
     }
 
     public function check_login() {

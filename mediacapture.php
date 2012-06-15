@@ -67,7 +67,7 @@ class mediacapture {
      * Type option names for the video recorder
      */
     public function get_video_option_names() {
-        return array();
+        return array('video_quality', 'frame_size');
     }
 
     /**
@@ -87,6 +87,24 @@ class mediacapture {
 
         $mform->addElement('select', 'audio_format', get_string('audio_format', 'repository_mediacapture'), $audio_format_options);
         $mform->addElement('select', 'sampling_rate', get_string('sampling_rate', 'repository_mediacapture'), $sampling_rate_options);
+    }
+
+    /**
+     * Fetch config form for video recorder
+     */
+    public function get_video_config_form($mform) {
+        $video_quality_options = array(
+            get_string('video_low', 'repository_mediacapture'),
+            get_string('video_normal', 'repository_mediacapture'),
+            get_string('video_high', 'repository_mediacapture'),
+        );
+        $video_frame_size = array(
+            get_string('frame_small', 'repository_mediacapture'),
+            get_string('frame_large', 'repository_mediacapture'),
+        );
+
+        $mform->addElement('select', 'video_quality', get_string('video_quality', 'repository_mediacapture'), $video_quality_options);
+        $mform->addElement('select', 'frame_size', get_string('frame_size', 'repository_mediacapture'), $video_frame_size);
     }
     
     /**
@@ -126,7 +144,6 @@ class mediacapture {
         $sampling_rate = $sampling_rates[$audio_format][$sampling_rate];
         $audio_format = $audio_formats[$audio_format];
 
-        $repo_name = get_string('name', 'repository_mediacapture');
         $javanotfound = get_string('javanotfound', 'repository_mediacapture');
         $save = get_string('save', 'repository_mediacapture');
 
@@ -159,6 +176,22 @@ class mediacapture {
         $tmp_loc = urlencode($CFG->dataroot. '/temp');
         $save = get_string('save', 'repository_mediacapture');
         
+        // get video preferences for the plugin
+        $sampling_rates = array('96,24', '160,32','256,48');
+        $video_quality_options = array(
+            get_string('video_low', 'repository_mediacapture'),
+            get_string('video_normal', 'repository_mediacapture'),
+            get_string('video_high', 'repository_mediacapture'),
+        );
+        $frame_size_options = array('small', 'large');
+
+        $video_quality = get_config('mediacapture', 'video_quality');   
+        $frame_size = get_config('mediacapture', 'frame_size');
+        
+        $sampling_rate = $sampling_rates[$video_quality];
+        $video_quality = $video_quality_options[$video_quality];
+        $frame_size = $frame_size_options[$frame_size];
+
         // set the layout elements for the recorder applet
         $recorder = '
                 <applet  
@@ -167,8 +200,8 @@ class mediacapture {
                   codebase = "'.dirname($url).'"
                   code     = "com.vimas.videoapplet.VimasVideoApplet.class"
                   name     = "VimasVideoApplet"
-                  width    = "322"
-                  height   = "300"
+                  width    = "240"
+                  height   = "220"
                   hspace   = "0"
                   vspace   = "0"
                   align    = "middle"
@@ -180,13 +213,9 @@ class mediacapture {
                     <param name = "ServerScript"        value = "'.$post_url.'">
                     <param name = "TimeLimit"           value = "30">
                     <param name = "BlockSize"           value = "10240">
-                    <param name = "UserServerFolder"    value = "mp4">
-                    <param name = "LowQuality"          value = "96,24">
-                    <param name = "NormalQuality"       value = "160,32">
-                    <param name = "HighQuality"         value = "256,48">
-                    <param name = "FrameSize"           value = "large">
+                    <param name = "'.$video_quality.'"  value = "'.$sampling_rate.'">
+                    <param name = "FrameSize"           value = "'.$frame_size.'">
                     <param name = "interface"           value = "compact">
-                    <param name = "showMenu"            value = "true">
                     <param name = "UserPostVariables"   value = "type">
                     <param name = "type"                value = "upload_video">
                 </applet>

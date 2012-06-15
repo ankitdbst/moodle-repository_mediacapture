@@ -32,6 +32,15 @@ $string['sampling_rate_medium'] = 'Medium quality';
 $string['sampling_rate_normal'] = 'Normal quality';
 $string['sampling_rate_high'] = 'High quality';
 
+$string['video_quality'] = 'Video quality';
+$string['video_low'] = 'LowQuality';
+$string['video_normal'] = 'NormalQuality';
+$string['video_high'] = 'HighQuality';
+
+$string['frame_size'] = 'Video frame size';
+$string['frame_small'] = 'small';
+$string['frame_large'] = 'large';
+
 $string['recordnew'] = 'New recording';
 $string['unexpectedevent'] = 'An unexpected event was detected. Please report this problem to the Moodle developers.';
 $string['appletnotfound'] = 'The applet was not detected. Please make sure that you have Java Runtime Environment (JRE) installed and the applet loaded properly.';
