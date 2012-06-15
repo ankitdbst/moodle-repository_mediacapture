@@ -59,7 +59,8 @@ function submitAudio() {
         return false;
     }
 
-    fileloc.value = encodeURIComponent(recorder.sendGongRequest("PostToForm", decodeURIComponent(posturl.value), "repo_upload_audio", "cookie=nanogong", "myfile"));
+    posturl.value = decodeURIComponent(posturl.value) + '?type=upload_audio';
+    fileloc.value = encodeURIComponent(recorder.sendGongRequest("PostToForm", posturl.value, "repo_upload_audio", "cookie=nanogong", "myfile"));
     
     if (!fileloc.value) {
         alert(mediacapture['filenotsaved']);

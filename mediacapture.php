@@ -98,8 +98,8 @@ class mediacapture {
         $html = '
             <input type="hidden" id="ajax_uri" name="ajax_uri" value="'.$ajax_uri.'" />
             <div class="appletcontainer" id="appletcontainer">
-                <input type="button" onclick="return load_recorder(0)" value="Start Audio" />
-                <input type="button" onclick="return load_recorder(1)" value="Start Video" />
+                <input type="button" onclick="return load_recorder(\'show_audio\')" value="Start Audio" />
+                <input type="button" onclick="return load_recorder(\'show_video\')" value="Start Video" />
             </div>';
         return $html;
     }
@@ -111,7 +111,7 @@ class mediacapture {
         global $CFG, $PAGE;
         
         $url = new moodle_url($CFG->wwwroot.'/repository/mediacapture/assets/audio/applet/nanogong.jar');
-        $post_url = urlencode(new moodle_url($CFG->wwwroot . '/repository/mediacapture/assets/audio/record.php'));
+        $post_url = urlencode(new moodle_url($CFG->wwwroot . '/repository/mediacapture/lib_ajax.php'));
 
         // Get recorder settings from the config form
         $sampling_rates = array(
@@ -154,7 +154,7 @@ class mediacapture {
         global $CFG, $PAGE;
         
         $url = new moodle_url($CFG->wwwroot.'/repository/mediacapture/assets/video/applet/VideoApplet.jar');
-        $post_url = new moodle_url($CFG->wwwroot .'/repository/mediacapture/assets/video/record.php');
+        $post_url = new moodle_url($CFG->wwwroot .'/repository/mediacapture/lib_ajax.php');
         $img_dir = new moodle_url($CFG->wwwroot.'/repository/mediacapture/assets/video/img');
         $tmp_loc = urlencode($CFG->dataroot. '/temp');
         $save = get_string('save', 'repository_mediacapture');
@@ -187,6 +187,8 @@ class mediacapture {
                     <param name = "FrameSize"           value = "large">
                     <param name = "interface"           value = "compact">
                     <param name = "showMenu"            value = "true">
+                    <param name = "UserPostVariables"   value = "type">
+                    <param name = "type"                value = "upload_video">
                 </applet>
                 <div id="toolbar">
                     <img src="'.$img_dir . '/rec.gif" onclick="record_rp()"/>

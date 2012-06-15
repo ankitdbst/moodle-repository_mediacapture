@@ -26,12 +26,28 @@
 
 require_once(dirname(__FILE__) . '/mediacapture.php');
 
+$type = required_param('type', PARAM_TEXT);
+
 $client = new mediacapture();
 
-if (isset($_REQUEST['type'])) {
-    if ($_REQUEST['type']) {
-        print $client->print_video_recorder();
-    } else {
-        print $client->print_audio_recorder();
-    }
+switch ($type) {
+    case 'show_audio':
+        echo $client->print_audio_recorder();
+        break;
+    case 'show_video':
+        echo $client->print_video_recorder();
+        break; 
+    case 'upload_audio':
+        $elname = 'repo_upload_audio';
+        $tmp_file = $_FILES[$elname]['tmp_name'];
+        $tmp_name = $client->get_unused_filename('.wav');
+        echo $client->save_temp_file($tmp_file, $tmp_name);
+        break;
+    case 'upload_video':
+        $elname = 'USERFILE';
+        $tmp_file = $_FILES[$elname]['tmp_name'];
+        $tmp_name = $_FILES[$elname]['name'];
+        echo $client->save_temp_file($tmp_file, $tmp_name);
+        break;
+    default:        
 }
