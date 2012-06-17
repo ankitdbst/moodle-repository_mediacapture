@@ -191,6 +191,13 @@ class mediacapture {
         $sampling_rate = $sampling_rates[$video_quality];
         $video_quality = $video_quality_options[$video_quality];
         $frame_size = $frame_size_options[$frame_size];
+        if ($frame_size === "small") {
+            $height = 175;
+            $width = 195;
+        } else {
+            $height = 275;
+            $width = 325;
+        }
 
         // set the layout elements for the recorder applet
         $recorder = '
@@ -200,14 +207,10 @@ class mediacapture {
                   codebase = "'.dirname($url).'"
                   code     = "com.vimas.videoapplet.VimasVideoApplet.class"
                   name     = "VimasVideoApplet"
-                  width    = "240"
-                  height   = "220"
-                  hspace   = "0"
-                  vspace   = "0"
+                  width    = "'.$width.'"
+                  height   = "'.$height.'"
                   align    = "middle"
                  MAYSCRIPT>
-                    <param name = "left"                value = "100">
-                    <param name = "top"                 value = "200">
                     <param name = "Registration"        value = "demo">
                     <param name = "LocalizationFile"    value = "localization.xml">
                     <param name = "ServerScript"        value = "'.$post_url.'">
