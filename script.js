@@ -40,7 +40,9 @@ function submitAudio() {
         posturl     = document.getElementById('posturl'),
         fileloc     = document.getElementById('fileloc');
         
-    filename.value = filename.value.replace('*.wav', '');
+    filename.value = filename.value.replace('.wav', '');
+    filename.value = filename.value.replace('*', '');
+
     if (!filename.value) {
         alert(mediacapture['nonamefound']);
         filename.value = '*.wav';
@@ -102,6 +104,11 @@ function setTimer(str) {
  */
 function record_rp() {
     document.VimasVideoApplet.RECORD_VIDEO();
+    document.getElementById('rec').disabled=true;
+    document.getElementById('play').disabled=true;
+    document.getElementById('stop').disabled=false;
+    document.getElementById('pause').disabled=false;
+    return false;
 }
 
 /**
@@ -109,6 +116,8 @@ function record_rp() {
  */
 function playback_rp() {
     document.VimasVideoApplet.PLAY_VIDEO();
+    document.getElementById('pause').disabled=false;
+    return false;
 }
 
 /**
@@ -116,6 +125,7 @@ function playback_rp() {
  */
 function pause_rp() {
     document.VimasVideoApplet.PAUSE_VIDEO();
+    return false;
 }
 
 /**
@@ -123,20 +133,40 @@ function pause_rp() {
  */
 function stop_rp() {
     document.VimasVideoApplet.STOP_VIDEO();
+    document.getElementById('rec').disabled=false;
+    document.getElementById('stop').disabled=true;
+    document.getElementById('pause').disabled=true;
+    document.getElementById('play').disabled=false;
+    return false;
 }
 
 /**
- * Method to upload the recorded audio to
+ * Method to upload the recorded video to
  * a tmp location on server.
  */
 function upload_rp() {
     var filename = document.getElementById('filename'),
-        fileloc = document.getElementById('fileloc');
-        
-    filename.value = filename.value.replace('.mp4', '') + '.mp4';
+        fileloc = document.getElementById('fileloc'),
+        duration = document.getElementById('Timer'); 
+
+    if (!duration.value.trim()) {
+        alert(mediacapture['norecordingfound']);
+        return false;
+    }
+
+    filename.value = filename.value.replace('.mp4', '');
+    filename.value = filename.value.replace('*', '');
+    if (!filename.value) {
+        alert(mediacapture['nonamefound']);
+        filename.value = '*.mp4';
+        return false;
+    }
+    filename.value = filename.value + '.mp4';
+
     document.VimasVideoApplet.UPLOAD_VIDEO(String(filename.value));
     fileloc.value = encodeURIComponent(decodeURIComponent(fileloc.value) + '/' + filename.value);
     simulateClick(filename, '.mp4');
+    return true;
 }
 
 /**

@@ -67,7 +67,7 @@ class mediacapture {
      * Type option names for the video recorder
      */
     public function get_video_option_names() {
-        return array('video_quality', 'frame_size');
+        return array('video_quality');
     }
 
     /**
@@ -98,13 +98,8 @@ class mediacapture {
             get_string('video_normal', 'repository_mediacapture'),
             get_string('video_high', 'repository_mediacapture'),
         );
-        $video_frame_size = array(
-            get_string('frame_small', 'repository_mediacapture'),
-            get_string('frame_large', 'repository_mediacapture'),
-        );
 
         $mform->addElement('select', 'video_quality', get_string('video_quality', 'repository_mediacapture'), $video_quality_options);
-        $mform->addElement('select', 'frame_size', get_string('frame_size', 'repository_mediacapture'), $video_frame_size);
     }
     
     /**
@@ -158,7 +153,7 @@ class mediacapture {
                 </applet><br /><br />
                 <input type="hidden" id="posturl" name="posturl" value="' . $post_url . '" />
                 <input type="hidden" id="fileloc" name="fileloc" />
-                <input type="text" class="audio_filename" id="filename" name="filename" onfocus="this.select()" value="*.wav"/><br /><br />
+                <input type="text" id="filename" name="filename" onfocus="this.select()" value="*.wav" style="width:150px;" /><br /><br />
                 <input type="button" onclick="submitAudio()" value="'. $save .'" />
                 ';
         return $recorder;
@@ -183,21 +178,10 @@ class mediacapture {
             get_string('video_normal', 'repository_mediacapture'),
             get_string('video_high', 'repository_mediacapture'),
         );
-        $frame_size_options = array('small', 'large');
-
         $video_quality = get_config('mediacapture', 'video_quality');   
-        $frame_size = get_config('mediacapture', 'frame_size');
         
         $sampling_rate = $sampling_rates[$video_quality];
         $video_quality = $video_quality_options[$video_quality];
-        $frame_size = $frame_size_options[$frame_size];
-        if ($frame_size === "small") {
-            $height = 175;
-            $width = 195;
-        } else {
-            $height = 275;
-            $width = 325;
-        }
 
         // set the layout elements for the recorder applet
         $recorder = '
@@ -207,8 +191,8 @@ class mediacapture {
                   codebase = "'.dirname($url).'"
                   code     = "com.vimas.videoapplet.VimasVideoApplet.class"
                   name     = "VimasVideoApplet"
-                  width    = "'.$width.'"
-                  height   = "'.$height.'"
+                  width    = "325"
+                  height   = "240"
                   align    = "middle"
                  MAYSCRIPT>
                     <param name = "Registration"        value = "demo">
@@ -217,22 +201,30 @@ class mediacapture {
                     <param name = "TimeLimit"           value = "30">
                     <param name = "BlockSize"           value = "10240">
                     <param name = "'.$video_quality.'"  value = "'.$sampling_rate.'">
-                    <param name = "FrameSize"           value = "'.$frame_size.'">
+                    <param name = "FrameSize"           value = "large">
                     <param name = "interface"           value = "compact">
                     <param name = "UserPostVariables"   value = "type">
                     <param name = "type"                value = "upload_video">
                 </applet>
-                <div id="toolbar">
-                    <img src="'.$img_dir . '/rec.gif" onclick="record_rp()"/>
-                    <img src="'.$img_dir . '/play.gif" onclick="playback_rp()"/>
-                    <img src="'.$img_dir . '/pause.gif" onclick="pause_rp()"/>
-                    <img src="'.$img_dir . '/stop.gif" onclick="stop_rp()"/>
+                <div id="toolbar" class="clearfix">
+                    <button id="rec" onclick="return  record_rp()">
+                        <img src="'.$img_dir.'/rec.gif" />
+                    </button>
+                    <button id="play" onclick="return playback_rp()" disabled>
+                        <img src="'.$img_dir.'/play.gif" />
+                    </button>
+                    <button id="pause" onclick="return pause_rp()" disabled>
+                        <img src="'.$img_dir.'/pause.gif" />    
+                    </button>
+                    <button id="stop" onclick="return stop_rp()" disabled>
+                        <img src="'.$img_dir.'/stop.gif" />
+                    </button>
                     <input type="text" name="Timer" id="Timer" disabled/>
                 </div><br />
                 <input type="hidden" id="Status" name="Status" value="" />
                 <input type="hidden" id="fileloc" name="fileloc" value="'.$tmp_loc.'"/>
-                <input type="text" class="video_filename" id="filename" name="filename" onfocus="this.select()" value="*.mp4"/><br /><br />
-                <input type="button" onclick="upload_rp();" value="'. $save .'" />
+                <input type="text" id="filename" name="filename" onfocus="this.select()" value="*.mp4" style="width:310px;" /><br /><br />
+                <input type="button" onclick="return upload_rp()" value="'. $save .'" />
                 ';
         return $recorder;
     }
