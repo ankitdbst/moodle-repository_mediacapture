@@ -10,8 +10,7 @@
 function load_recorder(type) {
     // Create a YUI instance using io-base module.
     YUI().use('node', 'io-base', function(Y) {
-        var uri = decodeURIComponent(Y.one('#ajax_uri').get('value')) +
-                 '?type=' + type;
+        var uri = decodeURIComponent(Y.one('#ajax_uri').get('value'));
         var applet = Y.one('#appletcontainer');
         // Define a function to handle the response data.
         function complete(id, o) {
@@ -23,8 +22,16 @@ function load_recorder(type) {
         // Subscribe to event "io:complete"
         Y.on('io:complete', complete, Y);
 
-        // Make an HTTP request to posturl.
-        var request = Y.io(uri);
+        // Make an HTTP POST request to posturl.
+        cfg = {
+            method: 'POST',  
+            data:   'type='+type+
+                    '&java='+BrowserPlugins.java+
+                    '&flash='+BrowserPlugins.flash+
+                    '&os='+BrowserDetect.OS,
+        };
+
+        var request = Y.io(uri, cfg);
     });
 
     return false;
@@ -167,6 +174,29 @@ function upload_rp() {
     fileloc.value = encodeURIComponent(decodeURIComponent(fileloc.value) + '/' + filename.value);
     simulateClick(filename, '.mp4');
     return true;
+}
+
+/**
+ * Submits the video recording to the server 
+ * for processing upload
+ */
+function submitVideo() {
+    var filename = document.getElementById('filename'),
+        fileloc = document.getElementById('fileloc');
+
+    filename.value = filename.value.replace('.flv', '');
+    filename.value = filename.value.replace('*', '');
+    if (!filename.value) {
+        alert(mediacapture['nonamefound']);
+        filename.value = '*.flv';
+        return false;
+    }
+    
+    filename.value = filename.value + '.flv';
+    fileloc.value = encodeURIComponent(decodeURIComponent(fileloc.value));
+
+    simulateClick(filename, '.flv');
+    return true;    
 }
 
 /**

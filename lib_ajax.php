@@ -26,7 +26,10 @@
 
 require_once(dirname(__FILE__) . '/mediacapture.php');
 
-$type = required_param('type', PARAM_TEXT);
+$type   = required_param('type', PARAM_TEXT);
+$java   = optional_param('java', -1, PARAM_INT);
+$flash  = optional_param('flash', -1, PARAM_INT);
+$os     = optional_param('os', '', PARAM_TEXT);
 
 $client = new mediacapture();
 
@@ -35,7 +38,11 @@ switch ($type) {
         echo $client->print_audio_recorder();
         break;
     case 'show_video':
-        echo $client->print_video_recorder();
+        if ($os === 'Linux') {
+            echo $client->print_flash_video_recorder();    
+        } else {
+            echo $client->print_java_video_recorder();    
+        }        
         break; 
     case 'upload_audio':
         $elname = 'repo_upload_audio';

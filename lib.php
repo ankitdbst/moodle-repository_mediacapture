@@ -87,6 +87,7 @@ class repository_mediacapture extends repository {
      */
     private function include_js() {
         global $PAGE, $CFG;
+        $PAGE->requires->js(new moodle_url($CFG->wwwroot . '/repository/mediacapture/assets/prerequisites.js'));
         $PAGE->requires->js(new moodle_url($CFG->wwwroot . '/repository/mediacapture/script.js'));
         $client = new mediacapture();
         $string_js = $client->get_string_js();
@@ -122,7 +123,7 @@ class repository_mediacapture extends repository {
 		
 		$filename = required_param('filename', PARAM_TEXT);
         $fileloc = urldecode(required_param('fileloc', PARAM_PATH));
-		        
+		
         return $this->process_upload($saveas_filename, $maxbytes, $types, $savepath, $itemid, $license, $author, $filename, $fileloc);
     }
 

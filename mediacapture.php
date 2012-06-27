@@ -160,9 +160,9 @@ class mediacapture {
     }
        
     /**
-     * Prints the video recorder applet in the filepicker
+     * Prints the java video recorder applet in the filepicker
      */
-    public function print_video_recorder() {
+    public function print_java_video_recorder() {
         global $CFG, $PAGE;
         
         $url = new moodle_url($CFG->wwwroot.'/repository/mediacapture/assets/video/applet/VideoApplet.jar');
@@ -222,9 +222,44 @@ class mediacapture {
                     <input type="text" name="Timer" id="Timer" disabled/>
                 </div><br />
                 <input type="hidden" id="Status" name="Status" value="" />
-                <input type="hidden" id="fileloc" name="fileloc" value="'.$tmp_loc.'"/>
+                <input type="hidden" id="fileloc" name="fileloc" value="' . $tmp_loc . '"/>
                 <input type="text" id="filename" name="filename" onfocus="this.select()" value="*.mp4" style="width:310px;" /><br /><br />
                 <input type="button" onclick="return upload_rp()" value="'. $save .'" />
+                ';
+        return $recorder;
+    }
+
+    /**
+     * Prints the flash/red5 video recorder in the filepicker
+     */
+    public function print_flash_video_recorder() {
+        global $CFG, $PAGE;
+
+        $url = new moodle_url($CFG->wwwroot.'/repository/mediacapture/assets/video/flash/red5recorder.swf');
+        $tmp_loc = urlencode($CFG->dataroot. '/streams/video.flv');
+        $save = get_string('save', 'repository_mediacapture');
+
+        $recorder = '
+                <object classid="clsid:D27CDB6E-AE6D-11cf-96B8-444553540000"
+                    id="red5recorder" width="100%" height="100%"
+                    codebase="http://fpdownload.macromedia.com/get/flashplayer/current/swflash.cab">
+                    <param name="movie" value="'.$url.'" />
+                    <param name="quality" value="high" />
+                    <param name="bgcolor" value="#869ca7" />
+                    <param name="allowScriptAccess" value="sameDomain" />
+                    <embed src="'.$url.'" quality="high" bgcolor="#869ca7"
+                        width="320px" height="240px" name="red5recorder" align="middle"
+                        play="true"
+                        loop="false"
+                        quality="high"
+                        allowScriptAccess="sameDomain"
+                        type="application/x-shockwave-flash"
+                        pluginspage="http://www.adobe.com/go/getflashplayer">
+                    </embed>
+                </object><br /><br />
+                <input type="hidden" id="fileloc" name="fileloc" value="' . $tmp_loc . '" />
+                <input type="text" id="filename" name="filename" onfocus="this.select()" value="*.flv" style="width:305px;" /><br /><br />
+                <input type="button" onclick="return submitVideo();" value="'.$save .'" />
                 ';
         return $recorder;
     }
