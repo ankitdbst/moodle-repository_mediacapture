@@ -123,8 +123,10 @@ class repository_mediacapture extends repository {
 		
 		$filename = required_param('filename', PARAM_TEXT);
         $fileloc = urldecode(required_param('fileloc', PARAM_PATH));
+        $filedata = optional_param('filedata', '', PARAM_RAW);
+        $filedata = base64_decode($filedata);
 		
-        return $this->process_upload($saveas_filename, $maxbytes, $types, $savepath, $itemid, $license, $author, $filename, $fileloc);
+        return $this->process_upload($saveas_filename, $maxbytes, $types, $savepath, $itemid, $license, $author, $filename, $fileloc, $filedata);
     }
 
     /**
@@ -138,9 +140,10 @@ class repository_mediacapture extends repository {
      * @param string $author optional the name of the author of this file
      * @param string $filename required the name of the recording
      * @param string $fileloc required the tmp location of the recorded stream
+     * @param string filedata optional raw data of the recorded file
      * @return object containing details of the file uploaded
      */
-    public function process_upload($saveas_filename, $maxbytes, $types = '*', $savepath = '/', $itemid = 0, $license = null, $author = '', $filename, $fileloc) {
+    public function process_upload($saveas_filename, $maxbytes, $types = '*', $savepath = '/', $itemid = 0, $license = null, $author = '', $filename, $fileloc, $filedata) {
         global $USER, $CFG;
         $record = new stdClass();
         $record->filearea = 'draft';
@@ -173,7 +176,11 @@ class repository_mediacapture extends repository {
             $existingfilename = $record->filename;
             $unused_filename = repository::get_unused_filename($record->itemid, $record->filepath, $record->filename);
             $record->filename = $unused_filename;
-            $stored_file = $fs->create_file_from_pathname($record, $fileloc);
+            if (!empty($filedata)) {
+                $stored_file = $fs->create_file_from_string($record, $filedata);
+            } else {
+                $stored_file = $fs->create_file_from_pathname($record, $fileloc);
+            }
             $event = array();
             $event['event'] = 'fileexists';
             $event['newfile'] = new stdClass;
@@ -187,9 +194,13 @@ class repository_mediacapture extends repository {
             $event['existingfile']->url      = moodle_url::make_draftfile_url($record->itemid, $record->filepath, $existingfilename)->out();;
             return $event;
         } else {
-            $stored_file = $fs->create_file_from_pathname($record, $fileloc);
-            // removes the temporary file from the 'temp' dataroot
-            unlink($fileloc);
+            if (!empty($filedata)) {
+                $stored_file = $fs->create_file_from_string($record, $filedata);
+            } else {
+                $stored_file = $fs->create_file_from_pathname($record, $fileloc);
+                // removes the temporary file from the 'temp' dataroot
+                unlink($fileloc);
+            }
             return array(
                 'url'=>moodle_url::make_draftfile_url($record->itemid, $record->filepath, $record->filename)->out(),
                 'id'=>$record->itemid,

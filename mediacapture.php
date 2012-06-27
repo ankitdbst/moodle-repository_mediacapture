@@ -120,7 +120,7 @@ class mediacapture {
     /**
      * Prints the audio recorder applet in the filepicker
      */
-    public function print_audio_recorder() {
+    public function print_java_audio_recorder() {
         global $CFG, $PAGE;
         
         $url = new moodle_url($CFG->wwwroot.'/repository/mediacapture/assets/audio/applet/nanogong.jar');
@@ -156,6 +156,42 @@ class mediacapture {
                 <input type="text" id="filename" name="filename" onfocus="this.select()" value="*.wav" style="width:150px;" /><br /><br />
                 <input type="button" onclick="submitAudio()" value="'. $save .'" />
                 ';
+        return $recorder;
+    }
+
+    /**
+     * Prints the flash audio recorder in the filepicker
+     * Uses the mp3 recorder by Paul Nicholls which doesn't require red5
+     */
+    public function print_flash_audio_recorder() {    
+        global $CFG, $PAGE;
+
+        $url = new moodle_url($CFG->wwwroot.'/repository/mediacapture/assets/audio/flash/recorder.swf?gateway=form');
+        $tmp_loc = urlencode($CFG->dataroot);
+        $callback = urlencode("(function(a, b){d=document;d.g=d.getElementById;fn=d.g('filename');fn.value=a;fd=d.g('filedata');fd.value=b;f=fn;while(f.tagName!='FORM')f=f.parentNode;f.repo_upload_file.type='hidden';f.repo_upload_file.value='bogus.mp3';while(f.tagName!='DIV')f=f.nextSibling;f.getElementsByTagName('button')[0].click();})");
+        $flashvars = "&callback={$callback}&filename=new_recording";
+
+        $recorder = '
+                <object id="onlineaudiorecorder" classid="clsid:D27CDB6E-AE6D-11cf-96B8-444553540000" width="215" height="138">
+                    <param name="movie" value="'.$url.$flashvars.'" />
+                    <param name="wmode" value="transparent" />
+                    <!--[if !IE]>-->
+                    <object type="application/x-shockwave-flash" data="'.$url.$flashvars.'" width="215" height="138">
+                    <!--<![endif]-->
+                    <div>
+                        <p>
+                            <a href="http://www.adobe.com/go/getflashplayer"><img src="http://www.adobe.com/images/shared/download_buttons/get_flash_player.gif" alt="Get Adobe Flash player" />
+                            </a>
+                        </p>
+                    </div>
+                    <!--[if !IE]>-->
+                    </object>
+                    <!--<![endif]-->
+                </object>
+                <input type="hidden" name="filename" id="filename" />
+                <input type="hidden" name="fileloc" id="fileloc" value="'.$tmp_loc.'" />
+                <textarea name="filedata" id="filedata" style="display:none;"></textarea>';
+                
         return $recorder;
     }
        

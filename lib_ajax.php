@@ -35,7 +35,11 @@ $client = new mediacapture();
 
 switch ($type) {
     case 'show_audio':
-        echo $client->print_audio_recorder();
+        if ($os === 'Linux') {
+            echo $client->print_flash_audio_recorder();
+        } else {
+            echo $client->print_java_audio_recorder();    
+        }
         break;
     case 'show_video':
         if ($os === 'Linux') {

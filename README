@@ -1,13 +1,15 @@
 Introduction
 ------------
-This is a Audio/Video recording plugin for recording audio/video streams directly using the filepicker.
+This is mediacapture plugin for recording audio/video streams directly using the filepicker. The plugin provides recording capabilities using both flash and java.
 
 > Audio
 The audio recorder uses Nanogong applet to record and playback the recorded stream.
 More about Nanogong project : http://nanogong.ust.hk/
 
+The flash audio recorder uses the mp3 recorder written by Paul Nicholls which doesn't require red5.
+More about the project : https://github.com/MaxThrax/moodle-repository_recordaudio
+
 > Video
-The plugin provides video recording capabilities using both flash and java.
 The java video recorder uses Vimas applet to record and playback the video stream.
 More about Vimas : http://www.vimas.com/video.php
 
