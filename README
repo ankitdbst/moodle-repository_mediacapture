@@ -11,7 +11,7 @@ The plugin provides video recording capabilities using both flash and java.
 The java video recorder uses Vimas applet to record and playback the video stream.
 More about Vimas : http://www.vimas.com/video.php
 
-The flash video recorder uses red5recorder. Red5Recorder is an open source project to record and play webcam videos using flash. The recorder requires an RTMP server such as Red5.
+The flash video recorder uses Red5Recorder. Red5Recorder is an open source project to record and play webcam videos using flash. The recorder requires an RTMP server such as Red5.
 More on Red5 : http://code.google.com/p/red5/
 More on Red5Recorder : http://code.google.com/p/red5-recorder/
 
@@ -27,6 +27,14 @@ Installation
 - Download patch add_attachment_label.txt from http://tracker.moodle.org/browse/CONTRIB-3649
 - Apply patch to filepicker.js
 - Purge Cache : Site administration -> Development -> Purge all Caches
+
+In order to use the flash based Video Recorder you need to do the following :
+- Install Red5 using the instructions given here http://trac.red5.org/wiki/Install
+- Copy assets/video/flash/red5recorder to %RED5_HOME/dist/webapps 
+- chmod -R 775 red5recorder/
+- Start red5 server from within the %RED5_HOME/dist/ using ./red5.sh
+- Navigate to MOODLE-DATAROOT
+- ln -s %RED%_HOME/dist/webapps/red5recorder/streams/ .
 
 Copyright
 ---------
