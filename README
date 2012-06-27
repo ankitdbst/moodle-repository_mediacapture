@@ -34,7 +34,7 @@ In order to use the flash based Video Recorder you need to do the following :
 - chmod -R 775 red5recorder/
 - Start red5 server from within the %RED5_HOME/dist/ using ./red5.sh
 - Navigate to MOODLE-DATAROOT
-- ln -s %RED%_HOME/dist/webapps/red5recorder/streams/ .
+- ln -s %RED5_HOME/dist/webapps/red5recorder/streams/ .
 
 Copyright
 ---------
