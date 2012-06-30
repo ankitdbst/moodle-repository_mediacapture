@@ -28,6 +28,7 @@ function load_recorder(type) {
             data:   'type='+type+
                     '&java='+BrowserPlugins.java+
                     '&flash='+BrowserPlugins.flash+
+                    '&quicktime='+BrowserPlugins.quicktime+
                     '&os='+BrowserDetect.OS,
         };
 
@@ -194,6 +195,37 @@ function submitVideo() {
     
     filename.value = filename.value + '.flv';
     fileloc.value = encodeURIComponent(decodeURIComponent(fileloc.value));
+
+    var duration = 90; // max-duration
+
+    // Create a YUI instance using io-base module.
+    YUI().use('node', 'io-base', function(Y) {
+        var uri = decodeURIComponent(Y.one('#posturl').get('value'));
+        // Define a function to handle the response data.
+        function complete(id, o) {
+            var id = id; // Transaction ID.
+            var data = o.responseText; // Response data.
+            if (data === 'NONE') {
+                duration = 0;
+            }
+        };
+
+        // Subscribe to event "io:complete"
+        Y.on('io:complete', complete, Y);
+
+        // Make an HTTP POST request to posturl.
+        cfg = {
+            method: 'POST',  
+            data:   'type=check_duration',
+            sync:true
+        };
+        var request = Y.io(uri, cfg);  
+    });
+
+    if (duration <= 0) {    
+        alert(mediacapture['norecordingfound']);
+        return false;
+    }
 
     simulateClick(filename, '.flv');
     return true;    

@@ -11,7 +11,7 @@
  */
 var BrowserPlugins = (function(){
     var found = {};
-    var version_reg = /[0-9]+/;
+    var version_reg = /[0-9]+.[0-9]+/;
  
     /*
      * Differentiate between IE (detection via ActiveXObject)

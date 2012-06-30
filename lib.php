@@ -45,7 +45,8 @@ class repository_mediacapture extends repository {
         $client = new mediacapture();
         $audio_option = $client->get_audio_option_names();
         $video_option = $client->get_video_option_names();
-        return array_merge($audio_option, $video_option);
+        $recorders = $client->get_recorder_names();
+        return array_merge($audio_option, $video_option, $recorders);
     }
 
     /**
@@ -59,6 +60,7 @@ class repository_mediacapture extends repository {
         $client = new mediacapture();
         $client->get_audio_config_form($mform);
         $client->get_video_config_form($mform);
+        $client->get_recorder_config_form($mform);
     }
 
     public function check_login() {

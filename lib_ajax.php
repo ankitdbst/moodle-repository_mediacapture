@@ -26,27 +26,23 @@
 
 require_once(dirname(__FILE__) . '/mediacapture.php');
 
-$type   = required_param('type', PARAM_TEXT);
-$java   = optional_param('java', -1, PARAM_INT);
-$flash  = optional_param('flash', -1, PARAM_INT);
-$os     = optional_param('os', '', PARAM_TEXT);
+$type       = required_param('type', PARAM_TEXT);
+// List of plugins supported by the client browser
+$browser_plugins = new stdClass;
+
+$browser_plugins->os         = optional_param('os', '', PARAM_TEXT);
+$browser_plugins->java       = optional_param('java', -1.0, PARAM_FLOAT);
+$browser_plugins->flash      = optional_param('flash', -1.0, PARAM_FLOAT);
+$browser_plugins->quicktime  = optional_param('quicktime', -1.0, PARAM_FLOAT);
 
 $client = new mediacapture();
 
 switch ($type) {
     case 'show_audio':
-        if ($os === 'Linux') {
-            echo $client->print_flash_audio_recorder();
-        } else {
-            echo $client->print_java_audio_recorder();    
-        }
+        echo $client->print_audio_recorder($browser_plugins);
         break;
     case 'show_video':
-        if ($os === 'Linux') {
-            echo $client->print_flash_video_recorder();    
-        } else {
-            echo $client->print_java_video_recorder();    
-        }        
+        echo $client->print_video_recorder($browser_plugins);
         break; 
     case 'upload_audio':
         $elname = 'repo_upload_audio';
@@ -59,6 +55,12 @@ switch ($type) {
         $tmp_file = $_FILES[$elname]['tmp_name'];
         $tmp_name = $_FILES[$elname]['name'];
         echo $client->save_temp_file($tmp_file, $tmp_name);
+        break;
+    case 'check_duration':
+        $tmp_file = $CFG->dataroot. '/streams/video.flv';            
+        if (!file_exists($tmp_file) || !filesize($tmp_file)) {
+            echo 'NONE';
+        }
         break;
     default:        
 }

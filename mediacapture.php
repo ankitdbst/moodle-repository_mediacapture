@@ -50,13 +50,6 @@ class mediacapture {
     }
 
     /**
-     * Get details of the client 
-     */
-    public function get_client_details() {
-        // fetch user-agent string and parse values        
-    }
-
-    /**
      * Type option names for the audio recorder
      */
     public function get_audio_option_names() {
@@ -68,6 +61,14 @@ class mediacapture {
      */
     public function get_video_option_names() {
         return array('video_quality');
+    }
+
+    /**
+     * Type option names for the recorders
+     */
+    public function get_recorder_names() {
+        return array('flash_video_recorder', 'flash_audio_recorder',
+                    'java_video_recorder', 'java_audio_recorder');
     }
 
     /**
@@ -101,20 +102,88 @@ class mediacapture {
 
         $mform->addElement('select', 'video_quality', get_string('video_quality', 'repository_mediacapture'), $video_quality_options);
     }
+
+    /**
+     * Fetch config form for available recorders
+     */
+    public function get_recorder_config_form($mform) {
+        $mform->addElement('advcheckbox', 'flash_video_recorder', get_string('flash_video_recorder', 'repository_mediacapture'), '  (requires Red5)', array('group' => 1));        
+        $mform->addElement('advcheckbox', 'flash_audio_recorder', get_string('flash_audio_recorder', 'repository_mediacapture'), null, array('group' => 1));
+        $mform->addElement('advcheckbox', 'java_video_recorder', get_string('java_video_recorder', 'repository_mediacapture'), '  (Windows only)', array('group' => 1));
+        $mform->addElement('advcheckbox', 'java_audio_recorder', get_string('java_audio_recorder', 'repository_mediacapture'), null, array('group' => 1));
+        // set defaults
+        $mform->setDefault('flash_video_recorder', 0);
+        $mform->setDefault('flash_audio_recorder', 1);
+        $mform->setDefault('java_video_recorder', 0);
+        $mform->setDefault('java_audio_recorder', 1);
+    }
     
     /**
      * Initialize the plugin and load the start screen
      */    
     public function init() {
         global $PAGE, $CFG;
+        // Get list of available recorders
+        $recorder = new stdClass;
+        
+        $recorder->flash = new stdClass;
+        $recorder->flash->audio = get_config('mediacapture', 'flash_audio_recorder');
+        $recorder->flash->video = get_config('mediacapture', 'flash_video_recorder');
+
+        $recorder->java = new stdClass;
+        $recorder->java->audio = get_config('mediacapture', 'java_audio_recorder');
+        $recorder->java->video = get_config('mediacapture', 'java_video_recorder');
+
         $ajax_uri = urlencode(new moodle_url($CFG->wwwroot.'/repository/mediacapture/lib_ajax.php'));
-        $html = '
-            <input type="hidden" id="ajax_uri" name="ajax_uri" value="'.$ajax_uri.'" />
-            <div class="appletcontainer" id="appletcontainer">
-                <input type="button" onclick="return load_recorder(\'show_audio\')" value="Start Audio" />
-                <input type="button" onclick="return load_recorder(\'show_video\')" value="Start Video" />
-            </div>';
+        $html = '<input type="hidden" id="ajax_uri" name="ajax_uri" value="'.$ajax_uri.'" /><div class="appletcontainer" id="appletcontainer">';
+        if ($recorder->flash->audio or $recorder->java->audio) {
+            $html .= '<input type="button" onclick="return load_recorder(\'show_audio\')" value="Start Audio" /> ';
+        }
+        if ($recorder->flash->video or $recorder->java->video) {
+            $html .= '<input type="button" onclick="return load_recorder(\'show_video\')" value="Start Video" />';
+        }
+        $html .= '</div>';
+
         return $html;
+    }
+
+    /**
+     * Prints the appropriate audio recorder by checking
+     * client's browser plugins else outputs error messages.
+     */
+    public function print_audio_recorder($plugins) {
+        $error = array();
+        if ($plugins->flash >= 9) {
+            return $this->print_flash_audio_recorder();
+        } else if ($plugins->java >= 1.5) {            
+            return $this->print_java_audio_recorder();
+        } else {
+            array_push($error, get_string('flashnotfound', 'repository_mediacapture'));
+            array_push($error, get_string('javanotfound', 'repository_mediacapture'));    
+            return $this->print_error($error);
+        }
+    }
+
+    /**
+     * Prints the appropriate video recorder by checking
+     * client's browser plugins else outputs error messages.
+     */
+    public function print_video_recorder($plugins) {
+        $errors = array();
+        if ($plugins->flash >= 9) {
+            return $this->print_flash_video_recorder();
+        } else if ($plugins->java >= 1.5 && $plugins->quicktime >= 1.0 && 
+                    $plugins->os !== 'Linux') {            
+            return $this->print_java_video_recorder();
+        } else {
+            array_push($errors, get_string('flashnotfound', 'repository_mediacapture'));
+            if ($plugins->java < 1.5) {
+                array_push($errors, get_string('javanotfound', 'repository_mediacapture'));    
+            } elseif ($plugins->quicktime < 1.0) {
+                array_push($errors, get_string('quicktimenotfound', 'repository_mediacapture'));    
+            }
+            return $this->print_error($errors);
+        }
     }
 
     /**
@@ -142,7 +211,7 @@ class mediacapture {
         $javanotfound = get_string('javanotfound', 'repository_mediacapture');
         $save = get_string('save', 'repository_mediacapture');
 
-        // set the layout elements for the recorder applet
+        // Set the layout elements for the recorder applet
         $recorder = '            
                 <applet id="audio_recorder" name="audio_recorder" code="gong.NanoGong" width="160" height="40" archive="' . $url . '">
                     <param name="AudioFormat" value="' . $audio_format .'" />
@@ -272,6 +341,7 @@ class mediacapture {
         global $CFG, $PAGE;
 
         $url = new moodle_url($CFG->wwwroot.'/repository/mediacapture/assets/video/flash/red5recorder.swf');
+        $post_url = new moodle_url($CFG->wwwroot .'/repository/mediacapture/lib_ajax.php');
         $tmp_loc = urlencode($CFG->dataroot. '/streams/video.flv');
         $save = get_string('save', 'repository_mediacapture');
 
@@ -294,10 +364,24 @@ class mediacapture {
                     </embed>
                 </object><br /><br />
                 <input type="hidden" id="fileloc" name="fileloc" value="' . $tmp_loc . '" />
+                <input type="hidden" id="posturl" name="posturl" value="' . $post_url . '" />
                 <input type="text" id="filename" name="filename" onfocus="this.select()" value="*.flv" style="width:305px;" /><br /><br />
                 <input type="button" onclick="return submitVideo();" value="'.$save .'" />
                 ';
         return $recorder;
+    }
+
+    /**
+     * Outputs error messages for the user to correct
+     */
+    public function print_error($errors) {
+        $html = '<p>Please correct the following errors and reload</p>
+                <ul>';
+        foreach($errors as $error) {
+            $html .= '<li>'.$error.'</li>';
+        }
+        $html .= '</ul>';
+        return $html;
     }
 
     /**
