@@ -28,10 +28,13 @@ require_once(dirname(dirname(__FILE__)).'/../config.php');
 class mediacapture {
 
     /**
-     * Constructor
+     * Loads the required js files and populates lang strings
      */
-    public function __construct() {
-        global $CFG;
+    public function include_js() {
+        global $PAGE, $CFG;
+        $PAGE->requires->js(new moodle_url($CFG->wwwroot . '/repository/mediacapture/assets/prerequisites.js'));
+        $PAGE->requires->js(new moodle_url($CFG->wwwroot . '/repository/mediacapture/script.js'));
+        $PAGE->requires->data_for_js('mediacapture', $this->get_string_js());
     }
 
     /**
@@ -123,25 +126,30 @@ class mediacapture {
      */    
     public function init() {
         global $PAGE, $CFG;
+
+        // Include recorder JS
+        $this->include_js();
+
         // Get list of available recorders
-        $recorder = new stdClass;
+        unset($recorder);
+        $recorder = new stdClass();
         
-        $recorder->flash = new stdClass;
+        $recorder->flash = new stdClass();
         $recorder->flash->audio = get_config('mediacapture', 'flash_audio_recorder');
         $recorder->flash->video = get_config('mediacapture', 'flash_video_recorder');
 
-        $recorder->java = new stdClass;
+        $recorder->java = new stdClass();
         $recorder->java->audio = get_config('mediacapture', 'java_audio_recorder');
         $recorder->java->video = get_config('mediacapture', 'java_video_recorder');
 
         $ajax_uri = urlencode(new moodle_url($CFG->wwwroot.'/repository/mediacapture/lib_ajax.php'));
 
-        $html = '<input type="hidden" id="ajax_uri" name="ajax_uri" value="'.$ajax_uri.'" /><div class="appletcontainer" id="appletcontainer" style="margin:10px 0 0 40px;">';
+        $html = '<input type="hidden" id="ajax_uri" name="ajax_uri" value="'.$ajax_uri.'" /><div class="appletcontainer" id="appletcontainer">';
         if ($recorder->flash->audio or $recorder->java->audio) {
-            $html .= '<input type="button" onclick="return parent.load_recorder(\'show_audio\')" value="Start Audio" /> ';
+            $html .= '<input type="button" onclick="return load_recorder(\'show_audio\')" value="Start Audio" /> ';
         }
         if ($recorder->flash->video or $recorder->java->video) {
-            $html .= '<input type="button" onclick="return parent.load_recorder(\'show_video\')" value="Start Video" />';
+            $html .= '<input type="button" onclick="return load_recorder(\'show_video\')" value="Start Video" />';
         }
         $html .= '</div>';
 
@@ -154,12 +162,14 @@ class mediacapture {
      */
     public function print_audio_recorder($plugins) {
         $error = array();
-        $recorder = new stdClass;
+
+        unset($recorder);
+        $recorder = new stdClass();
         
-        $recorder->flash = new stdClass;
+        $recorder->flash = new stdClass();
         $recorder->flash->audio = get_config('mediacapture', 'flash_audio_recorder');
 
-        $recorder->java = new stdClass;
+        $recorder->java = new stdClass();
         $recorder->java->audio = get_config('mediacapture', 'java_audio_recorder');
 
         if ($plugins->flash >= 9 && $recorder->flash->audio) {
@@ -180,10 +190,13 @@ class mediacapture {
     public function print_video_recorder($plugins) {
         $errors = array();
 
-        $recorder->flash = new stdClass;
+        unset($recorder);
+        $recorder = new stdClass();
+
+        $recorder->flash = new stdClass();
         $recorder->flash->video = get_config('mediacapture', 'flash_video_recorder');
 
-        $recorder->java = new stdClass;
+        $recorder->java = new stdClass();
         $recorder->java->video = get_config('mediacapture', 'java_video_recorder');
 
         if ($plugins->flash >= 9 && $recorder->flash->video) {
@@ -231,7 +244,7 @@ class mediacapture {
 
         // Set the layout elements for the recorder applet
         $recorder = '
-                <form method="post" action="'.$callbackurl.'">            
+                <form method="post" action="'.$callbackurl.'" onsubmit="return submit_java_audio();">
                     <applet id="audio_recorder" name="audio_recorder" code="gong.NanoGong" width="160" height="40" archive="' . $url . '">
                         <param name="AudioFormat" value="' . $audio_format .'" />
                         <param name="ShowSaveButton" value="false" />
@@ -241,10 +254,10 @@ class mediacapture {
                     </applet><br /><br />
                     <input type="hidden" id="posturl" name="posturl" value="' . $post_url . '" />
                     <input type="hidden" id="fileloc" name="fileloc" />
-                    <input type="text" id="filename" name="filename" onfocus="this.select()" value="*.wav" style="width:150px;" /><br /><br />
-                    <input type="button" onclick="parent.submit_java_audio();" value="'. $save .'" />
-                </form>
-                ';
+                    <input type="text" id="filename" name="filename" onfocus="this.select()" value="*.wav"/>
+                    <br />
+                    <input type="submit" value="'. $save .'" />
+                </form>';
         return $recorder;
     }
 
@@ -257,9 +270,9 @@ class mediacapture {
 
         $url = new moodle_url($CFG->wwwroot.'/repository/mediacapture/assets/audio/flash/recorder.swf?gateway=form');
         $tmp_loc = urlencode($CFG->dataroot);
-        $callback = urlencode("(function(a,b){parent.submit_flash_audio(a,b);})");
+        $js_callback = urlencode("(function(a, b){d=document;d.g=d.getElementById;fn=d.g('filename');fn.value=a;fd=d.g('filedata');fd.value=b;d.forms[0].submit();})");
         $callbackurl = new moodle_url('/repository/mediacapture/callback.php');
-        $flashvars = "&callback={$callback}&filename=new_recording";
+        $flashvars = "&callback={$js_callback}&filename=new_recording";
 
         $recorder = '
                 <form method="post" action="'.$callbackurl.'">
@@ -314,7 +327,7 @@ class mediacapture {
 
         // set the layout elements for the recorder applet
         $recorder = '
-            <form method="post" action="'.$callbackurl.'"> 
+            <form method="post" action="'.$callbackurl.'" onsubmit="return upload_rp();"> 
                 <applet  
                   ID       = "applet"
                   ARCHIVE  = "'.$url.'"
@@ -336,25 +349,25 @@ class mediacapture {
                     <param name = "UserPostVariables"   value = "type">
                     <param name = "type"                value = "upload_video">
                 </applet>
-                <div id="toolbar" class="clearfix" style="width:325px;margin:10px 0 30px 0">
-                    <button id="rec" onclick="return  parent.record_rp()" style="height:25px; float:left; min-width:35px; margin:0 15px 0 0;">
+                <div id="toolbar" class="clearfix">
+                    <button id="rec" onclick="return  record_rp()">
                         <img src="'.$img_dir.'/rec.gif" />
                     </button>
-                    <button id="play" onclick="return parent.playback_rp()" disabled style="height:25px; float:left; min-width:35px; margin:0 15px 0 0;">
+                    <button id="play" onclick="return playback_rp()" disabled>
                         <img src="'.$img_dir.'/play.gif" />
                     </button>
-                    <button id="pause" onclick="return parent.pause_rp()" disabled style="height:25px; float:left; min-width:35px; margin:0 15px 0 0;">
+                    <button id="pause" onclick="return pause_rp()" disabled>
                         <img src="'.$img_dir.'/pause.gif" />    
                     </button>
-                    <button id="stop" onclick="return parent.stop_rp()" disabled style="height:25px; float:left; min-width:35px; margin:0 15px 0 0;">
+                    <button id="stop" onclick="return stop_rp()" disabled>
                         <img src="'.$img_dir.'/stop.gif" />
                     </button>
-                    <input type="text" name="Timer" id="Timer" disabled style="float:right; width:80px; height:25px; text-align:center;" />
-                </div><br />
+                    <input type="text" name="Timer" id="Timer" disabled/>
+                </div>
                 <input type="hidden" id="Status" name="Status" value="" />
                 <input type="hidden" id="fileloc" name="fileloc" value="' . $tmp_loc . '"/>
-                <input type="text" id="filename" name="filename" onfocus="this.select()" value="*.mp4" style="width:325px;" /><br /><br />
-                <input type="button" onclick="parent.upload_rp()" value="'. $save .'" />
+                <input type="text" id="filename" name="filename" onfocus="this.select()" value="*.mp4"/><br />
+                <input type="submit" value="'. $save .'" />
             </form>';
         return $recorder;
     }
@@ -372,7 +385,7 @@ class mediacapture {
         $save = get_string('save', 'repository_mediacapture');
 
         $recorder = '
-                <form method="post" action="'.$callbackurl.'"> 
+                <form method="post" action="'.$callbackurl.'" onsubmit="return submit_flash_video();"> 
                     <object classid="clsid:D27CDB6E-AE6D-11cf-96B8-444553540000"
                         id="red5recorder" width="100%" height="100%"
                         codebase="http://fpdownload.macromedia.com/get/flashplayer/current/swflash.cab">
@@ -392,8 +405,8 @@ class mediacapture {
                     </object><br /><br />
                     <input type="hidden" id="fileloc" name="fileloc" value="' . $tmp_loc . '" />
                     <input type="hidden" id="posturl" name="posturl" value="' . $post_url . '" />
-                    <input type="text" id="filename" name="filename" onfocus="this.select()" value="*.flv" style="width:305px;" /><br /><br />
-                    <input type="button" onclick="parent.submit_flash_video();" value="'.$save .'" />
+                    <input type="text" id="filename" name="filename" onfocus="this.select()" value="*.flv"/><br /><br />
+                    <input type="submit" value="'.$save .'" />
                 </form>';
         return $recorder;
     }

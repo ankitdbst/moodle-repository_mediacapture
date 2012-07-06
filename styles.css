@@ -1,0 +1,47 @@
+/**
+ * @file CSS file to manage the layout elements of the mediacapture plugin
+ */
+
+/* General layout rules  */
+.appletcontainer { 
+    height:320px;     
+    /* Firefox */
+    display:-moz-box;
+    -moz-box-orient:horizontal;
+    -moz-box-pack:center;
+    -moz-box-align:center;
+
+    /* Safari and Chrome */
+    display:-webkit-box;
+    -webkit-box-orient:horizontal;
+    -webkit-box-pack:center;
+    -webkit-box-align:center;
+
+    /* W3C */
+    display:box;
+    box-orient:horizontal;
+    box-pack:center;
+    box-align:center;
+}
+
+#toolbar {
+    margin:10px 0 15px 0
+}
+
+#toolbar button {
+    height:25px;
+    float:left;
+    min-width:35px;
+    margin:0 10px 0 0;
+}
+
+#filename {
+    margin:0 0 5px 0;
+}
+
+#Timer {
+    float:right;
+    width:80px;
+    height:20px;
+    text-align:center;
+}

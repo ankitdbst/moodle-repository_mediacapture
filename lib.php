@@ -38,7 +38,6 @@ class repository_mediacapture extends repository {
     public function __construct($repositoryid, $context = SITEID, $options = array()) {
         global $PAGE, $CFG, $action, $itemid;
         parent::__construct($repositoryid, $context, $options);
-        $this->include_js();
     }
 
     public static function get_type_option_names() {
@@ -92,18 +91,6 @@ class repository_mediacapture extends repository {
     }
 
     /**
-     * Loads the required js files and populates lang strings
-     */
-    private function include_js() {
-        global $PAGE, $CFG;
-        $PAGE->requires->js(new moodle_url($CFG->wwwroot . '/repository/mediacapture/assets/prerequisites.js'));
-        $PAGE->requires->js(new moodle_url($CFG->wwwroot . '/repository/mediacapture/script.js'));
-        $client = new mediacapture();
-        $string_js = $client->get_string_js();
-        $PAGE->requires->data_for_js('mediacapture', $string_js);
-    }
-
-    /**
      * Upload the recorded file
      *
      * @param string $url the url of file
@@ -115,11 +102,15 @@ class repository_mediacapture extends repository {
         $path = $this->prepare_file($filename);
         $url1 = unserialize(base64_decode($url));        
         $filedata = base64_decode($url1->filedata);
+        // Check whenever raw data is not passed
         if (empty($filedata)) {
             $filedata = file_get_contents($url1->url);
         }
-        unlink($url1->url);
         file_put_contents($path, $filedata);
+        // Delete the temp file only when raw data is not passed
+        if (empty($filedata)) {
+            unlink($url1->url);
+        }        
 
         return array('path'=>$path, 'url'=>$url);
     }

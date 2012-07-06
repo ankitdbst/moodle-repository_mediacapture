@@ -25,6 +25,14 @@
  */
 
 require_once(dirname(__FILE__) . '/mediacapture.php');
+$returnurl = required_param('returnurl', PARAM_URL);
+$PAGE->set_context(get_context_instance(CONTEXT_SYSTEM));
+$PAGE->set_url('/repository/mediacapture/view.php', array('returnurl'=>$returnurl));
+$PAGE->set_pagelayout('embedded');
 $client = new mediacapture();
+
+
+echo $OUTPUT->header();
 echo $client->init();
+echo $OUTPUT->footer();
 ?>
