@@ -3,83 +3,167 @@
  * of the mediacapture plugin
  */
 
+/**
+ * Custom timer event
+ */
+var secs;
+var timerID = null;
+var timerRunning = false;
+var maxTime = 20;
+var delay = 1000;
+
+function InitializeTimer() {
+    // Set the length of the timer, in seconds
+    secs = 0;
+    StopTheClock();
+    StartTheTimer();
+}
+
+function PauseTheClock() {
+    if(timerRunning) {
+        timerRunning = false;
+        clearTimeout(timerID);
+    } else {
+        timerRunning = true;
+        timerID = self.setTimeout("StartTheTimer()", delay);
+    }
+}
+
+function StopTheClock() {
+    if(timerRunning) {
+        clearTimeout(timerID);
+    }
+    timerRunning = false;
+}
+
+function StartTheTimer()
+{
+    setTimer('00:'+zeroFill(secs,2)+'/00:20');
+    if (secs == maxTime)
+    {
+        StopTheClock();
+    }
+    else
+    {
+        self.status = secs;
+        secs = secs + 1;
+        timerRunning = true;
+        timerID = self.setTimeout("StartTheTimer()", delay);
+    }
+}
+
+function zeroFill( number, width ) {
+    width -= number.toString().length;
+    if (width > 0)
+    {
+        return new Array( width + (/\./.test( number ) ? 2 : 1) ).join( '0' ) + number;
+    }
+    return number + ""; // always return a string
+}
+
  /**
   * Start the appropriate audio/video recorder via ajax
   * in response to user selection
   */
 function load_recorder(type) {
     // Create a YUI instance using io-base module.
-    YUI().use('node', 'io-base', function(Y) {
-        var uri = decodeURIComponent(Y.one('#ajax_uri').get('value'));
-        var applet = Y.one('#appletcontainer');
-        // Define a function to handle the response data.
-        function complete(id, o) {
-            var id = id; // Transaction ID.
-            var data = o.responseText; // Response data.
-            applet.setContent(data);
-        };
+    YUI().use('node', function(Y) {
+        var object = Y.one('object'),
+        doc = Y.Node.getDOMNode(object.get('contentDocument'));
 
-        // Subscribe to event "io:complete"
-        Y.on('io:complete', complete, Y);
+        YUI({ doc: doc }).use('node', 'io-base', function(innerY) {        
+            var uri = decodeURIComponent(innerY.one('#ajax_uri').get('value'));
+            var applet = innerY.one('#appletcontainer');
+            // Define a function to handle the response data.
+            function complete(id, o) {
+                var id = id; // Transaction ID.
+                var data = o.responseText; // Response data.
+                applet.setContent(data);
+            };
 
-        // Make an HTTP POST request to posturl.
-        cfg = {
-            method: 'POST',  
-            data:   'type='+type+
-                    '&java='+BrowserPlugins.java+
-                    '&flash='+BrowserPlugins.flash+
-                    '&quicktime='+BrowserPlugins.quicktime+
-                    '&os='+BrowserDetect.OS,
-        };
+            // Subscribe to event "io:complete"
+            innerY.on('io:complete', complete, innerY);
 
-        var request = Y.io(uri, cfg);
+            // Make an HTTP POST request to posturl.
+            cfg = {
+                method: 'POST',  
+                data:   'type='+type+
+                        '&java='+parent.BrowserPlugins.java+
+                        '&flash='+parent.BrowserPlugins.flash+
+                        '&quicktime='+parent.BrowserPlugins.quicktime+
+                        '&os='+parent.BrowserDetect.OS,
+            };
+
+            var request = innerY.io(uri, cfg);
+        });
+
     });
 
     return false;
 }  
- 
+
 /**
  * Method to validate the audio recording form and save
  * the recording to temp file
  */
-function submitAudio() {
-    var filename    = document.getElementById('filename'),
-        recorder    = document.getElementById('audio_recorder'),
-        posturl     = document.getElementById('posturl'),
-        fileloc     = document.getElementById('fileloc');
+function submit_java_audio() {
+
+    YUI().use('node', function(Y) {
+        var object = Y.one('object'),
+        doc = object.get('contentDocument');
         
-    filename.value = filename.value.replace('.wav', '');
-    filename.value = filename.value.replace('*', '');
+        var filename = Y.Node.getDOMNode(doc.one('#filename')),
+            recorder = Y.Node.getDOMNode(doc.one('#audio_recorder')),
+            posturl = Y.Node.getDOMNode(doc.one('#posturl')),
+            fileloc = Y.Node.getDOMNode(doc.one('#fileloc'));
 
-    if (!filename.value) {
-        alert(mediacapture['nonamefound']);
-        filename.value = '*.wav';
-        return false;
-    }
-    filename.value += '.wav';
+        filename.value = filename.value.replace('.wav', '');
+        filename.value = filename.value.replace('*', '');
 
-    if (!recorder || !(recorder.sendGongRequest)) {
-        alert(mediacapture['appletnotfound']);
-        return false;
-    }
+        if (!filename.value) {
+            alert(parent.mediacapture['nonamefound']);
+            filename.value = '*.wav';
+            return false;
+        }
 
-    var duration = parseInt(recorder.sendGongRequest("GetMediaDuration", "audio")) || 0
-    if (duration <= 0) {
-        alert(mediacapture['norecordingfound']);
-        return false;
-    }
+        filename.value += '.wav';
 
-    posturl.value = decodeURIComponent(posturl.value) + '?type=upload_audio';
-    fileloc.value = encodeURIComponent(recorder.sendGongRequest("PostToForm", posturl.value, "repo_upload_audio", "cookie=nanogong", "myfile"));
-    
-    if (!fileloc.value) {
-        alert(mediacapture['filenotsaved']);
-        return false;
-    }
-    
-    simulateClick(recorder, '.wav');
+        if (!recorder || !(recorder.sendGongRequest)) {
+            alert(parent.mediacapture['appletnotfound']);
+            return false;
+        }
 
-    return true;
+        var duration = parseInt(recorder.sendGongRequest("GetMediaDuration", "audio")) || 0
+        if (duration <= 0) {
+            alert(parent.mediacapture['norecordingfound']);
+            return false;
+        }
+
+        posturl.value = decodeURIComponent(posturl.value) + '?type=upload_audio';
+        fileloc.value = encodeURIComponent(recorder.sendGongRequest("PostToForm", posturl.value, "repo_upload_audio", "cookie=nanogong", "myfile"));
+        
+        if (!fileloc.value) {
+            alert(parent.mediacapture['filenotsaved']);
+            return false;
+        }
+        
+        Y.Node.getDOMNode(doc.one('form')).submit();
+    });    
+}
+
+function submit_flash_audio(a, b) {
+    YUI().use('node', function(Y) {
+        var object = Y.one('object'),
+        doc = object.get('contentDocument');
+
+        var filename = Y.Node.getDOMNode(doc.one('#filename')),
+            filedata = Y.Node.getDOMNode(doc.one('#filedata'));
+        
+        filename.value = a;
+        filedata.value = b;
+
+        Y.Node.getDOMNode(doc.one('form')).submit();
+    });
 }
 
 /**
@@ -97,25 +181,44 @@ function setStatus(num, str) {
     // StartPlay = 3;
     // PauseSet = 4;
     // Stopped = 5;
-    document.getElementById('Status').value = str;
+    YUI().use('node', function(Y) {
+        var object = Y.one('object'),
+        doc = object.get('contentDocument');
+        
+        var status = Y.Node.getDOMNode(doc.one('#Status'));
+        status.value = str;
+    });
 }
 
 /**
  * Start the timer for the recording
  */
 function setTimer(str) {
-    document.getElementById('Timer').value = str;
+    YUI().use('node', function(Y) {
+        var object = Y.one('object'),
+        doc = object.get('contentDocument');
+        
+        var timer = Y.Node.getDOMNode(doc.one('#Timer'));
+        timer.value = str;
+    });
 }
 
 /**
  * Start recording
  */
 function record_rp() {
-    document.VimasVideoApplet.RECORD_VIDEO();
-    document.getElementById('rec').disabled=true;
-    document.getElementById('play').disabled=true;
-    document.getElementById('stop').disabled=false;
-    document.getElementById('pause').disabled=false;
+    YUI().use('node', function(Y) {
+        var object = Y.one('object'),
+        doc = object.get('contentDocument');
+        
+        Y.Node.getDOMNode(doc.one('applet')).RECORD_VIDEO();
+        InitializeTimer();
+        Y.Node.getDOMNode(doc.one('#rec')).disabled = true;
+        Y.Node.getDOMNode(doc.one('#play')).disabled=true;
+        Y.Node.getDOMNode(doc.one('#stop')).disabled=false;
+        Y.Node.getDOMNode(doc.one('#pause')).disabled=false;
+    });
+
     return false;
 }
 
@@ -123,8 +226,15 @@ function record_rp() {
  * Playback for the recorded video
  */
 function playback_rp() {
-    document.VimasVideoApplet.PLAY_VIDEO();
-    document.getElementById('pause').disabled=false;
+    YUI().use('node', function(Y) {
+        var object = Y.one('object'),
+        doc = object.get('contentDocument');
+        
+        Y.Node.getDOMNode(doc.one('applet')).PLAY_VIDEO();
+        StartTheTimer();
+        Y.Node.getDOMNode(doc.one('#pause')).disabled = false;
+    });
+
     return false;
 }
 
@@ -132,19 +242,33 @@ function playback_rp() {
  * Pause the playback/recording
  */
 function pause_rp() {
-    document.VimasVideoApplet.PAUSE_VIDEO();
+    YUI().use('node', function(Y) {
+        var object = Y.one('object'),
+        doc = object.get('contentDocument');
+        
+        Y.Node.getDOMNode(doc.one('applet')).PAUSE_VIDEO();
+        PauseTheClock();
+    });
+
     return false;
 }
 
 /**
  * Stop recording
  */
-function stop_rp() {
-    document.VimasVideoApplet.STOP_VIDEO();
-    document.getElementById('rec').disabled=false;
-    document.getElementById('stop').disabled=true;
-    document.getElementById('pause').disabled=true;
-    document.getElementById('play').disabled=false;
+function stop_rp() {    
+    YUI().use('node', function(Y) {
+        var object = Y.one('object'),
+        doc = object.get('contentDocument');
+        
+        Y.Node.getDOMNode(doc.one('applet')).STOP_VIDEO();
+        StopTheClock();
+        Y.Node.getDOMNode(doc.one('#rec')).disabled=false;
+        Y.Node.getDOMNode(doc.one('#stop')).disabled=true;
+        Y.Node.getDOMNode(doc.one('#pause')).disabled=true;
+        Y.Node.getDOMNode(doc.one('#play')).disabled=false;
+    });
+
     return false;
 }
 
@@ -153,94 +277,92 @@ function stop_rp() {
  * a tmp location on server.
  */
 function upload_rp() {
-    var filename = document.getElementById('filename'),
-        fileloc = document.getElementById('fileloc'),
-        duration = document.getElementById('Timer'); 
+    YUI().use('node', function(Y) {
+        var object = Y.one('object'),
+        doc = object.get('contentDocument');
+        
+        var filename = Y.Node.getDOMNode(doc.one('#filename')),
+            fileloc = Y.Node.getDOMNode(doc.one('#fileloc')),
+            duration = Y.Node.getDOMNode(doc.one('#Timer'));
+        /*
+        if (!duration.value.trim()) {
+            alert(parent.mediacapture['norecordingfound']);
+            return false;
+        }
+        */
 
-    if (!duration.value.trim()) {
-        alert(mediacapture['norecordingfound']);
-        return false;
-    }
+        filename.value = filename.value.replace('.mp4', '');
+        filename.value = filename.value.replace('*', '');
+        if (!filename.value) {
+            alert(parent.mediacapture['nonamefound']);
+            filename.value = '*.mp4';
+            return false;
+        }
+        filename.value = filename.value + '.mp4';
 
-    filename.value = filename.value.replace('.mp4', '');
-    filename.value = filename.value.replace('*', '');
-    if (!filename.value) {
-        alert(mediacapture['nonamefound']);
-        filename.value = '*.mp4';
-        return false;
-    }
-    filename.value = filename.value + '.mp4';
-
-    document.VimasVideoApplet.UPLOAD_VIDEO(String(filename.value));
-    fileloc.value = encodeURIComponent(decodeURIComponent(fileloc.value) + '/' + filename.value);
-    simulateClick(filename, '.mp4');
-    return true;
+        Y.Node.getDOMNode(doc.one('applet')).UPLOAD_VIDEO(String(filename.value));
+        fileloc.value = encodeURIComponent(decodeURIComponent(fileloc.value) + '/' + filename.value);
+        Y.Node.getDOMNode(doc.one('form')).submit();
+    });
 }
 
 /**
  * Submits the video recording to the server 
  * for processing upload
  */
-function submitVideo() {
-    var filename = document.getElementById('filename'),
-        fileloc = document.getElementById('fileloc');
+function submit_flash_video() {
+    YUI().use('node', function(Y) {
+        var object = Y.one('object'),
+        doc = object.get('contentDocument');
 
-    filename.value = filename.value.replace('.flv', '');
-    filename.value = filename.value.replace('*', '');
-    if (!filename.value) {
-        alert(mediacapture['nonamefound']);
-        filename.value = '*.flv';
-        return false;
-    }
-    
-    filename.value = filename.value + '.flv';
-    fileloc.value = encodeURIComponent(decodeURIComponent(fileloc.value));
+        var filename = Y.Node.getDOMNode(doc.one('#filename')),
+            fileloc = Y.Node.getDOMNode(doc.one('#fileloc'));
 
-    var duration = 90; // max-duration
+        filename.value = filename.value.replace('.flv', '');
+        filename.value = filename.value.replace('*', '');
+        if (!filename.value) {
+            alert(parent.mediacapture['nonamefound']);
+            filename.value = '*.flv';
+            return false;
+        }
+        
+        filename.value = filename.value + '.flv';
+        fileloc.value = fileloc.value;
 
-    // Create a YUI instance using io-base module.
-    YUI().use('node', 'io-base', function(Y) {
-        var uri = decodeURIComponent(Y.one('#posturl').get('value'));
-        // Define a function to handle the response data.
-        function complete(id, o) {
-            var id = id; // Transaction ID.
-            var data = o.responseText; // Response data.
-            if (data === 'NONE') {
-                duration = 0;
-            }
-        };
+        var duration = 90; // max-duration
 
-        // Subscribe to event "io:complete"
-        Y.on('io:complete', complete, Y);
+        win = Y.Node.getDOMNode(object.get('contentDocument'));
 
-        // Make an HTTP POST request to posturl.
-        cfg = {
-            method: 'POST',  
-            data:   'type=check_duration',
-            sync:true
-        };
-        var request = Y.io(uri, cfg);  
+        // Create a YUI instance using io-base module.
+        YUI({ win: win }).use('node', 'io-base', function(innerY) { 
+            var uri = decodeURIComponent(innerY.one('#posturl').get('value'));
+            // Define a function to handle the response data.
+            function complete(id, o) {
+                var id = id; // Transaction ID.
+                var data = o.responseText; // Response data.
+                if (data === 'NONE') {
+                    duration = 0;
+                }
+            };
+
+            // Subscribe to event "io:complete"
+            innerY.on('io:complete', complete, innerY);
+
+            // Make an HTTP POST request to posturl.
+            cfg = {
+                method: 'POST',  
+                data:   'type=check_duration',
+                sync:true
+            };
+            var request = innerY.io(uri, cfg);  
+        });
+
+        if (duration <= 0) {    
+            alert(parent.mediacapture['norecordingfound']);
+            return false;
+        }
+
+        Y.Node.getDOMNode(doc.one('form')).submit();
     });
 
-    if (duration <= 0) {    
-        alert(mediacapture['norecordingfound']);
-        return false;
-    }
-
-    simulateClick(filename, '.flv');
-    return true;    
-}
-
-/**
- * Simulates the 'click' event for the form upload
- */
-function simulateClick(el, type) {
-
-    while(el.tagName != 'FORM') {
-        el = el.parentNode;
-    }
-
-    el.repo_upload_file.type = 'hidden';
-    el.repo_upload_file.value = 'temp'+type;
-    el.nextElementSibling.getElementsByTagName('button')[0].click();
 }

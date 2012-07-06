@@ -135,12 +135,13 @@ class mediacapture {
         $recorder->java->video = get_config('mediacapture', 'java_video_recorder');
 
         $ajax_uri = urlencode(new moodle_url($CFG->wwwroot.'/repository/mediacapture/lib_ajax.php'));
-        $html = '<input type="hidden" id="ajax_uri" name="ajax_uri" value="'.$ajax_uri.'" /><div class="appletcontainer" id="appletcontainer">';
+
+        $html = '<input type="hidden" id="ajax_uri" name="ajax_uri" value="'.$ajax_uri.'" /><div class="appletcontainer" id="appletcontainer" style="margin:10px 0 0 40px;">';
         if ($recorder->flash->audio or $recorder->java->audio) {
-            $html .= '<input type="button" onclick="return load_recorder(\'show_audio\')" value="Start Audio" /> ';
+            $html .= '<input type="button" onclick="return parent.load_recorder(\'show_audio\')" value="Start Audio" /> ';
         }
         if ($recorder->flash->video or $recorder->java->video) {
-            $html .= '<input type="button" onclick="return load_recorder(\'show_video\')" value="Start Video" />';
+            $html .= '<input type="button" onclick="return parent.load_recorder(\'show_video\')" value="Start Video" />';
         }
         $html .= '</div>';
 
@@ -153,9 +154,17 @@ class mediacapture {
      */
     public function print_audio_recorder($plugins) {
         $error = array();
-        if ($plugins->flash >= 9) {
+        $recorder = new stdClass;
+        
+        $recorder->flash = new stdClass;
+        $recorder->flash->audio = get_config('mediacapture', 'flash_audio_recorder');
+
+        $recorder->java = new stdClass;
+        $recorder->java->audio = get_config('mediacapture', 'java_audio_recorder');
+
+        if ($plugins->flash >= 9 && $recorder->flash->audio) {
             return $this->print_flash_audio_recorder();
-        } else if ($plugins->java >= 1.5) {            
+        } else if ($plugins->java >= 1.5 && $recorder->java->audio) {            
             return $this->print_java_audio_recorder();
         } else {
             array_push($error, get_string('flashnotfound', 'repository_mediacapture'));
@@ -170,10 +179,17 @@ class mediacapture {
      */
     public function print_video_recorder($plugins) {
         $errors = array();
-        if ($plugins->flash >= 9) {
+
+        $recorder->flash = new stdClass;
+        $recorder->flash->video = get_config('mediacapture', 'flash_video_recorder');
+
+        $recorder->java = new stdClass;
+        $recorder->java->video = get_config('mediacapture', 'java_video_recorder');
+
+        if ($plugins->flash >= 9 && $recorder->flash->video) {
             return $this->print_flash_video_recorder();
         } else if ($plugins->java >= 1.5 && $plugins->quicktime >= 1.0 && 
-                    $plugins->os !== 'Linux') {            
+                    $plugins->os !== 'Linux' && $recorder->java->video) {            
             return $this->print_java_video_recorder();
         } else {
             array_push($errors, get_string('flashnotfound', 'repository_mediacapture'));
@@ -211,19 +227,23 @@ class mediacapture {
         $javanotfound = get_string('javanotfound', 'repository_mediacapture');
         $save = get_string('save', 'repository_mediacapture');
 
+        $callbackurl = new moodle_url('/repository/mediacapture/callback.php');
+
         // Set the layout elements for the recorder applet
-        $recorder = '            
-                <applet id="audio_recorder" name="audio_recorder" code="gong.NanoGong" width="160" height="40" archive="' . $url . '">
-                    <param name="AudioFormat" value="' . $audio_format .'" />
-                    <param name="ShowSaveButton" value="false" />
-                    <param name="ShowTime" value="true" />
-                    <param name="SamplingRate" value="' . $sampling_rate . '" />
-                    <p>' . $javanotfound . '</p>
-                </applet><br /><br />
-                <input type="hidden" id="posturl" name="posturl" value="' . $post_url . '" />
-                <input type="hidden" id="fileloc" name="fileloc" />
-                <input type="text" id="filename" name="filename" onfocus="this.select()" value="*.wav" style="width:150px;" /><br /><br />
-                <input type="button" onclick="submitAudio()" value="'. $save .'" />
+        $recorder = '
+                <form method="post" action="'.$callbackurl.'">            
+                    <applet id="audio_recorder" name="audio_recorder" code="gong.NanoGong" width="160" height="40" archive="' . $url . '">
+                        <param name="AudioFormat" value="' . $audio_format .'" />
+                        <param name="ShowSaveButton" value="false" />
+                        <param name="ShowTime" value="true" />
+                        <param name="SamplingRate" value="' . $sampling_rate . '" />
+                        <p>' . $javanotfound . '</p>
+                    </applet><br /><br />
+                    <input type="hidden" id="posturl" name="posturl" value="' . $post_url . '" />
+                    <input type="hidden" id="fileloc" name="fileloc" />
+                    <input type="text" id="filename" name="filename" onfocus="this.select()" value="*.wav" style="width:150px;" /><br /><br />
+                    <input type="button" onclick="parent.submit_java_audio();" value="'. $save .'" />
+                </form>
                 ';
         return $recorder;
     }
@@ -237,29 +257,32 @@ class mediacapture {
 
         $url = new moodle_url($CFG->wwwroot.'/repository/mediacapture/assets/audio/flash/recorder.swf?gateway=form');
         $tmp_loc = urlencode($CFG->dataroot);
-        $callback = urlencode("(function(a, b){d=document;d.g=d.getElementById;fn=d.g('filename');fn.value=a;fd=d.g('filedata');fd.value=b;f=fn;while(f.tagName!='FORM')f=f.parentNode;f.repo_upload_file.type='hidden';f.repo_upload_file.value='bogus.mp3';while(f.tagName!='DIV')f=f.nextSibling;f.getElementsByTagName('button')[0].click();})");
+        $callback = urlencode("(function(a,b){parent.submit_flash_audio(a,b);})");
+        $callbackurl = new moodle_url('/repository/mediacapture/callback.php');
         $flashvars = "&callback={$callback}&filename=new_recording";
 
         $recorder = '
-                <object id="onlineaudiorecorder" classid="clsid:D27CDB6E-AE6D-11cf-96B8-444553540000" width="215" height="138">
-                    <param name="movie" value="'.$url.$flashvars.'" />
-                    <param name="wmode" value="transparent" />
-                    <!--[if !IE]>-->
-                    <object type="application/x-shockwave-flash" data="'.$url.$flashvars.'" width="215" height="138">
-                    <!--<![endif]-->
-                    <div>
-                        <p>
-                            <a href="http://www.adobe.com/go/getflashplayer"><img src="http://www.adobe.com/images/shared/download_buttons/get_flash_player.gif" alt="Get Adobe Flash player" />
-                            </a>
-                        </p>
-                    </div>
-                    <!--[if !IE]>-->
+                <form method="post" action="'.$callbackurl.'">
+                    <object id="onlineaudiorecorder" classid="clsid:D27CDB6E-AE6D-11cf-96B8-444553540000" width="215" height="138">
+                        <param name="movie" value="'.$url.$flashvars.'" />
+                        <param name="wmode" value="transparent" />
+                        <!--[if !IE]>-->
+                        <object type="application/x-shockwave-flash" data="'.$url.$flashvars.'" width="215" height="138">
+                        <!--<![endif]-->
+                        <div>
+                            <p>
+                                <a href="http://www.adobe.com/go/getflashplayer"><img src="http://www.adobe.com/images/shared/download_buttons/get_flash_player.gif" alt="Get Adobe Flash player" />
+                                </a>
+                            </p>
+                        </div>
+                        <!--[if !IE]>-->
+                        </object>
+                        <!--<![endif]-->
                     </object>
-                    <!--<![endif]-->
-                </object>
-                <input type="hidden" name="filename" id="filename" />
-                <input type="hidden" name="fileloc" id="fileloc" value="'.$tmp_loc.'" />
-                <textarea name="filedata" id="filedata" style="display:none;"></textarea>';
+                    <input type="hidden" name="filename" id="filename" />
+                    <input type="hidden" name="fileloc" id="fileloc" value="'.$tmp_loc.'" />
+                    <textarea name="filedata" id="filedata" style="display:none;"></textarea>
+                </form>';
                 
         return $recorder;
     }
@@ -272,6 +295,7 @@ class mediacapture {
         
         $url = new moodle_url($CFG->wwwroot.'/repository/mediacapture/assets/video/applet/VideoApplet.jar');
         $post_url = new moodle_url($CFG->wwwroot .'/repository/mediacapture/lib_ajax.php');
+        $callbackurl = new moodle_url('/repository/mediacapture/callback.php');
         $img_dir = new moodle_url($CFG->wwwroot.'/repository/mediacapture/assets/video/img');
         $tmp_loc = urlencode($CFG->dataroot. '/temp');
         $save = get_string('save', 'repository_mediacapture');
@@ -290,6 +314,7 @@ class mediacapture {
 
         // set the layout elements for the recorder applet
         $recorder = '
+            <form method="post" action="'.$callbackurl.'"> 
                 <applet  
                   ID       = "applet"
                   ARCHIVE  = "'.$url.'"
@@ -311,26 +336,26 @@ class mediacapture {
                     <param name = "UserPostVariables"   value = "type">
                     <param name = "type"                value = "upload_video">
                 </applet>
-                <div id="toolbar" class="clearfix">
-                    <button id="rec" onclick="return  record_rp()">
+                <div id="toolbar" class="clearfix" style="width:325px;margin:10px 0 30px 0">
+                    <button id="rec" onclick="return  parent.record_rp()" style="height:25px; float:left; min-width:35px; margin:0 15px 0 0;">
                         <img src="'.$img_dir.'/rec.gif" />
                     </button>
-                    <button id="play" onclick="return playback_rp()" disabled>
+                    <button id="play" onclick="return parent.playback_rp()" disabled style="height:25px; float:left; min-width:35px; margin:0 15px 0 0;">
                         <img src="'.$img_dir.'/play.gif" />
                     </button>
-                    <button id="pause" onclick="return pause_rp()" disabled>
+                    <button id="pause" onclick="return parent.pause_rp()" disabled style="height:25px; float:left; min-width:35px; margin:0 15px 0 0;">
                         <img src="'.$img_dir.'/pause.gif" />    
                     </button>
-                    <button id="stop" onclick="return stop_rp()" disabled>
+                    <button id="stop" onclick="return parent.stop_rp()" disabled style="height:25px; float:left; min-width:35px; margin:0 15px 0 0;">
                         <img src="'.$img_dir.'/stop.gif" />
                     </button>
-                    <input type="text" name="Timer" id="Timer" disabled/>
+                    <input type="text" name="Timer" id="Timer" disabled style="float:right; width:80px; height:25px; text-align:center;" />
                 </div><br />
                 <input type="hidden" id="Status" name="Status" value="" />
                 <input type="hidden" id="fileloc" name="fileloc" value="' . $tmp_loc . '"/>
-                <input type="text" id="filename" name="filename" onfocus="this.select()" value="*.mp4" style="width:310px;" /><br /><br />
-                <input type="button" onclick="return upload_rp()" value="'. $save .'" />
-                ';
+                <input type="text" id="filename" name="filename" onfocus="this.select()" value="*.mp4" style="width:325px;" /><br /><br />
+                <input type="button" onclick="parent.upload_rp()" value="'. $save .'" />
+            </form>';
         return $recorder;
     }
 
@@ -341,33 +366,35 @@ class mediacapture {
         global $CFG, $PAGE;
 
         $url = new moodle_url($CFG->wwwroot.'/repository/mediacapture/assets/video/flash/red5recorder.swf');
+        $callbackurl = new moodle_url('/repository/mediacapture/callback.php');
         $post_url = new moodle_url($CFG->wwwroot .'/repository/mediacapture/lib_ajax.php');
         $tmp_loc = urlencode($CFG->dataroot. '/streams/video.flv');
         $save = get_string('save', 'repository_mediacapture');
 
         $recorder = '
-                <object classid="clsid:D27CDB6E-AE6D-11cf-96B8-444553540000"
-                    id="red5recorder" width="100%" height="100%"
-                    codebase="http://fpdownload.macromedia.com/get/flashplayer/current/swflash.cab">
-                    <param name="movie" value="'.$url.'" />
-                    <param name="quality" value="high" />
-                    <param name="bgcolor" value="#869ca7" />
-                    <param name="allowScriptAccess" value="sameDomain" />
-                    <embed src="'.$url.'" quality="high" bgcolor="#869ca7"
-                        width="320px" height="240px" name="red5recorder" align="middle"
-                        play="true"
-                        loop="false"
-                        quality="high"
-                        allowScriptAccess="sameDomain"
-                        type="application/x-shockwave-flash"
-                        pluginspage="http://www.adobe.com/go/getflashplayer">
-                    </embed>
-                </object><br /><br />
-                <input type="hidden" id="fileloc" name="fileloc" value="' . $tmp_loc . '" />
-                <input type="hidden" id="posturl" name="posturl" value="' . $post_url . '" />
-                <input type="text" id="filename" name="filename" onfocus="this.select()" value="*.flv" style="width:305px;" /><br /><br />
-                <input type="button" onclick="return submitVideo();" value="'.$save .'" />
-                ';
+                <form method="post" action="'.$callbackurl.'"> 
+                    <object classid="clsid:D27CDB6E-AE6D-11cf-96B8-444553540000"
+                        id="red5recorder" width="100%" height="100%"
+                        codebase="http://fpdownload.macromedia.com/get/flashplayer/current/swflash.cab">
+                        <param name="movie" value="'.$url.'" />
+                        <param name="quality" value="high" />
+                        <param name="bgcolor" value="#869ca7" />
+                        <param name="allowScriptAccess" value="sameDomain" />
+                        <embed src="'.$url.'" quality="high" bgcolor="#869ca7"
+                            width="320px" height="240px" name="red5recorder" align="middle"
+                            play="true"
+                            loop="false"
+                            quality="high"
+                            allowScriptAccess="sameDomain"
+                            type="application/x-shockwave-flash"
+                            pluginspage="http://www.adobe.com/go/getflashplayer">
+                        </embed>
+                    </object><br /><br />
+                    <input type="hidden" id="fileloc" name="fileloc" value="' . $tmp_loc . '" />
+                    <input type="hidden" id="posturl" name="posturl" value="' . $post_url . '" />
+                    <input type="text" id="filename" name="filename" onfocus="this.select()" value="*.flv" style="width:305px;" /><br /><br />
+                    <input type="button" onclick="parent.submit_flash_video();" value="'.$save .'" />
+                </form>';
         return $recorder;
     }
 

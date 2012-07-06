@@ -63,11 +63,6 @@ class repository_mediacapture extends repository {
         $client->get_recorder_config_form($mform);
     }
 
-    public function check_login() {
-        // Needs to return false so that the "login" form is displayed (print_login())
-        return false;
-    }
-
     public function global_search() {
         // Plugin doesn't support global search, since we don't have anything to search
         return false;
@@ -80,8 +75,20 @@ class repository_mediacapture extends repository {
      * @param string $page current page in the repository path
      * @return array structure of listing information
      */
-    public function get_listing($path = '', $page = '') {
-        return array();
+    public function get_listing($path = null, $page = null) {
+        global $COURSE;
+        $callbackurl = new moodle_url('/repository/mediacapture/callback.php', array('repo_id'=>$this->id));
+        $mimetypesstr = '';
+        
+        $url = new moodle_url('/repository/mediacapture/view.php', array('returnurl' => $callbackurl));
+        $list = array();
+        $list['object'] = array();
+        $list['object']['type'] = 'text/html';
+        $list['object']['src'] = $url->out(false);
+        $list['nologin']  = true;
+        $list['nosearch'] = true;
+        $list['norefresh'] = true;
+        return $list;
     }
 
     /**
@@ -97,117 +104,24 @@ class repository_mediacapture extends repository {
     }
 
     /**
-     * Prints the appropriate recorder html in the filepicker
+     * Upload the recorded file
+     *
+     * @param string $url the url of file
+     * @param string $filename save location
+     * @return string the location of the file
      */
-    public function print_login() {
-        global $CFG, $PAGE;
-
-        $client = new mediacapture();
-        $recorder = $client->init();
-        
-        $ret = array();
-        $ret['upload'] = array('label'=>$recorder, 'id'=>'repo-form');
-        return $ret;
-    }
-
-    /**
-     * Process uploaded file
-     * @return array|bool
-     */
-    public function upload($saveas_filename, $maxbytes) {
-        global $CFG;
-
-        $types = optional_param_array('accepted_types', '*', PARAM_RAW);
-        $savepath = optional_param('savepath', '/', PARAM_PATH);
-        $itemid = optional_param('itemid', 0, PARAM_INT);
-        $license = optional_param('license', $CFG->sitedefaultlicense, PARAM_TEXT);
-        $author = optional_param('author', '', PARAM_TEXT);
-		
-		$filename = required_param('filename', PARAM_TEXT);
-        $fileloc = urldecode(required_param('fileloc', PARAM_PATH));
-        $filedata = optional_param('filedata', '', PARAM_RAW);
-        $filedata = base64_decode($filedata);
-		
-        return $this->process_upload($saveas_filename, $maxbytes, $types, $savepath, $itemid, $license, $author, $filename, $fileloc, $filedata);
-    }
-
-    /**
-     * Do the actual processing of the uploaded file
-     * @param string $saveas_filename name to give to the file
-     * @param int $maxbytes maximum file size
-     * @param mixed $types optional array of file extensions that are allowed or '*' for all
-     * @param string $savepath optional path to save the file to
-     * @param int $itemid optional the ID for this item within the file area
-     * @param string $license optional the license to use for this file
-     * @param string $author optional the name of the author of this file
-     * @param string $filename required the name of the recording
-     * @param string $fileloc required the tmp location of the recorded stream
-     * @param string filedata optional raw data of the recorded file
-     * @return object containing details of the file uploaded
-     */
-    public function process_upload($saveas_filename, $maxbytes, $types = '*', $savepath = '/', $itemid = 0, $license = null, $author = '', $filename, $fileloc, $filedata) {
-        global $USER, $CFG;
-        $record = new stdClass();
-        $record->filearea = 'draft';
-        $record->component = 'user';
-        $record->filepath = $savepath;
-        $record->itemid = $itemid;
-        $record->license = $license;
-        $record->author = $author;
-
-        $context = get_context_instance(CONTEXT_USER, $USER->id);
-
-        $fs = get_file_storage();
-        $sm = get_string_manager();
-
-        if ($record->filepath !== '/') {
-            $record->filepath = file_correct_filepath($record->filepath);
+    public function get_file($url, $filename = '') {
+        global $USER;
+        $path = $this->prepare_file($filename);
+        $url1 = unserialize(base64_decode($url));        
+        $filedata = base64_decode($url1->filedata);
+        if (empty($filedata)) {
+            $filedata = file_get_contents($url1->url);
         }
+        unlink($url1->url);
+        file_put_contents($path, $filedata);
 
-        $record->filename = $filename;
-
-        if (empty($record->itemid)) {
-            $record->itemid = 0;
-        }
-
-        $record->contextid = $context->id;
-        $record->userid = $USER->id;
-        $record->source = '';
-
-        if (repository::draftfile_exists($record->itemid, $record->filepath, $record->filename)) {
-            $existingfilename = $record->filename;
-            $unused_filename = repository::get_unused_filename($record->itemid, $record->filepath, $record->filename);
-            $record->filename = $unused_filename;
-            if (!empty($filedata)) {
-                $stored_file = $fs->create_file_from_string($record, $filedata);
-            } else {
-                $stored_file = $fs->create_file_from_pathname($record, $fileloc);
-            }
-            $event = array();
-            $event['event'] = 'fileexists';
-            $event['newfile'] = new stdClass;
-            $event['newfile']->filepath = $record->filepath;
-            $event['newfile']->filename = $unused_filename;
-            $event['newfile']->url = moodle_url::make_draftfile_url($record->itemid, $record->filepath, $unused_filename)->out();
-
-            $event['existingfile'] = new stdClass;
-            $event['existingfile']->filepath = $record->filepath;
-            $event['existingfile']->filename = $existingfilename;
-            $event['existingfile']->url      = moodle_url::make_draftfile_url($record->itemid, $record->filepath, $existingfilename)->out();;
-            return $event;
-        } else {
-            if (!empty($filedata)) {
-                $stored_file = $fs->create_file_from_string($record, $filedata);
-            } else {
-                $stored_file = $fs->create_file_from_pathname($record, $fileloc);
-                // removes the temporary file from the 'temp' dataroot
-                unlink($fileloc);
-            }
-            return array(
-                'url'=>moodle_url::make_draftfile_url($record->itemid, $record->filepath, $record->filename)->out(),
-                'id'=>$record->itemid,
-                'file'=>$record->filename);
-        }
+        return array('path'=>$path, 'url'=>$url);
     }
 
     /**
