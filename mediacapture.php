@@ -63,7 +63,7 @@ class mediacapture {
      * Type option names for the video recorder
      */
     public function get_video_option_names() {
-        return array('video_quality');
+        return array('video_quality','rtmp_server','max_video_length');
     }
 
     /**
@@ -104,6 +104,10 @@ class mediacapture {
         );
 
         $mform->addElement('select', 'video_quality', get_string('video_quality', 'repository_mediacapture'), $video_quality_options);
+
+        $mform->addElement('text', 'rtmp_server', get_string('rtmpserver', 'repository_mediacapture'), 'maxlength="100" size="25" ');
+        $mform->setType('rtmp_server', PARAM_NOTAGS);
+        $mform->setDefault('rtmp_server', 'rtmp://127.0.0.1');
     }
 
     /**
@@ -379,9 +383,17 @@ class mediacapture {
         global $CFG, $PAGE;
 
         $url = new moodle_url($CFG->wwwroot.'/repository/mediacapture/assets/video/flash/red5recorder.swf');
+        $rtmp_server = get_config('mediacapture', 'rtmp_server');
+        $rtmp_server .= '/red5recorder/';
+        $max_length = '120';
+        
+        $tmp_loc = $CFG->dataroot. '/streams';
+        $tmp_name = $this->get_unused_filename('.flv', $tmp_loc);
+        $tmp_loc = urlencode($tmp_loc.'/'.$tmp_name);
+
+        $flashvars = '?server='.$rtmp_server.'&maxLength='.$max_length.'&fileName='.basename($tmp_name, '.flv');        
         $callbackurl = new moodle_url('/repository/mediacapture/callback.php');
         $post_url = new moodle_url($CFG->wwwroot .'/repository/mediacapture/lib_ajax.php');
-        $tmp_loc = urlencode($CFG->dataroot. '/streams/video.flv');
         $save = get_string('save', 'repository_mediacapture');
 
         $recorder = '
@@ -393,7 +405,7 @@ class mediacapture {
                         <param name="quality" value="high" />
                         <param name="bgcolor" value="#869ca7" />
                         <param name="allowScriptAccess" value="sameDomain" />
-                        <embed src="'.$url.'" quality="high" bgcolor="#869ca7"
+                        <embed src="'.$url.$flashvars.'" quality="high" bgcolor="#869ca7"
                             width="320px" height="240px" name="red5recorder" align="middle"
                             play="true"
                             loop="false"
@@ -445,9 +457,11 @@ class mediacapture {
     /**
      * Creates a unique temp file name for the recording
      */
-    public function get_unused_filename($type) {
+    public function get_unused_filename($type, $dir = '') {
         global $CFG;
-        $dir = $CFG->dataroot.'/temp';
+        if (empty($dir)) {
+            $dir = $CFG->dataroot.'/temp';
+        }
         $i = 0;
         do {
             if ($i > 0)

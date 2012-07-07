@@ -57,7 +57,7 @@ switch ($type) {
         echo $client->save_temp_file($tmp_file, $tmp_name);
         break;
     case 'check_duration':
-        $tmp_file = $CFG->dataroot. '/streams/video.flv';            
+        $tmp_file = urldecode(optional_param('tmp_loc', '', PARAM_PATH));       
         if (!file_exists($tmp_file) || !filesize($tmp_file)) {
             echo 'NONE';
         }

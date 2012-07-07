@@ -55,6 +55,7 @@ $string['javanotfound'] = 'Your browser does not have Java support. Consider ins
 $string['flashnotfound'] = 'Your browser does not have Flash support. Consider installing the latest version of <a href="http://www.adobe.com/go/getflashplayer">Adobe Flash Player</a>';
 $string['quicktimenotfound'] = 'Your browser does not have Quicktime player installed. Consider installing the latest version of <a href="https://www.apple.com/quicktime/download">Quicktime Player</a>';
 $string['filenotsaved'] = 'The file could not be saved! Please try again';
+$string['rtmpserver'] = 'RTMP Server URL (for flash video recorder)';
 
 $string['save'] = 'Save';
 $string['name'] = 'Name';

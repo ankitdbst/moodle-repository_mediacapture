@@ -192,7 +192,6 @@ function submit_flash_video() {
     }
     
     filename.value = filename.value + '.flv';
-    fileloc.value = encodeURIComponent(decodeURIComponent(fileloc.value));
 
     var duration = 90; // max-duration
 
@@ -214,7 +213,8 @@ function submit_flash_video() {
         // Make an HTTP POST request to posturl.
         cfg = {
             method: 'POST',
-            data: 'type=check_duration',
+            data: 'type=check_duration'+
+                    '&tmp_loc='+fileloc.value,
             sync:true
         };
         var request = Y.io(uri, cfg);
