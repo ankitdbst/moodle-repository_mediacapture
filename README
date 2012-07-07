@@ -32,7 +32,7 @@ Installation
 - Trigger moodle upgrade script
 - Enable the plugin from Site administration -> Plugins -> Repositories -> Manage Repositories
 
-In order to use the Red5Recorder you need to do the following :
+In order to use the Flash Video Recorder (Red5Recorder) you need to do the following :
 
 - Install Red5 using the Red5 installation instructions given below.
 - Copy assets/video/flash/red5recorder to %RED5_HOME/dist/webapps 
@@ -40,15 +40,8 @@ In order to use the Red5Recorder you need to do the following :
 - Start red5 server from within the %RED5_HOME/dist/ using ./red5.sh
 - Navigate to MOODLE-DATAROOT
 - Make a link to the streams dir using 'ln -s %RED5_HOME/dist/webapps/red5recorder/streams/ .' (without the quotes)
-
-For the recorder to work on a web-hosting (static IP) you need to do the following additional steps to build the red5recorder.swf from source.
-- Copy assets/video/flash/src to your home folder (or any other folder).
-- Change the Recorder.as (src/classes/Recorder.as) file as below :
-server:String="rtmp://127.0.0.1/red5recorder/";
-to
-server:String="rtmp://your-server-ip/red5recorder/";
-- Compile the src/red5recorder.as from source to create the new *.swf
-- Copy this *.swf to assets/video/flash/ and replace the original red5recorder.swf
+- Enter the RTMP server URL in the admin settings of the 'medicapture' plugin.
+- Enjoy!
 
 Red5 installation
 -----------------
