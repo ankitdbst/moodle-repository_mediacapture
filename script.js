@@ -29,7 +29,7 @@ function load_recorder(type) {
                     '&java='+BrowserPlugins.java+
                     '&flash='+BrowserPlugins.flash+
                     '&quicktime='+BrowserPlugins.quicktime+
-                    '&os='+BrowserDetect.OS,
+                    '&os='+BrowserDetect.OS
         };
 
         var request = Y.io(uri, cfg);
