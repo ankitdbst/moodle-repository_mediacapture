@@ -45,7 +45,7 @@ class repository_mediacapture extends repository {
         $audio_option = $client->get_audio_option_names();
         $video_option = $client->get_video_option_names();
         $recorders = $client->get_recorder_names();
-        return array_merge($audio_option, $video_option, $recorders);
+        return array_merge($audio_option, $video_option, $recorders, array('pluginname'));
     }
 
     /**
