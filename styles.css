@@ -4,7 +4,8 @@
 
 /* General layout rules  */
 .appletcontainer { 
-    height:320px;     
+    height:320px;    
+    width:500px; 
     /* Firefox */
     display:-moz-box;
     -moz-box-orient:horizontal;
