@@ -258,7 +258,7 @@ class mediacapture {
                     </applet><br /><br />
                     <input type="hidden" id="posturl" name="posturl" value="' . $post_url . '" />
                     <input type="hidden" id="fileloc" name="fileloc" />
-                    <input type="text" id="filename" name="filename" onfocus="this.select()" value="*.wav"/>
+                    <input type="text" id="filename" name="filename" value="Untitled"/>
                     <br />
                     <input type="submit" value="'. $save .'" />
                 </form>';
@@ -276,11 +276,11 @@ class mediacapture {
         $tmp_loc = urlencode($CFG->dataroot);
         $js_callback = urlencode("(function(a, b){d=document;d.g=d.getElementById;fn=d.g('filename');fn.value=a;fd=d.g('filedata');fd.value=b;d.forms[0].submit();})");
         $callbackurl = new moodle_url('/repository/mediacapture/callback.php');
-        $flashvars = "&callback={$js_callback}&filename=new_recording";
+        $flashvars = "&callback={$js_callback}&filename=Untitled";
 
         $recorder = '
                 <form method="post" action="'.$callbackurl.'">
-                    <object id="onlineaudiorecorder" classid="clsid:D27CDB6E-AE6D-11cf-96B8-444553540000" width="215" height="138">
+                    <object id="onlineaudiorecorder" classid="clsid:D27CDB6E-AE6D-11cf-96B8-444553540000" width="225" height="138">
                         <param name="movie" value="'.$url.$flashvars.'" />
                         <param name="wmode" value="transparent" />
                         <!--[if !IE]>-->
@@ -370,7 +370,7 @@ class mediacapture {
                 </div>
                 <input type="hidden" id="Status" name="Status" value="" />
                 <input type="hidden" id="fileloc" name="fileloc" value="' . $tmp_loc . '"/>
-                <input type="text" id="filename" name="filename" onfocus="this.select()" value="*.mp4"/><br />
+                <input type="text" id="filename" name="filename" value="Untitled"/><br />
                 <input type="submit" value="'. $save .'" />
             </form>';
         return $recorder;
@@ -417,7 +417,7 @@ class mediacapture {
                     </object><br /><br />
                     <input type="hidden" id="fileloc" name="fileloc" value="' . $tmp_loc . '" />
                     <input type="hidden" id="posturl" name="posturl" value="' . $post_url . '" />
-                    <input type="text" id="filename" name="filename" onfocus="this.select()" value="*.flv"/><br /><br />
+                    <input type="text" id="filename" name="filename" value="Untitled"/><br /><br />
                     <input type="submit" value="'.$save .'" />
                 </form>';
         return $recorder;
