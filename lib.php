@@ -38,6 +38,7 @@ class repository_mediacapture extends repository {
     public function __construct($repositoryid, $context = SITEID, $options = array()) {
         global $PAGE, $CFG, $action, $itemid;
         parent::__construct($repositoryid, $context, $options);
+        $this->get_installed_recorders();
     }
 
     public static function get_type_option_names() {
@@ -60,6 +61,37 @@ class repository_mediacapture extends repository {
         $client->get_audio_config_form($mform);
         $client->get_video_config_form($mform);
         $client->get_recorder_config_form($mform);
+    }
+
+    /**
+     * @return array structure of recorders installed
+     */
+    public function get_installed_recorders() {
+        global $CFG;
+
+        $recorders = array();
+        $recorders['audio'] = $recorders['video'] = array();
+
+        $pluginsdir = $CFG->dirroot . '/repository/mediacapture/plugins';
+
+        if ($handle = opendir($pluginsdir)) {
+            while (false !== ($plugin = readdir($handle))) {
+                if ($plugin != "." && $plugin != "..") {
+                    if (file_exists($pluginsdir . '/' . $plugin .'/lib.php')) {
+                        require_once($pluginsdir . '/' . $plugin .'/lib.php');
+                        $classname = 'mediacapture_plugins_' . $plugin;
+                        $rec = new $classname();
+                        $type = $rec->recorder_type();
+                        $recorders[$type] = $plugin;
+                    } else {
+                        throw new moodle_exception('error');
+                    }
+                }
+            }
+            closedir($handle);
+        }
+
+        return $recorders;
     }
 
     public function global_search() {
@@ -116,7 +148,7 @@ class repository_mediacapture extends repository {
     }
 
     /**
-     * Returns the suported file types
+     * Returns the supported file types
      *
      * @return array of supported file types and extensions.
      */
