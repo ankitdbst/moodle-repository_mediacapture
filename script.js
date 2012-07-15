@@ -37,151 +37,190 @@ function load_recorder(media) {
 
     return false;
 }
+
+/*
+ * Returns an object with found plugins and their versions
+ * BrowserPlugins['java'] returns version of JRE
+ * BrowserPlugins['quicktime'] returns version of Apple QT player
+ * BrowserPlugins['flash'] returns Adobe Flash player version
+ */
+var BrowserPlugins = (function(){
+    var found = {};
+    var version_reg = /[0-9]+.[0-9]+/;
  
-/**
-* Status of the applet.
-* This is the hidden element in the interface
-* Useful for debug options (document.getElementById('Status').value)
-*/
-function setStatus(num, str) {
-    // Handle status changes
-    //**********************
-    // Status codes:
-    // StartUpload = 0;
-    // UploadDone = 1;
-    // StartRecord = 2;
-    // StartPlay = 3;
-    // PauseSet = 4;
-    // Stopped = 5;
-    document.getElementById('Status').value = str;
-}
-
-/**
-* Start the timer for the recording
-*/
-function setTimer(str) {
-    document.getElementById('Timer').value = str;
-}
-
-/**
-* Start recording
-*/
-function record_rp() {
-    document.VimasVideoApplet.RECORD_VIDEO();
-    document.getElementById('rec').disabled=true;
-    document.getElementById('play').disabled=true;
-    document.getElementById('stop').disabled=false;
-    document.getElementById('pause').disabled=false;
-    return false;
-}
-
-/**
-* Playback for the recorded video
-*/
-function playback_rp() {
-    document.VimasVideoApplet.PLAY_VIDEO();
-    document.getElementById('pause').disabled=false;
-    return false;
-}
-
-/**
-* Pause the playback/recording
-*/
-function pause_rp() {
-    document.VimasVideoApplet.PAUSE_VIDEO();
-    return false;
-}
-
-/**
-* Stop recording
-*/
-function stop_rp() {
-    document.VimasVideoApplet.STOP_VIDEO();
-    document.getElementById('rec').disabled=false;
-    document.getElementById('stop').disabled=true;
-    document.getElementById('pause').disabled=true;
-    document.getElementById('play').disabled=false;
-    return false;
-}
-
-/**
-* Method to upload the recorded video to
-* a tmp location on server.
-*/
-function upload_rp() {
-    var filename = document.getElementById('filename'),
-        fileloc = document.getElementById('fileloc'),
-        duration = document.getElementById('Timer');
-
-    if (!duration.value.trim()) {
-        alert(mediacapture['norecordingfound']);
-        return false;
-    }
-
-    filename.value = filename.value.replace('.mp4', '');
-    filename.value = filename.value.replace('*', '');
-    if (!filename.value) {
-        alert(mediacapture['nonamefound']);
-        filename.value = '*.mp4';
-        return false;
-    }
-    filename.value = filename.value + '.mp4';
-
-    document.VimasVideoApplet.UPLOAD_VIDEO(String(filename.value));
-    fileloc.value = encodeURIComponent(decodeURIComponent(fileloc.value) + '/' + filename.value);
-    
-    return true;
-}
-
-/**
-* Submits the video recording to the server
-* for processing upload
-*/
-function submit_flash_video() {
-    var filename = document.getElementById('filename'),
-        fileloc = document.getElementById('fileloc');
-
-    filename.value = filename.value.replace('.flv', '');
-    filename.value = filename.value.replace('*', '');
-    if (!filename.value) {
-        alert(mediacapture['nonamefound']);
-        filename.value = '*.flv';
-        return false;
-    }
-    
-    filename.value = filename.value + '.flv';
-
-    var duration = 90; // max-duration
-
-    // Create a YUI instance using io-base module.
-    YUI().use('node', 'io-base', function(Y) {
-        var uri = decodeURIComponent(Y.one('#posturl').get('value'));
-        // Define a function to handle the response data.
-        function complete(id, o) {
-            var id = id; // Transaction ID.
-            var data = o.responseText; // Response data.
-            if (data === 'NONE') {
-                duration = 0;
+    /*
+     * Differentiate between IE (detection via ActiveXObject)
+     * and the rest (detection via navigator.plugins)
+     */
+    if (window.ActiveXObject) {
+        var plugin_list = {
+            flash: 'ShockwaveFlash.ShockwaveFlash.1',
+            quicktime: 'QuickTime.QuickTime'
+        }
+ 
+        for (var plugin in plugin_list){
+            var version = msieDetect(plugin_list[plugin]);
+            if (version){
+                var version_reg_val = version_reg.exec(version);
+                found[plugin] = (version_reg_val && version_reg_val[0]) || '';
             }
-        };
+        }
+ 
+        if (navigator.javaEnabled()){
+            found['java'] = '';
+        }
+    } else {
+        var plugins = navigator.plugins;
+        var reg = /Flash|Java|QuickTime/;
+        for (var i = 0; i < plugins.length; i++) {
+            var reg_val = reg.exec(plugins[i].description);
+            if (reg_val){
+                var plugin = reg_val[0].toLowerCase();
+                /*
+                 * Search in version property, if not available concat name and description
+                 * and search for a version number in there
+                 */
+                var version = plugins[i].version || 
+                    (plugins[i].name + ' ' + plugins[i].description);
+                var version_reg_val = version_reg.exec(version);
+                if (!found[plugin]) {
+                    found[plugin] = (version_reg_val && version_reg_val[0]) || '';
+                }
+            }
+        }
+    }    
 
-        // Subscribe to event "io:complete"
-        Y.on('io:complete', complete, Y);
+    return found;
 
-        // Make an HTTP POST request to posturl.
-        cfg = {
-            method: 'POST',
-            data: 'type=check_duration'+
-                    '&tmp_loc='+fileloc.value,
-            sync:true
-        };
-        var request = Y.io(uri, cfg);
-    });
-
-    if (duration <= 0) {
-        alert(mediacapture['norecordingfound']);
-        return false;
+    /*
+     * Return version number if plugin installed
+     * Return true if plugin is installed but no version number found
+     * Return false if plugin not found
+     */ 
+    function msieDetect(name){
+        try {
+            var active_x_obj = new ActiveXObject(name);
+            try {
+                return active_x_obj.GetVariable('$version');
+            } catch(e) {
+                try {
+                    return active_x_obj.GetVersions();
+                } catch (e) {
+                    try {
+                        var version;
+                        for (var i = 1; i < 9; i++) {
+                            if (active_x_obj.isVersionSupported(i + '.0')){
+                                version = i;
+                            }
+                        }
+                        return version || true;
+                    } catch (e) {
+                        return true;
+                    }
+                }
+            }
+        } catch(e){
+            return false;
+        }
     }
+})();
 
-    return true;
-}
+/*
+ * Returns an object with the browser name, version and OS details
+ * BrowserDetect.browser returns browser name
+ * BrowserDetect.version returns browser version
+ * BrowserDetect.OS returns Operating System, Win, Mac, Linux
+ */
+var BrowserDetect = {
+    init: function () {
+        this.browser = this.searchString(this.dataBrowser) || "an unknown browser";
+        this.version = this.searchVersion(navigator.userAgent)
+            || this.searchVersion(navigator.appVersion)
+            || "an unknown version";
+        this.OS = this.searchString(this.dataOS) || "an unknown OS";
+    },
+    searchString: function (data) {
+        for (var i=0;i<data.length;i++) {
+            var dataString = data[i].string;
+            var dataProp = data[i].prop;
+            this.versionSearchString = data[i].versionSearch || data[i].identity;
+            if (dataString) {
+                if (dataString.indexOf(data[i].subString) != -1)
+                    return data[i].identity;
+            }
+            else if (dataProp)
+                return data[i].identity;
+        }
+    },
+    searchVersion: function (dataString) {
+        var index = dataString.indexOf(this.versionSearchString);
+        if (index == -1) return;
+        return parseFloat(dataString.substring(index+this.versionSearchString.length+1));
+    },
+    dataBrowser: [
+        {
+            string: navigator.userAgent,
+            subString: "Chrome",
+            identity: "Chrome"
+        },
+        {
+            string: navigator.vendor,
+            subString: "Apple",
+            identity: "Safari",
+            versionSearch: "Version"
+        },
+        {
+            prop: window.opera,
+            identity: "Opera",
+            versionSearch: "Version"
+        },
+        {
+            string: navigator.userAgent,
+            subString: "Firefox",
+            identity: "Firefox"
+        },
+        {
+            string: navigator.userAgent,
+            subString: "MSIE",
+            identity: "Explorer",
+            versionSearch: "MSIE"
+        },
+        {
+            string: navigator.userAgent,
+            subString: "Gecko",
+            identity: "Mozilla",
+            versionSearch: "rv"
+        },
+        {       // for older Netscapes (4-)
+            string: navigator.userAgent,
+            subString: "Mozilla",
+            identity: "Netscape",
+            versionSearch: "Mozilla"
+        }
+    ],
+    dataOS : [
+        {
+            string: navigator.platform,
+            subString: "Win",
+            identity: "Windows"
+        },
+        {
+            string: navigator.platform,
+            subString: "Mac",
+            identity: "Mac"
+        },
+        {
+               string: navigator.userAgent,
+               subString: "iPhone",
+               identity: "iPhone/iPod"
+        },
+        {
+            string: navigator.platform,
+            subString: "Linux",
+            identity: "Linux"
+        }
+    ]
+
+};
+
+BrowserDetect.init();

@@ -59,8 +59,6 @@ function init() {
     // Include general scripts and language strings used by the plugin
     $PAGE->requires->js(new moodle_url($CFG->wwwroot .
                          '/repository/mediacapture/script.js'));
-    $PAGE->requires->js(new moodle_url($CFG->wwwroot .
-                         '/repository/mediacapture/assets/prerequisites.js'));
 
     $recorders = get_recorder_list();
     $stringdefs = get_string_defs();
