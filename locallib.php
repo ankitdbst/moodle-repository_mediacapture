@@ -66,8 +66,7 @@ function init() {
     foreach ($recorders as $recorder) {
         $classname = 'repository_mediacapture_' . $recorder;
         $client = new $classname();
-        if (file_exists(new moodle_url($CFG->wwwroot .
-                 '/repository/mediacapture/plugins/' . $recorder . '/script.js'))) {
+        if (file_exists($CFG->dirroot . '/repository/mediacapture/plugins/' . $recorder . '/script.js')) {
             $PAGE->requires->js(new moodle_url($CFG->wwwroot .
                  '/repository/mediacapture/plugins/' . $recorder . '/script.js'));
         }                
@@ -114,7 +113,7 @@ function require_css() {
 
     $pluginsdir = $CFG->dirroot . '/repository/mediacapture/plugins';
     foreach ($recorders as $recorder) {
-       if (file_exists(new moodle_url($pluginsdir . $recorder . '/styles.css'))) {
+       if (file_exists($CFG->dirroot . '/repository/mediacapture/plugins/' . $recorder . '/styles.css')) {
             $PAGE->requires->css(new moodle_url($pluginsdir . $recorder . '/styles.css'));
         }        
     }
