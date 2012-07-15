@@ -24,7 +24,7 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-require_once(dirname(__FILE__) . '/mediacapture.php');
+require_once(dirname(__FILE__) . '/locallib.php');
 
 class repository_mediacapture extends repository {
 
@@ -36,67 +36,57 @@ class repository_mediacapture extends repository {
      * @param array $options
      */
     public function __construct($repositoryid, $context = SITEID, $options = array()) {
-        global $PAGE, $CFG, $action, $itemid;
         parent::__construct($repositoryid, $context, $options);
-        $this->get_installed_recorders();
-    }
-
-    public static function get_type_option_names() {
-        $client = new mediacapture();
-        $audio_option = $client->get_audio_option_names();
-        $video_option = $client->get_video_option_names();
-        $recorders = $client->get_recorder_names();
-        return array_merge($audio_option, $video_option, $recorders, array('pluginname'));
     }
 
     /**
-     * Admin settings for the media capture plugin
+     * @return Admin config type option names
+     */
+    public static function get_type_option_names() {
+        $options = array('pluginname');
+        
+        $recorders = get_recorder_list();
+        
+        foreach ($recorders as $recorder) {
+            $classname = 'repository_mediacapture_' . $recorder;
+            $client = new $classname();
+            $options = array_merge($options, $client->get_type_option_names());
+        }
+
+        return $options;
+    }
+
+    /**
+     * Admin settings for the plugin
      *
      * @param object $mform
      * @param string $classname
      */
     public static function type_config_form($mform, $classname = 'repository') {
         parent::type_config_form($mform);
-        $client = new mediacapture();
-        $client->get_audio_config_form($mform);
-        $client->get_video_config_form($mform);
-        $client->get_recorder_config_form($mform);
+
+        $recorders = get_recorder_list();
+        
+        foreach ($recorders as $recorder) {
+            $classname = 'repository_mediacapture_' . $recorder;
+            $client = new $classname();
+            $client->get_config_form($mform);
+        }
     }
 
     /**
-     * @return array structure of recorders installed
+     * Plugin doesn't support global search, since we don't have anything to search
      */
-    public function get_installed_recorders() {
-        global $CFG;
-
-        $recorders = array();
-        $recorders['audio'] = $recorders['video'] = array();
-
-        $pluginsdir = $CFG->dirroot . '/repository/mediacapture/plugins';
-
-        if ($handle = opendir($pluginsdir)) {
-            while (false !== ($plugin = readdir($handle))) {
-                if ($plugin != "." && $plugin != "..") {
-                    if (file_exists($pluginsdir . '/' . $plugin .'/lib.php')) {
-                        require_once($pluginsdir . '/' . $plugin .'/lib.php');
-                        $classname = 'mediacapture_plugins_' . $plugin;
-                        $rec = new $classname();
-                        $type = $rec->recorder_type();
-                        $recorders[$type] = $plugin;
-                    } else {
-                        throw new moodle_exception('error');
-                    }
-                }
-            }
-            closedir($handle);
-        }
-
-        return $recorders;
+    public function global_search() {        
+        return false;
     }
 
-    public function global_search() {
-        // Plugin doesn't support global search, since we don't have anything to search
-        return false;
+    /**
+     * @return The callback url for uploading the recorded content
+     */
+    public function get_callback_url() {
+        return new moodle_url('/repository/mediacapture/callback.php',
+                 array('repo_id'=>$this->id));
     }
 
     /**
@@ -107,11 +97,11 @@ class repository_mediacapture extends repository {
      * @return array structure of listing information
      */
     public function get_listing($path = null, $page = null) {
-        global $COURSE;
-        $callbackurl = new moodle_url('/repository/mediacapture/callback.php', array('repo_id'=>$this->id));
+        $callbackurl = $this->get_callback_url();
         $mimetypesstr = '';
         
-        $url = new moodle_url('/repository/mediacapture/view.php', array('returnurl' => $callbackurl));
+        $url = new moodle_url('/repository/mediacapture/renderer.php',
+                 array('returnurl' => $callbackurl));
         $list = array();
         $list['object'] = array();
         $list['object']['type'] = 'text/html';
@@ -155,5 +145,4 @@ class repository_mediacapture extends repository {
     public function supported_filetypes() {
         return array('web_audio', 'web_video');
     }
-
 }

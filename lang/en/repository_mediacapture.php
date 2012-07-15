@@ -17,34 +17,18 @@
 /**
  * This file contains 'repository_mediacapture' repository plugin language strings
  */
+
+require_once(dirname(dirname(dirname(__FILE__))) . '/locallib.php');
+
 $string['pluginname'] = 'Media Capture';
 $string['mediacapture:view'] = 'Use Media Capture in file picker';
 $string['configplugin'] = 'Media Capture repository configuration';
 $string['repositoryname'] = 'MediaCapture';
 
-$string['audio_format'] = 'Audio format';
-$string['audio_format_imaadpcm'] = 'ImaADPCM';
-$string['audio_format_speex'] = 'Speex';
-
-$string['sampling_rate'] = 'Sampling rate';
-$string['sampling_rate_low'] = 'Low quality';
-$string['sampling_rate_medium'] = 'Medium quality';
-$string['sampling_rate_normal'] = 'Normal quality';
-$string['sampling_rate_high'] = 'High quality';
-
 $string['video_quality'] = 'Video quality';
 $string['video_low'] = 'LowQuality';
 $string['video_normal'] = 'NormalQuality';
 $string['video_high'] = 'HighQuality';
-
-$string['frame_size'] = 'Video frame size';
-$string['frame_small'] = 'small';
-$string['frame_large'] = 'large';
-
-$string['flash_video_recorder'] = 'Flash Video Recorder';
-$string['flash_audio_recorder'] = 'Flash Audio Recorder';
-$string['java_video_recorder'] = 'Java Video Recorder';
-$string['java_audio_recorder'] = 'Java Audio Recorder';
 
 $string['recordnew'] = 'New recording';
 $string['unexpectedevent'] = 'An unexpected event was detected. Please report this problem to the Moodle developers.';
@@ -60,3 +44,8 @@ $string['rtmpserver'] = 'RTMP Server URL (for flash video recorder)';
 $string['save'] = 'Save';
 $string['name'] = 'Name';
 $string['account'] = 'Account';
+
+$files = init_lang();
+foreach ($files as $file) {
+	require_once($file);
+}

@@ -7,7 +7,7 @@
 * Start the appropriate audio/video recorder via ajax
 * in response to user selection
 */
-function load_recorder(type) {
+function load_recorder(media) {
     // Create a YUI instance using io-base module.
     YUI().use('node', 'io-base', function(Y) {
         var uri = decodeURIComponent(Y.one('#ajax_uri').get('value'));
@@ -25,7 +25,7 @@ function load_recorder(type) {
         // Make an HTTP POST request to posturl.
         cfg = {
             method: 'POST',
-            data: 'type='+type+
+            data: 'media='+media+
                     '&java='+BrowserPlugins.java+
                     '&flash='+BrowserPlugins.flash+
                     '&quicktime='+BrowserPlugins.quicktime+
@@ -38,48 +38,6 @@ function load_recorder(type) {
     return false;
 }
  
-/**
-* Method to validate the audio recording form and save
-* the recording to temp file
-*/
-function submit_java_audio() {
-    var filename = document.getElementById('filename'),
-        recorder = document.getElementById('audio_recorder'),
-        posturl = document.getElementById('posturl'),
-        fileloc = document.getElementById('fileloc');
-        
-    filename.value = filename.value.replace('.wav', '');
-    filename.value = filename.value.replace('*', '');
-
-    if (!filename.value) {
-        alert(mediacapture['nonamefound']);
-        filename.value = '*.wav';
-        return false;
-    }
-    filename.value += '.wav';
-
-    if (!recorder || !(recorder.sendGongRequest)) {
-        alert(mediacapture['appletnotfound']);
-        return false;
-    }
-
-    var duration = parseInt(recorder.sendGongRequest("GetMediaDuration", "audio")) || 0
-    if (duration <= 0) {
-        alert(mediacapture['norecordingfound']);
-        return false;
-    }
-
-    posturl.value = decodeURIComponent(posturl.value) + '?type=upload_audio';
-    fileloc.value = encodeURIComponent(recorder.sendGongRequest("PostToForm", posturl.value, "repo_upload_audio", "cookie=nanogong", "myfile"));
-    
-    if (!fileloc.value) {
-        alert(mediacapture['filenotsaved']);
-        return false;
-    }
-    
-    return true;
-}
-
 /**
 * Status of the applet.
 * This is the hidden element in the interface
