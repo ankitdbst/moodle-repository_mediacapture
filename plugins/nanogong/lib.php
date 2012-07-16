@@ -35,84 +35,82 @@ class repository_mediacapture_nanogong implements mediacapture {
     }
 
     /**
-     * Returns a list of type option names for nanogong
+     * @return array $options Array of type options used by the recorder
      */
     public static function get_type_option_names() {
     	return array('audio_format', 'sampling_rate', 'nanogong');
     }
 
     /**
-     * Returns the config form elements for nanogong
+     * Adds the settings configuration needed by the recorder to the plugin
+     * @param object $mform
      */
     public function get_config_form($mform) {    	
-        $audio_format_options = array(
+        $audioformatoptions = array(
             get_string('audioformatimaadpcm', 'repository_mediacapture'),
             get_string('audioformatspeex', 'repository_mediacapture'),
         );
 
-        $sampling_rate_options = array(
+        $samplingrateoptions = array(
             get_string('samplingratelow', 'repository_mediacapture'),
             get_string('samplingratemedium', 'repository_mediacapture'),
             get_string('samplingratenormal', 'repository_mediacapture'),
             get_string('samplingratehigh', 'repository_mediacapture'),
         );
 
-        $mform->addElement('select', 'audio_format', get_string('audioformat', 'repository_mediacapture'), $audio_format_options);
-        $mform->addElement('select', 'sampling_rate', get_string('samplingrate', 'repository_mediacapture'), $sampling_rate_options);
+        $mform->addElement('select', 'audio_format', get_string('audioformat', 'repository_mediacapture'), $audioformatoptions);
+        $mform->addElement('select', 'sampling_rate', get_string('samplingrate', 'repository_mediacapture'), $samplingrateoptions);
         $mform->addElement('advcheckbox', 'nanogong', get_string('nanogong', 'repository_mediacapture'), null, array('group' => 1));
     }
 
     /**
-     * Returns the view renderer for nanogong
+     * @param string $callbackurl for the plugin
+     * @return string $recorder HTML for the recorder. 
      */
-    public function renderer() {
+    public function renderer($callbackurl) {
     	global $CFG, $PAGE;
         
         $url = new moodle_url($CFG->wwwroot . 
                 '/repository/mediacapture/plugins/nanogong/nanogong.jar');        
-        $post_url = urlencode(new moodle_url($CFG->wwwroot . 
+        $posturl = urlencode(new moodle_url($CFG->wwwroot . 
                 '/repository/mediacapture/plugins/nanogong/record.php'));
-        $tmp_dir = urlencode(get_temp_dir());
+        $tmpdir = urlencode(get_temp_dir());
 
         // Get recorder settings from the config form
-        $sampling_rates = array(
+        $samplingrates = array(
             array(8000, 11025, 22050, 44100),
             array(8000, 16000, 32000, 44100)
         );
-        $audio_formats = array('ImaADPCM', 'Speex');
+        $audioformats = array('ImaADPCM', 'Speex');
 
-        $audio_format = get_config('audio_format', 'repository_mediacapture');
-        $sampling_rate = get_config('sampling_rate', 'repository_mediacapture');
+        $audioformat = get_config('audio_format', 'repository_mediacapture');
+        $samplingrate = get_config('sampling_rate', 'repository_mediacapture');
 
-        if (empty($audio_format)) {
-            $audio_format = 0;
+        if (empty($audioformat)) {
+            $audioformat = 0;
         }
-
         if (empty($sampling_rate)) {
-            $sampling_rate = 0;
+            $samplingrate = 0;
         }
 
-        $sampling_rate = $sampling_rates[$audio_format][$sampling_rate];
-        $audio_format = $audio_formats[$audio_format];
+        $samplingrate = $samplingrates[$audioformat][$samplingrate];
+        $audioformat = $audioformats[$audioformat];
 
         $javanotfound = get_string('javanotfound', 'repository_mediacapture');
         $save = get_string('save', 'repository_mediacapture');
 
-        $callbackurl = new moodle_url('/repository/mediacapture/callback.php');
-
-        // Set the layout elements for the recorder applet
         $recorder = '
                 <form method="post" action="'.$callbackurl.'" onsubmit="return submit_audio();">
                     <applet id="audio_recorder" name="audio_recorder" code="gong.NanoGong" width="160" height="40" archive="' . $url . '">
-                        <param name="AudioFormat" value="' . $audio_format .'" />
+                        <param name="AudioFormat" value="' . $audioformat .'" />
                         <param name="ShowSaveButton" value="false" />
                         <param name="ShowTime" value="true" />
-                        <param name="SamplingRate" value="' . $sampling_rate . '" />
+                        <param name="SamplingRate" value="' . $samplingrate . '" />
                         <p>' . $javanotfound . '</p>
                     </applet><br /><br />
                     <input type="hidden" id="fileloc" name="fileloc" />
-                    <input type="hidden" id="tmpdir" name="tmpdir" value="' . $tmp_dir . '" />
-                    <input type="hidden" id="posturl" name="posturl" value="' . $post_url . '"/>
+                    <input type="hidden" id="tmpdir" name="tmpdir" value="' . $tmpdir . '" />
+                    <input type="hidden" id="posturl" name="posturl" value="' . $posturl . '"/>
                     <input type="text" id="filename" name="filename" value="Untitled"/>
                     <br />
                     <input type="submit" value="'. $save .'" />
@@ -121,7 +119,7 @@ class repository_mediacapture_nanogong implements mediacapture {
     }
 
     /**
-     * @return string definitions for the plugin
+     * @return string $stringdefs Array of string definitions used by the recorder.
      */
     public function get_string_defs() {
         return array('audioformat', 'audioformatimaadpcm', 'audioformatspeex',
@@ -131,21 +129,21 @@ class repository_mediacapture_nanogong implements mediacapture {
     }
 
     /**
-     * @return minumum version required by the plugin
+     * @return array $version Minimum version of $type required by the recorder.
      */
     public function get_min_version() {
-        return 1.5;
+        return array('java' => 1.5);
     }
 
     /**
-     * @return array of supported media.
+     * @return array $media Supported media by the recorder.
      */
     public function supported_media() {
         return array('audio');
     }
 
     /**
-     * @return array of supported web technology
+     * @return array $type Supported technology by the recorder.
      */
     public function supported_technology() {
         return array('java');

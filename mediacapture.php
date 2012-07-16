@@ -38,11 +38,10 @@ interface mediacapture {
     function get_config_form($mform);
 
     /**
-     * Renderer for the recorder
-     *
-     * @return raw/html
+     * @param string $callbackurl Callback url for the plugin
+     * @return string $recorder HTML for the recorder
      */
-    function renderer();
+    function renderer($callbackurl);
 
     /**
      * @return array $stringdefs List of all strings defined by the recorder

@@ -1,30 +1,26 @@
 Mediacapture plugin
 ===================
 
+
 Introduction
 ------------
-This is a Moodle repository plugin for recording audio/video streams directly using the filepicker. The plugin provides recording capabilities using both Flash and Java. Currently the plugin checks for Flash, Java (in that order) to load audio/video recorders. It falls back to the appropriate technology in case the other is missing.
-Admin settings to enable/disable one or more recorders is also provided.
+This is a Moodle repository plugin for recording media directly using the filepicker. The plugin is built as a framework and provides an interface for the sub-plugins/recorders to implement.
+Plugin automatically checks for the installed recorders and sets the config for the recorders in the admin settings. The recorders are loaded based on the client browser requirements and priority of recorders in admin settings.
 
-Audio Recorder
----------------
-The java audio recorder uses Nanogong applet to record and playback the recorded stream.
+
+About the sub-plugins
+---------------------
+
+Nanogong
+--------
+Nanogong is a Java applet to record and playback the recorded audio stream.
 More about Nanogong project : http://nanogong.ust.hk/
 
-The flash audio recorder uses the mp3 recorder written by Paul Nicholls which doesn't require a Red5 RTMP server.
-More about the project : https://github.com/MaxThrax/moodle-repository_recordaudio
-
-Video Recorder
----------------
-The java video recorder uses Vimas applet to record and playback the video stream.
-More about Vimas project : http://www.vimas.com/video.php
-
-The flash video recorder uses Red5Recorder. Red5Recorder is an open source project to record and play webcam videos using flash. The recorder requires an RTMP server such as Red5.
-More about Red5Recorder project : http://code.google.com/p/red5-recorder/
 
 Requirement
 -----------
  Moodle 2.3 onward
+
 
 Installation
 ------------
@@ -32,24 +28,11 @@ Installation
 - Trigger moodle upgrade script
 - Enable the plugin from Site administration -> Plugins -> Repositories -> Manage Repositories
 
-In order to use the Flash Video Recorder (Red5Recorder) you need to do the following :
-
-- Install Red5 using the Red5 installation instructions given below.
-- Copy assets/video/flash/red5recorder to %RED5_HOME/dist/webapps 
-- chmod -R 775 red5recorder/
-- Start red5 server from within the %RED5_HOME/dist/ using ./red5.sh
-- Navigate to MOODLE-DATAROOT
-- Make a link to the streams dir using 'ln -s %RED5_HOME/dist/webapps/red5recorder/streams/ .' (without the quotes)
-- Enter the RTMP server URL in the admin settings of the 'medicapture' plugin.
-- Enjoy!
-
-Red5 installation
------------------
-- Red5 installation instructions can be found on this Moodle doc : http://docs.moodle.org/21/en/Moodle_Language_Lab or one can follow the instructions given here http://trac.red5.org/wiki/Install
 
 Copyright
 ---------
 2012 Ankit Gupta <mailtoankitgupta@gmail.com>
+
 
 License
 -------

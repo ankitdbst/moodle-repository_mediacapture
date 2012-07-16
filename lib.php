@@ -82,14 +82,6 @@ class repository_mediacapture extends repository {
     }
 
     /**
-     * @return string $callbackurl Callback url for the plugin. 
-     */
-    public function get_callback_url() {
-        $callbackurl = new moodle_url('/repository/mediacapture/callback.php', array('repo_id'=>$this->id));
-        return $callbackurl;
-    }
-
-    /**
      * Method to get the repository content.
      *
      * @param string $path current path in the repository
@@ -97,7 +89,7 @@ class repository_mediacapture extends repository {
      * @return array structure of listing information
      */
     public function get_listing($path = null, $page = null) {
-        $callbackurl = $this->get_callback_url();
+        $callbackurl = get_callback_url();
         $mimetypesstr = '';
         
         $url = new moodle_url('/repository/mediacapture/renderer.php', array('returnurl' => $callbackurl));
@@ -108,7 +100,7 @@ class repository_mediacapture extends repository {
         $list['nologin']  = true;
         $list['nosearch'] = true;
         $list['norefresh'] = true;
-        
+
         return $list;
     }
 

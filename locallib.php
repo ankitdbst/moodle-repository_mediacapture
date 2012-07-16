@@ -50,8 +50,10 @@ function print_recorder($media, $browserplugins) {
             if (get_config('mediacapture', $recorder)) {
                 $classname = 'repository_mediacapture_' . $recorder;
                 $client = new $classname();
-                if ($browserplugins->$type >= $client->get_min_version()) {
-                    return $client->renderer(); // return the first recorder in the priority list
+                $version = $client->get_min_version();
+                if ($browserplugins->$type >= $version[$type]) {
+                    $callbackurl = get_callback_url();
+                    return $client->renderer($callbackurl); // return the first recorder in the priority list
                 }
             }
         }
@@ -246,6 +248,14 @@ function get_temp_dir() {
     global $USER;
     
     return make_temp_directory('repository/medicapture/' . $USER->id);
+}
+
+/**
+ * @return string $callbackurl Callback url for the plugin. 
+ */
+function get_callback_url() {
+    $callbackurl = new moodle_url('/repository/mediacapture/callback.php');
+    return $callbackurl;
 }
 
 /**
