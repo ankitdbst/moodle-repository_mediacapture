@@ -25,7 +25,7 @@ require_once(dirname(__FILE__) . '/locallib.php');
 interface mediacapture {
 
     /**
-     * List of type options for the recorder
+     * @return array $options Type option names for the recorder
      */
     static function get_type_option_names();
 
@@ -45,28 +45,26 @@ interface mediacapture {
     function renderer();
 
     /**
-     * List of all the strings defined in the lang/en dir
+     * @return array $stringdefs List of all strings defined by the recorder
      */
     function get_string_defs();
 
     /**
-     * Min version of java/flash required by the plugin
-     *
-     * @return array structure containing the version
+     * @return array $version Version of supported_technology() used.
      */ 
     function get_min_version();
 
     /**
      * array('audio', 'video')
      *
-     * @return array of supported media.
+     * @return array $media Supported media.
      */
     function supported_media();
 
     /**
      * array('html5', 'flash', 'java')
      *
-     * @return array of supported web technology
+     * @return array $type Supported web technology
      */
     function supported_technology();
 

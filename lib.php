@@ -40,7 +40,7 @@ class repository_mediacapture extends repository {
     }
 
     /**
-     * @return Admin config type option names
+     * @return array $options Type option names for sub-plugins installed
      */
     public static function get_type_option_names() {
         $options = array('pluginname');
@@ -57,7 +57,7 @@ class repository_mediacapture extends repository {
     }
 
     /**
-     * Admin settings for the plugin
+     * Settings configuration form for the plugin
      *
      * @param object $mform
      * @param string $classname
@@ -82,11 +82,11 @@ class repository_mediacapture extends repository {
     }
 
     /**
-     * @return The callback url for uploading the recorded content
+     * @return string $callbackurl Callback url for the plugin. 
      */
     public function get_callback_url() {
-        return new moodle_url('/repository/mediacapture/callback.php',
-                 array('repo_id'=>$this->id));
+        $callbackurl = new moodle_url('/repository/mediacapture/callback.php', array('repo_id'=>$this->id));
+        return $callbackurl;
     }
 
     /**
@@ -100,8 +100,7 @@ class repository_mediacapture extends repository {
         $callbackurl = $this->get_callback_url();
         $mimetypesstr = '';
         
-        $url = new moodle_url('/repository/mediacapture/renderer.php',
-                 array('returnurl' => $callbackurl));
+        $url = new moodle_url('/repository/mediacapture/renderer.php', array('returnurl' => $callbackurl));
         $list = array();
         $list['object'] = array();
         $list['object']['type'] = 'text/html';
@@ -109,6 +108,7 @@ class repository_mediacapture extends repository {
         $list['nologin']  = true;
         $list['nosearch'] = true;
         $list['norefresh'] = true;
+        
         return $list;
     }
 
@@ -138,8 +138,6 @@ class repository_mediacapture extends repository {
     }
 
     /**
-     * Returns the supported file types
-     *
      * @return array of supported file types and extensions.
      */
     public function supported_filetypes() {

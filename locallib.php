@@ -36,6 +36,11 @@ if (!empty($media)) {
     echo print_recorder($media, $browserplugins);
 }
 
+/**
+ * @param string $media Type of recorder ('audio', 'video')
+ * @param object $browserplugins List of client browser plugins along with version installed.
+ * @return string $html HTML for the recorder
+ */
 function print_recorder($media, $browserplugins) {
     $recorders = get_installed_recorders();
 
@@ -46,13 +51,16 @@ function print_recorder($media, $browserplugins) {
                 $classname = 'repository_mediacapture_' . $recorder;
                 $client = new $classname();
                 if ($browserplugins->$type >= $client->get_min_version()) {
-                    return $client->renderer();
+                    return $client->renderer(); // return the first recorder in the priority list
                 }
             }
         }
     }
 }
 
+/**
+ * Initializes the recorder with javascript files of sub-plugins
+ */
 function init() {
     global $PAGE, $CFG;
 
@@ -108,6 +116,9 @@ function init() {
     return $html;
 }
 
+/**
+ * Include the css files for the sub-plugins
+ */
 function require_css() {
     global $PAGE, $CFG;
     $recorders = get_recorder_list();
@@ -121,11 +132,17 @@ function require_css() {
     }
 }
 
+/**
+ * $return array $stringdefs List of all the general string definitions for the plugin 
+ */
 function get_string_defs() {
     return array('unexpectedevent', 'appletnotfound', 'norecordingfound',
             'nonamefound', 'filenotsaved');
 }
 
+/**
+ * @return arrray $files List of the required language files of the sub-plugins
+ */
 function init_lang() {
     global $CFG;
 
@@ -145,6 +162,9 @@ function init_lang() {
     return $files;
 }
 
+/**
+ * @return object $recorders Object structure containing media/type/name of recorders installed.
+ */
 function get_installed_recorders() {
     global $CFG;
     
@@ -188,6 +208,9 @@ function get_installed_recorders() {
     return $recorders;
 }   
 
+/**
+ * @return array $list Array of recorders currently installed
+ */
 function get_recorder_list() {
     $recorders = get_installed_recorders();
 
@@ -203,6 +226,9 @@ function get_recorder_list() {
     return $list;
 }
 
+/**
+ * @return array $jsstring Array of string definitions to be used by javascript.
+ */
 function get_string_js($stringdefs) {        
     $jsstring = array();
     
@@ -213,16 +239,25 @@ function get_string_js($stringdefs) {
     return $jsstring;
 }
 
+/**
+ * @return string $path Path of the temp directory to store the local recorded media before uploading.
+ */
 function get_temp_dir() {
     global $USER;
     
     return make_temp_directory('repository/medicapture/' . $USER->id);
 }
 
+/**
+ * @return array $media Supported media allowed.
+ */
 function supported_media() {
     return array('audio', 'video');
 }
 
+/**
+ * @return array $type Supported type allowed.
+ */
 function supported_type() {
     return array('html5', 'flash', 'java');
 }
