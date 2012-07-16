@@ -3,7 +3,7 @@
  */
 
 /* General layout rules  */
-.appletcontainer { 
+.mediacontainer { 
     height:320px;    
     width:500px; 
     /* Firefox */
@@ -23,26 +23,4 @@
     box-orient:horizontal;
     box-pack:center;
     box-align:center;
-}
-
-#toolbar {
-    margin:10px 0 15px 0
-}
-
-#toolbar button {
-    height:25px;
-    float:left;
-    min-width:35px;
-    margin:0 10px 0 0;
-}
-
-#filename {
-    margin:0 0 5px 0;
-}
-
-#Timer {
-    float:right;
-    width:80px;
-    height:20px;
-    text-align:center;
 }

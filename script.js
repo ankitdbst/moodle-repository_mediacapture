@@ -11,12 +11,12 @@ function load_recorder(media) {
     // Create a YUI instance using io-base module.
     YUI().use('node', 'io-base', function(Y) {
         var uri = decodeURIComponent(Y.one('#ajax_uri').get('value'));
-        var applet = Y.one('#appletcontainer');
+        var container = Y.one('#mediacontainer');
         // Define a function to handle the response data.
         function complete(id, o) {
             var id = id; // Transaction ID.
             var data = o.responseText; // Response data.
-            applet.setContent(data);
+            container.setContent(data);
         };
 
         // Subscribe to event "io:complete"

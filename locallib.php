@@ -77,7 +77,8 @@ function init() {
 
     $ajax_uri = urlencode(new moodle_url($CFG->wwwroot . '/repository/mediacapture/locallib.php'));
 
-    $html = '<input type="hidden" id="ajax_uri" name="ajax_uri" value="'.$ajax_uri.'" /><div class="appletcontainer" id="appletcontainer">';
+    $html = '<input type="hidden" id="ajax_uri" name="ajax_uri" value="'.$ajax_uri.'" />
+                <div class="mediacontainer" id="mediacontainer">';
     
     $list = array();
     foreach (supported_media() as $media) {
@@ -114,7 +115,8 @@ function require_css() {
     $pluginsdir = $CFG->dirroot . '/repository/mediacapture/plugins';
     foreach ($recorders as $recorder) {
        if (file_exists($CFG->dirroot . '/repository/mediacapture/plugins/' . $recorder . '/styles.css')) {
-            $PAGE->requires->css(new moodle_url($pluginsdir . $recorder . '/styles.css'));
+            $PAGE->requires->css(new moodle_url($CFG->wwwroot .
+                 '/repository/mediacapture/plugins/' . $recorder . '/styles.css'));
         }        
     }
 }
