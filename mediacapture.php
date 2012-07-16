@@ -24,41 +24,41 @@ require_once(dirname(__FILE__) . '/locallib.php');
 
 interface mediacapture {
 
-	/**
-	 * List of type options for the recorder
-	 */
-	static function get_type_option_names();
+    /**
+     * List of type options for the recorder
+     */
+    static function get_type_option_names();
 
-	/**
-	 * Admin config settings for the type options defined in
-	 * get_type_option_names()
-	 *
-	 * @param $mform
-	 */
-	function get_config_form($mform);
+    /**
+     * Admin config settings for the type options defined in
+     * get_type_option_names()
+     *
+     * @param $mform
+     */
+    function get_config_form($mform);
 
-	/**
-	 * Renderer for the recorder
-	 *
-	 * @return raw/html
-	 */
-	function renderer();
+    /**
+     * Renderer for the recorder
+     *
+     * @return raw/html
+     */
+    function renderer();
 
-	/**
-	 * List of all the strings defined in the lang/en dir
-	 */
-	function get_string_defs();
+    /**
+     * List of all the strings defined in the lang/en dir
+     */
+    function get_string_defs();
 
-	/**
-	 * Min version of java/flash required by the plugin
-	 *
-	 * @return array structure containing the version
-	 */	
-	function get_min_version();
+    /**
+     * Min version of java/flash required by the plugin
+     *
+     * @return array structure containing the version
+     */ 
+    function get_min_version();
 
-	/**
-	 * array('audio', 'video')
-	 *
+    /**
+     * array('audio', 'video')
+     *
      * @return array of supported media.
      */
     function supported_media();

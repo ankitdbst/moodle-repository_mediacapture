@@ -25,7 +25,7 @@ require_once(dirname(dirname(__FILE__)).'/../config.php');
 
 $browserplugins = new stdClass();
 
-$browserplugins->os	= optional_param('os', '', PARAM_TEXT);
+$browserplugins->os = optional_param('os', '', PARAM_TEXT);
 $browserplugins->java = optional_param('java', -1.0, PARAM_FLOAT);
 $browserplugins->flash = optional_param('flash', -1.0, PARAM_FLOAT);
 $browserplugins->quicktime = optional_param('quicktime', -1.0, PARAM_FLOAT);
@@ -33,24 +33,24 @@ $browserplugins->quicktime = optional_param('quicktime', -1.0, PARAM_FLOAT);
 $media = optional_param('media', '', PARAM_TEXT);
 
 if (!empty($media)) {
-	echo print_recorder($media, $browserplugins);
+    echo print_recorder($media, $browserplugins);
 }
 
 function print_recorder($media, $browserplugins) {
-	$recorders = get_installed_recorders();
+    $recorders = get_installed_recorders();
 
-	foreach (supported_type() as $type) {
-		$list = $recorders->$media->$type;
-		foreach ($list as $recorder) {
-			if (get_config('mediacapture', $recorder)) {
-				$classname = 'repository_mediacapture_' . $recorder;
+    foreach (supported_type() as $type) {
+        $list = $recorders->$media->$type;
+        foreach ($list as $recorder) {
+            if (get_config('mediacapture', $recorder)) {
+                $classname = 'repository_mediacapture_' . $recorder;
                 $client = new $classname();
                 if ($browserplugins->$type >= $client->get_min_version()) {
                     return $client->renderer();
                 }
-			}
-		}
-	}
+            }
+        }
+    }
 }
 
 function init() {
@@ -135,8 +135,8 @@ function init_lang() {
 
     $pluginsdir = $CFG->dirroot . '/repository/mediacapture/plugins';
     foreach ($recorders as $recorder) {
-    	$lang = $pluginsdir . '/' . $recorder 
-        	. '/lang/en/repository_mediacapture_' . $recorder . '.php';
+        $lang = $pluginsdir . '/' . $recorder 
+            . '/lang/en/repository_mediacapture_' . $recorder . '.php';
         if (file_exists($lang)) {
             $files[] = $lang;
         }        
@@ -147,55 +147,55 @@ function init_lang() {
 
 function get_installed_recorders() {
     global $CFG;
-   	
-   	$recorders = new stdClass();
-   	foreach (supported_media() as $media) {
-   		$recorders->$media = new stdClass();
-   		foreach (supported_type() as $type) {
-   			$recorders->$media->$type = array();
-   		}
-   	}
+    
+    $recorders = new stdClass();
+    foreach (supported_media() as $media) {
+        $recorders->$media = new stdClass();
+        foreach (supported_type() as $type) {
+            $recorders->$media->$type = array();
+        }
+    }
 
-   	$pluginsdir = $CFG->dirroot . '/repository/mediacapture/plugins';
+    $pluginsdir = $CFG->dirroot . '/repository/mediacapture/plugins';
     if ($handle = opendir($pluginsdir)) {
         while (false !== ($pluginname = readdir($handle))) {
             if ($pluginname != "." && $pluginname != "..") {
-            	$lib = $pluginsdir . '/' . $pluginname . '/lib.php';
-            	if (file_exists($lib)) {
-	            	require_once($lib);
+                $lib = $pluginsdir . '/' . $pluginname . '/lib.php';
+                if (file_exists($lib)) {
+                    require_once($lib);
                     $classname = 'repository_mediacapture_' . $pluginname;
                     if (class_exists($classname)) {
                         $client = new $classname();
                         $media = $client->supported_media();
                         $types = $client->supported_technology();
                         foreach ($media as $medium) {
-                        	foreach ($types as $type) {
-                        		if (in_array($medium, supported_media()) && 
-                        			in_array($type, supported_type())) {
-                        			array_push($recorders->$medium->$type, $pluginname);
-                        		}
-                        	}
+                            foreach ($types as $type) {
+                                if (in_array($medium, supported_media()) && 
+                                    in_array($type, supported_type())) {
+                                    array_push($recorders->$medium->$type, $pluginname);
+                                }
+                            }
                         }
-                	} 
-            	} else {
-            		throw new moodle_exception('error');
-            	}
+                    } 
+                } else {
+                    throw new moodle_exception('error');
+                }
             }
         }
         closedir($handle);
     }
 
     return $recorders;
-}	
+}   
 
 function get_recorder_list() {
-	$recorders = get_installed_recorders();
+    $recorders = get_installed_recorders();
 
-	$list = array();
-	foreach (supported_media() as $media) {
+    $list = array();
+    foreach (supported_media() as $media) {
         foreach (supported_type() as $type) {
             foreach ($recorders->$media->$type as $recorder) {
-            	$list[] = $recorder;
+                $list[] = $recorder;
             }
         }
     }
