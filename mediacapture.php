@@ -41,7 +41,7 @@ interface mediacapture {
      * @param string $callbackurl Callback url for the plugin
      * @return string $recorder HTML for the recorder
      */
-    function renderer($callbackurl);
+    function renderer();
 
     /**
      * @return array $stringdefs List of all strings defined by the recorder

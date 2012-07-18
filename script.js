@@ -10,7 +10,7 @@
 function load_recorder(media) {
     // Create a YUI instance using io-base module.
     YUI().use('node', 'io-base', function(Y) {
-        var uri = decodeURIComponent(Y.one('#ajax_uri').get('value'));
+        var uri = Y.one('*[name="ajaxuri"]').get('value');
         var container = Y.one('#mediacontainer');
         // Define a function to handle the response data.
         function complete(id, o) {
@@ -37,6 +37,20 @@ function load_recorder(media) {
 
     return false;
 }
+
+YUI().use('event', function (Y) {
+    var bt_audio = Y.one("#id_startaudio");
+
+    bt_audio.on("click", function (e) {
+        load_recorder('audio');
+    });
+
+    var bt_video = Y.one("#id_startvideo");
+
+    bt_video.on("click", function (e) {
+        load_recorder('video');
+    });
+});
 
 /*
  * Returns an object with found plugins and their versions

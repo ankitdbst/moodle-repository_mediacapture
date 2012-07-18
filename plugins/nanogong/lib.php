@@ -67,13 +67,11 @@ class repository_mediacapture_nanogong implements mediacapture {
      * @param string $callbackurl for the plugin
      * @return string $recorder HTML for the recorder. 
      */
-    public function renderer($callbackurl) {
+    public function renderer() {
     	global $CFG, $PAGE;
         
         $url = new moodle_url($CFG->wwwroot . 
                 '/repository/mediacapture/plugins/nanogong/nanogong.jar');        
-        $posturl = urlencode(new moodle_url($CFG->wwwroot . 
-                '/repository/mediacapture/plugins/nanogong/record.php'));
         $tmpdir = urlencode(get_temp_dir());
 
         // Get recorder settings from the config form
@@ -99,23 +97,24 @@ class repository_mediacapture_nanogong implements mediacapture {
         $javanotfound = get_string('javanotfound', 'repository_mediacapture');
         $save = get_string('save', 'repository_mediacapture');
 
-        $recorder = '
-                <form method="post" action="'.$callbackurl.'" onsubmit="return submit_audio();">
-                    <applet id="audio_recorder" name="audio_recorder" code="gong.NanoGong" width="160" height="40" archive="' . $url . '">
+        $recorder = array(
+            'html' => '<applet id="audio_recorder" name="audio_recorder" code="gong.NanoGong" width="160" height="40" archive="' . $url . '">
                         <param name="AudioFormat" value="' . $audioformat .'" />
                         <param name="ShowSaveButton" value="false" />
                         <param name="ShowTime" value="true" />
                         <param name="SamplingRate" value="' . $samplingrate . '" />
                         <p>' . $javanotfound . '</p>
-                    </applet><br /><br />
-                    <input type="hidden" id="fileloc" name="fileloc" />
-                    <input type="hidden" id="tmpdir" name="tmpdir" value="' . $tmpdir . '" />
-                    <input type="hidden" id="posturl" name="posturl" value="' . $posturl . '"/>
-                    <input type="text" id="filename" name="filename" value="Untitled"/>
-                    <br />
-                    <input type="submit" value="'. $save .'" />
-                </form>';
+                    </applet>',
+            'filename' => true,
+
+        );
         return $recorder;
+    }
+
+    public function get_ajax_uri() {
+        global $CFG;
+        $ajaxuri = new moodle_url($CFG->wwwroot . '/repository/mediacapture/plugins/nanogong/record.php');
+        return $ajaxuri;
     }
 
     /**

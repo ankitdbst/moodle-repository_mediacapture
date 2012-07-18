@@ -25,6 +25,9 @@ $string['mediacapture:view'] = 'Use Media Capture in file picker';
 $string['configplugin'] = 'Media Capture repository configuration';
 $string['repositoryname'] = 'MediaCapture';
 
+$string['startaudio'] = 'Start Audio';
+$string['startvideo'] = 'Start Video'; 
+
 $string['video_quality'] = 'Video quality';
 $string['video_low'] = 'LowQuality';
 $string['video_normal'] = 'NormalQuality';
@@ -42,7 +45,7 @@ $string['filenotsaved'] = 'The file could not be saved! Please try again';
 $string['rtmpserver'] = 'RTMP Server URL (for flash video recorder)';
 
 $string['save'] = 'Save';
-$string['name'] = 'Name';
+$string['filename'] = 'Filename';
 $string['account'] = 'Account';
 
 $files = init_lang();

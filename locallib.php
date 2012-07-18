@@ -23,6 +23,9 @@
 
 require_once(dirname(dirname(__FILE__)).'/../config.php');
 
+global $CFG, $PAGE;
+require_once("$CFG->libdir/formslib.php");
+
 $browserplugins = new stdClass();
 
 $browserplugins->os = optional_param('os', '', PARAM_TEXT);
@@ -32,8 +35,44 @@ $browserplugins->quicktime = optional_param('quicktime', -1.0, PARAM_FLOAT);
 
 $media = optional_param('media', '', PARAM_TEXT);
 
-if (!empty($media)) {
-    echo print_recorder($media, $browserplugins);
+/**
+ * This is a class used to define a mediacapture form for the recorders
+ */
+class mediacapture_form extends moodleform {
+    /** @var string action */
+    protected $action;
+
+    /**
+     * Definition of the moodleform
+     */
+    public function definition() {
+        global $CFG;
+
+        $mform =& $this->_form;
+        
+        $this->action = $this->_customdata['action'];
+        $mform->addElement('html', '<div class="mediacontainer" id="mediacontainer">');
+        $mform->addElement('hidden', 'ajaxuri', $this->_customdata['ajaxuri']);
+        if ($this->action ===  'init') {
+            if ($this->_customdata['startaudio']) {
+                $mform->addElement('button', 'startaudio', get_string('startaudio', 'repository_mediacapture'));
+            }
+            if ($this->_customdata['startvideo']) {
+                $mform->addElement('button', 'startvideo', get_string('startvideo', 'repository_mediacapture'));
+            }
+        } else {
+            $mform->addElement('html', $this->_customdata['recorder']['html']);
+            $mform->addElement('hidden', 'tmpdir', $this->_customdata['tmpdir']);
+            $mform->addElement('hidden', 'fileloc', '');
+            $type = 'hidden';
+            if ($this->_customdata['recorder']['filename']) {
+                $type = 'text';
+            }
+            $mform->addElement($type, 'filename', get_string('filename', 'repository_mediacapture'));
+            $mform->addElement('button', 'save', get_string('save', 'repository_mediacapture'));
+        }
+        $mform->addElement('html', '</div>');
+    }
 }
 
 /**
@@ -44,6 +83,7 @@ if (!empty($media)) {
 function print_recorder($media, $browserplugins) {
     $recorders = get_installed_recorders();
 
+    $flag = false;
     foreach (supported_type() as $type) {
         $list = $recorders->$media->$type;
         foreach ($list as $recorder) {
@@ -52,12 +92,32 @@ function print_recorder($media, $browserplugins) {
                 $client = new $classname();
                 $version = $client->get_min_version();
                 if ($browserplugins->$type >= $version[$type]) {
-                    $callbackurl = get_callback_url();
-                    return $client->renderer($callbackurl); // return the first recorder in the priority list
+                    // first recorder in the priority list
+                    $flag = true;
+                    break;
                 }
             }
         }
+        if ($flag) {
+            break;
+        }
     }
+
+    if ($flag) {
+        $formaction = get_callback_url();
+        $recorder = $client->renderer(); 
+        $ajaxuri = $client->get_ajax_uri();
+
+        $options = array(
+            'action' => 'load',
+            'ajaxuri' => $ajaxuri,
+            'tmpdir' => get_temp_dir(),
+            'recorder' => $recorder,
+        );    
+
+        $mform = new mediacapture_form($formaction, $options);    
+        $mform->display();
+    }    
 }
 
 /**
@@ -67,8 +127,7 @@ function init() {
     global $PAGE, $CFG;
 
     // Include general scripts and language strings used by the plugin
-    $PAGE->requires->js(new moodle_url($CFG->wwwroot .
-                         '/repository/mediacapture/script.js'));
+    $PAGE->requires->js(new moodle_url($CFG->wwwroot . '/repository/mediacapture/script.js'));
 
     $recorders = get_recorder_list();
     $stringdefs = get_string_defs();
@@ -82,19 +141,12 @@ function init() {
         }                
         array_merge($stringdefs, $client->get_string_defs());
     }
-
-    $PAGE->requires->data_for_js('mediacapture', get_string_js($stringdefs));        
-
-    $ajax_uri = urlencode(new moodle_url($CFG->wwwroot . '/repository/mediacapture/locallib.php'));
-
-    $html = '<input type="hidden" id="ajax_uri" name="ajax_uri" value="'.$ajax_uri.'" />
-                <div class="mediacontainer" id="mediacontainer">';
+    $PAGE->requires->data_for_js('mediacapture', get_string_js($stringdefs));       
     
     $list = array();
     foreach (supported_media() as $media) {
         $list[$media] = false;
     }
-
     $recorders = get_installed_recorders();
     foreach (supported_media() as $media) {
         foreach (supported_type() as $type) {
@@ -104,18 +156,18 @@ function init() {
             }
         }
     }
+    
+    $formaction = get_callback_url();
+    $ajaxuri = new moodle_url($CFG->wwwroot . '/repository/mediacapture/locallib.php');
+    $options = array(
+        'action' => 'init',
+        'ajaxuri' => $ajaxuri,
+        'startaudio' => $list['audio'],
+        'startvideo' => $list['video'],
+    );    
 
-    if ($list['audio']) {
-        $html .= '<input type="button" onclick="return load_recorder(\'audio\')" value="Start Audio" /> ';
-    }
-
-    if ($list['video']) {
-        $html .= '<input type="button" onclick="return load_recorder(\'video\')" value="Start Video" />';
-    }
-
-    $html .= '</div>';
-
-    return $html;
+    $mform = new mediacapture_form($formaction, $options);    
+    $mform->display();
 }
 
 /**
@@ -270,4 +322,9 @@ function supported_media() {
  */
 function supported_type() {
     return array('html5', 'flash', 'java');
+}
+
+if (!empty($media)) {
+    $PAGE->set_context(get_context_instance(CONTEXT_SYSTEM));
+    print_recorder($media, $browserplugins);
 }

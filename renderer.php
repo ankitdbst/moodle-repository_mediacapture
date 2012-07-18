@@ -33,6 +33,6 @@ $PAGE->set_pagelayout('embedded');
 
 require_css();
 echo $OUTPUT->header();
-echo init();
+init();
 echo $OUTPUT->footer();
 ?>
