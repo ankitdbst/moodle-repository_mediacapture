@@ -81,6 +81,7 @@ class mediacapture_form extends moodleform {
  * @return string $html HTML for the recorder
  */
 function print_recorder($media, $browserplugins) {
+    global $PAGE, $CFG;
     $recorders = get_installed_recorders();
 
     $flag = false;
@@ -104,6 +105,10 @@ function print_recorder($media, $browserplugins) {
     }
 
     if ($flag) {
+        if (file_exists($CFG->dirroot . '/repository/mediacapture/plugins/' . $recorder . '/script.js')) {
+            $PAGE->requires->js(new moodle_url($CFG->wwwroot . '/repository/mediacapture/plugins/' . $recorder . '/script.js'));            
+        }  
+        $PAGE->requires->data_for_js('mediacapture', get_string_js($client->get_string_defs()));       
         $formaction = get_callback_url();
         $recorder = $client->renderer(); 
         $ajaxuri = $client->get_ajax_uri();
@@ -131,18 +136,9 @@ function init() {
 
     $recorders = get_recorder_list();
     $stringdefs = get_string_defs();
-
-    foreach ($recorders as $recorder) {
-        $classname = 'repository_mediacapture_' . $recorder;
-        $client = new $classname();
-        if (file_exists($CFG->dirroot . '/repository/mediacapture/plugins/' . $recorder . '/script.js')) {
-            $PAGE->requires->js(new moodle_url($CFG->wwwroot .
-                 '/repository/mediacapture/plugins/' . $recorder . '/script.js'));
-        }                
-        array_merge($stringdefs, $client->get_string_defs());
-    }
-    $PAGE->requires->data_for_js('mediacapture', get_string_js($stringdefs));       
     
+    $PAGE->requires->data_for_js('mediacapture', get_string_js($stringdefs));       
+
     $list = array();
     foreach (supported_media() as $media) {
         $list[$media] = false;
