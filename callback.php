@@ -24,11 +24,13 @@
  */
 
 require_once(dirname(dirname(dirname(__FILE__))).'/config.php');
+
+require_sesskey();
+require_login();
+
 $filename = required_param('filename', PARAM_TEXT);
 $fileloc = required_param('fileloc', PARAM_PATH);
 $filedata = optional_param('filedata', '', PARAM_RAW);
-
-require_login();
 
 $url = urldecode($fileloc);
 $filename = $filename;

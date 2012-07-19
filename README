@@ -1,26 +1,21 @@
 Mediacapture plugin
 ===================
 
-
 Introduction
 ------------
 This is a Moodle repository plugin for recording media directly using the filepicker. The plugin is built as a framework and provides an interface for the sub-plugins/recorders to implement.
 Plugin automatically checks for the installed recorders and sets the config for the recorders in the admin settings. The recorders are loaded based on the client browser requirements and priority of recorders in admin settings.
 
-
 About the sub-plugins
 ---------------------
-
 Nanogong
 --------
 Nanogong is a Java applet to record and playback the recorded audio stream.
 More about Nanogong project : http://nanogong.ust.hk/
 
-
 Requirement
 -----------
  Moodle 2.3 onward
-
 
 Installation
 ------------
@@ -28,11 +23,9 @@ Installation
 - Trigger moodle upgrade script
 - Enable the plugin from Site administration -> Plugins -> Repositories -> Manage Repositories
 
-
 Copyright
 ---------
 2012 Ankit Gupta <mailtoankitgupta@gmail.com>
-
 
 License
 -------

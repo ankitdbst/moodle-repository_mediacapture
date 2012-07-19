@@ -51,9 +51,9 @@ class mediacapture_form extends moodleform {
         $mform =& $this->_form;
         
         $this->action = $this->_customdata['action'];
-        $mform->addElement('html', '<div class="mediacontainer" id="mediacontainer">');
-        $mform->addElement('hidden', 'ajaxuri', $this->_customdata['ajaxuri']);
+        $mform->addElement('html', '<div class="mediacontainer" id="mediacontainer">');        
         if ($this->action ===  'init') {
+            $mform->addElement('hidden', 'ajaxuri', $this->_customdata['ajaxuri']);
             if ($this->_customdata['startaudio']) {
                 $mform->addElement('button', 'startaudio', get_string('startaudio', 'repository_mediacapture'));
             }
@@ -61,6 +61,7 @@ class mediacapture_form extends moodleform {
                 $mform->addElement('button', 'startvideo', get_string('startvideo', 'repository_mediacapture'));
             }
         } else {
+            $mform->addElement('hidden', 'posturl', $this->_customdata['posturl']);
             $mform->addElement('html', $this->_customdata['recorder']['html']);
             $mform->addElement('hidden', 'tmpdir', $this->_customdata['tmpdir']);
             $mform->addElement('hidden', 'fileloc', '');
@@ -69,7 +70,7 @@ class mediacapture_form extends moodleform {
                 $type = 'text';
             }
             $mform->addElement($type, 'filename', get_string('filename', 'repository_mediacapture'));
-            $mform->addElement('button', 'save', get_string('save', 'repository_mediacapture'));
+            $mform->addElement('button', 'save', get_string('save', 'repository_mediacapture'), array('onclick' => $this->_customdata['eventbinder'].'(); return true;'));
         }
         $mform->addElement('html', '</div>');
     }
@@ -81,7 +82,6 @@ class mediacapture_form extends moodleform {
  * @return string $html HTML for the recorder
  */
 function print_recorder($media, $browserplugins) {
-    global $PAGE, $CFG;
     $recorders = get_installed_recorders();
 
     $flag = false;
@@ -93,7 +93,6 @@ function print_recorder($media, $browserplugins) {
                 $client = new $classname();
                 $version = $client->get_min_version();
                 if ($browserplugins->$type >= $version[$type]) {
-                    // first recorder in the priority list
                     $flag = true;
                     break;
                 }
@@ -105,19 +104,17 @@ function print_recorder($media, $browserplugins) {
     }
 
     if ($flag) {
-        if (file_exists($CFG->dirroot . '/repository/mediacapture/plugins/' . $recorder . '/script.js')) {
-            $PAGE->requires->js(new moodle_url($CFG->wwwroot . '/repository/mediacapture/plugins/' . $recorder . '/script.js'));            
-        }  
-        $PAGE->requires->data_for_js('mediacapture', get_string_js($client->get_string_defs()));       
         $formaction = get_callback_url();
         $recorder = $client->renderer(); 
-        $ajaxuri = $client->get_ajax_uri();
+        $eventbinder = $client->event_binder();
+        $posturl = $client->get_ajax_uri();
 
         $options = array(
             'action' => 'load',
-            'ajaxuri' => $ajaxuri,
+            'posturl' => $posturl,
             'tmpdir' => get_temp_dir(),
             'recorder' => $recorder,
+            'eventbinder' => $eventbinder
         );    
 
         $mform = new mediacapture_form($formaction, $options);    
@@ -136,9 +133,18 @@ function init() {
 
     $recorders = get_recorder_list();
     $stringdefs = get_string_defs();
-    
-    $PAGE->requires->data_for_js('mediacapture', get_string_js($stringdefs));       
 
+    foreach ($recorders as $recorder) {
+        $classname = 'repository_mediacapture_' . $recorder;
+        $client = new $classname();
+        if (file_exists($CFG->dirroot . '/repository/mediacapture/plugins/' . $recorder . '/script.js')) {
+            $PAGE->requires->js(new moodle_url($CFG->wwwroot .
+                 '/repository/mediacapture/plugins/' . $recorder . '/script.js'));
+        }                
+        array_merge($stringdefs, $client->get_string_defs());
+    }
+    $PAGE->requires->data_for_js('mediacapture', get_string_js($stringdefs));       
+    
     $list = array();
     foreach (supported_media() as $media) {
         $list[$media] = false;

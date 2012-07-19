@@ -41,6 +41,9 @@ class repository_mediacapture_nanogong implements mediacapture {
     	return array('audio_format', 'sampling_rate', 'nanogong');
     }
 
+    public function event_binder() {
+        return 'submit_audio';
+    }
     /**
      * Adds the settings configuration needed by the recorder to the plugin
      * @param object $mform
