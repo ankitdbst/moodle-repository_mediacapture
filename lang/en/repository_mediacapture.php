@@ -45,7 +45,7 @@ $string['filenotsaved'] = 'The file could not be saved! Please try again';
 $string['rtmpserver'] = 'RTMP Server URL (for flash video recorder)';
 
 $string['save'] = 'Save';
-$string['filename'] = 'Filename';
+$string['name'] = 'Name';
 $string['account'] = 'Account';
 
 $files = init_lang();

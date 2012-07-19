@@ -92,7 +92,7 @@ class repository_mediacapture extends repository {
         $callbackurl = get_callback_url();
         $mimetypesstr = '';
         
-        $url = new moodle_url('/repository/mediacapture/renderer.php', array('returnurl' => $callbackurl));
+        $url = new moodle_url('/repository/mediacapture/view.php', array('returnurl' => $callbackurl));
         $list = array();
         $list['object'] = array();
         $list['object']['type'] = 'text/html';

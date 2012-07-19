@@ -3,9 +3,8 @@
  */
 
 /* General layout rules  */
-.mediacontainer { 
+#content { 
     height:320px;    
-    width:500px; 
     /* Firefox */
     display:-moz-box;
     -moz-box-orient:horizontal;
@@ -24,3 +23,12 @@
     box-pack:center;
     box-align:center;
 }
+
+#mediacontainer {
+    width:250px;
+}
+
+#id_startvideo, #id_startaudio {
+    margin:0px 20px 5px 20px;
+}
+

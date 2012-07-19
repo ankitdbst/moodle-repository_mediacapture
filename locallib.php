@@ -69,7 +69,7 @@ class mediacapture_form extends moodleform {
             if ($this->_customdata['recorder']['filename']) {
                 $type = 'text';
             }
-            $mform->addElement($type, 'filename', get_string('filename', 'repository_mediacapture'));
+            $mform->addElement($type, 'filename', get_string('name', 'repository_mediacapture'));
             $mform->addElement('button', 'save', get_string('save', 'repository_mediacapture'), array('onclick' => $this->_customdata['eventbinder'].'(); return true;'));
         }
         $mform->addElement('html', '</div>');

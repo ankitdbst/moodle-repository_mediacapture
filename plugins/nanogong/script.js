@@ -14,7 +14,7 @@ function submit_audio() {
         alert(mediacapture['nonamefound']);
         return false;
     }
-    filename.value = filename.value.replace(/^\s+|\s+$/g,"") + '.wav';
+    filename.value = filename.value.replace(/^\s+|\s+$/g,"");
     if (!recorder || !(recorder.sendGongRequest)) {
         alert(mediacapture['appletnotfound']);
         return false;
@@ -35,6 +35,7 @@ function submit_audio() {
         return false;
     }
 
+    filename.value = filename.value + '.wav';
     // Submit the form to callback url
     var form = document.getElementById('mform1');
     form.submit();

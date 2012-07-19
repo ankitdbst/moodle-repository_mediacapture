@@ -28,7 +28,7 @@ require_once(dirname(__FILE__) . '/locallib.php');
 
 $returnurl = required_param('returnurl', PARAM_URL);
 $PAGE->set_context(get_context_instance(CONTEXT_SYSTEM));
-$PAGE->set_url('/repository/mediacapture/renderer.php', array('returnurl'=>$returnurl));
+$PAGE->set_url('/repository/mediacapture/view.php', array('returnurl'=>$returnurl));
 $PAGE->set_pagelayout('embedded');
 
 require_css();

@@ -3,6 +3,6 @@
  */
 
 /* General layout rules  */
-#filename {
-    margin:0 0 5px 0;
+#id_filename {
+    width:110px;
 }
