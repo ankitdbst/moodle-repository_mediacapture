@@ -51,7 +51,8 @@ class mediacapture_form extends moodleform {
                 break;
             case 'display':
                 $this->_customdata['recorder']->view($mform);
-                $mform->addElement('button', 'save', get_string('save', 'repository_mediacapture'), array('onclick' => $this->_customdata['eventbinder'].'(); return true;'));
+                $mform->addElement('button', 'save', get_string('save', 'repository_mediacapture'),
+                                    array('onclick' => $this->_customdata['eventbinder'].'(); return true;'));
                 break;
             case 'nodisplay':
                 break;
@@ -119,10 +120,12 @@ function view($mform) {
     $recorders = check_installed_recorders();
     $eventbinder = 'load_recorder';
     if (sizeof($recorders['audio'])) {
-        $mform->addElement('button', 'startaudio', get_string('startaudio', 'repository_mediacapture'), array('onclick' => $eventbinder . '("audio"); return true;'));
+        $mform->addElement('button', 'startaudio', get_string('startaudio', 'repository_mediacapture'),
+                            array('onclick' => $eventbinder . '("audio"); return true;'));
     }
     if (sizeof($recorders['video'])) {
-        $mform->addElement('button', 'startvideo', get_string('startvideo', 'repository_mediacapture'), array('onclick' => $eventbinder . '("video"); return true;'));
+        $mform->addElement('button', 'startvideo', get_string('startvideo', 'repository_mediacapture'),
+                            array('onclick' => $eventbinder . '("video"); return true;'));
     }
 }
 
@@ -168,7 +171,7 @@ function check_installed_recorders() {
 }
 
 /**
- * $return array $stringdefs List of all the general string definitions for the plugin
+ * $return array $keys List of all string keys for the plugin
  */
 function string_keys() {
     return array(

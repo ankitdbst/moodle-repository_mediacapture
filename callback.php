@@ -23,22 +23,20 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-require_once(dirname(dirname(dirname(__FILE__))).'/config.php');
+require_once(dirname(dirname(dirname(__FILE__))) . '/config.php');
 
 require_sesskey();
 require_login();
 
 $filename = required_param('filename', PARAM_TEXT);
-$fileloc = required_param('fileloc', PARAM_PATH);
-$filedata = optional_param('filedata', '', PARAM_RAW);
+$filepath = required_param('filepath', PARAM_PATH);
 
-$url = urldecode($fileloc);
-$filename = $filename;
-$thumbnail = '';
-$author = 'Unknown';
-$license = 'None';
+$url        = urldecode($filepath);
+$thumbnail  = '';
+$author     = 'Unknown'; // specify default author here
+$license    = 'None';
 
-$source = base64_encode(serialize((object)array('url'=>$url,'filename'=>$filename, 'filedata'=>$filedata)));
+$source = base64_encode(serialize((object)array('url'=>$url,'filename'=>$filename);
 
 $js =<<<EOD
 <html>
