@@ -26,13 +26,21 @@
 
 require_once(dirname(__FILE__) . '/locallib.php');
 
-$returnurl = required_param('returnurl', PARAM_URL);
+$returnurl      = required_param('returnurl', PARAM_URL);
+$type           = required_param('type', PARAM_TEXT);
+$browserplugins = optional_param('browserplugins', '', PARAM_TEXT);
+$browserdetect  = optional_param('browserdetect', '', PARAM_TEXT);
+
 $PAGE->set_context(get_context_instance(CONTEXT_SYSTEM));
 $PAGE->set_url('/repository/mediacapture/view.php', array('returnurl'=>$returnurl));
 $PAGE->set_pagelayout('embedded');
 
-require_css();
-echo $OUTPUT->header();
-init();
-echo $OUTPUT->footer();
+$OUTPUT->header();
+switch ($type) {
+    case 'init':
+        init(); break;
+    default:
+        print_recorder($type, $browserplugins); break;
+}
+$OUTPUT->footer();
 ?>

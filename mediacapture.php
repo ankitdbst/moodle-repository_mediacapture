@@ -38,20 +38,19 @@ interface mediacapture {
     function get_config_form($mform);
 
     /**
-     * @param string $callbackurl Callback url for the plugin
-     * @return string $recorder HTML for the recorder
+     * @param object $mform
      */
-    function renderer();
+    function view($mform);
 
     /**
-     * @return array $stringdefs List of all strings defined by the recorder
+     * @return array $strings List of all string keys defined by the recorder
      */
-    function get_string_defs();
+    function string_keys();
 
     /**
-     * @return array $version Version of supported_technology() used.
-     */ 
-    function get_min_version();
+     * @return array $version Version of $type used.
+     */
+    function min_version();
 
     /**
      * array('audio', 'video')
@@ -63,8 +62,8 @@ interface mediacapture {
     /**
      * array('html5', 'flash', 'java')
      *
-     * @return array $type Supported web technology
+     * @return array $type Supported type
      */
-    function supported_technology();
+    function supported_types();
 
 }

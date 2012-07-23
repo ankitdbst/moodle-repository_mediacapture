@@ -1,56 +1,18 @@
 /**
-* @file Javascript file to handle the audio/video recording
-* of the mediacapture plugin
-*/
+ * @file Javascript file to handle the audio/video recording
+ * of the mediacapture plugin
+ */
 
- /**
-* Start the appropriate audio/video recorder via ajax
-* in response to user selection
-*/
-function load_recorder(media) {
-    // Create a YUI instance using io-base module.
-    YUI().use('node', 'io-base', function(Y) {
-        var uri = Y.one('*[name="ajaxuri"]').get('value');
-        var container = Y.one('#content');
-        // Define a function to handle the response data.
-        function complete(id, o) {
-            var id = id; 
-            var data = o.responseText; // Response data.
-            container.setContent(data); // Set content for the recorders
-        };
-
-        // Subscribe to event "io:complete"
-        Y.on('io:complete', complete, Y);
-
-        // Make an HTTP POST request to posturl.
-        cfg = {
-            method: 'POST',
-            data: 'media='+media+
-                    '&java='+BrowserPlugins.java+
-                    '&flash='+BrowserPlugins.flash+
-                    '&quicktime='+BrowserPlugins.quicktime+
-                    '&os='+BrowserDetect.OS
-        };
-
-        var request = Y.io(uri, cfg);
-    });
-
-    return false;
+/**
+ * Load the appropriate recorder
+ */
+function display_recorder(type) {
+    var form = document.getElementById('mform1'),
+        params = 'type' + type + '&browserplugins' + JSON.stringify(BrowserPlugins) +
+            '&browserdetect' + JSON.stringify(BrowserDetect);
+    form.action = form.action + '?' + params;
+    form.submit();
 }
-
-YUI().use('event', function (Y) {
-    var bt_audio = Y.one("#id_startaudio");
-
-    bt_audio.on("click", function (e) {
-        load_recorder('audio');
-    });
-
-    var bt_video = Y.one("#id_startvideo");
-
-    bt_video.on("click", function (e) {
-        load_recorder('video');
-    });
-});
 
 /*
  * Returns an object with found plugins and their versions
@@ -61,7 +23,7 @@ YUI().use('event', function (Y) {
 var BrowserPlugins = (function(){
     var found = {};
     var version_reg = /[0-9]+.[0-9]+/;
- 
+
     /*
      * Differentiate between IE (detection via ActiveXObject)
      * and the rest (detection via navigator.plugins)
@@ -71,7 +33,7 @@ var BrowserPlugins = (function(){
             flash: 'ShockwaveFlash.ShockwaveFlash.1',
             quicktime: 'QuickTime.QuickTime'
         }
- 
+
         for (var plugin in plugin_list){
             var version = msieDetect(plugin_list[plugin]);
             if (version){
@@ -79,7 +41,7 @@ var BrowserPlugins = (function(){
                 found[plugin] = (version_reg_val && version_reg_val[0]) || '';
             }
         }
- 
+
         if (navigator.javaEnabled()){
             found['java'] = '';
         }
@@ -94,7 +56,7 @@ var BrowserPlugins = (function(){
                  * Search in version property, if not available concat name and description
                  * and search for a version number in there
                  */
-                var version = plugins[i].version || 
+                var version = plugins[i].version ||
                     (plugins[i].name + ' ' + plugins[i].description);
                 var version_reg_val = version_reg.exec(version);
                 if (!found[plugin]) {
@@ -102,7 +64,7 @@ var BrowserPlugins = (function(){
                 }
             }
         }
-    }    
+    }
 
     return found;
 
@@ -110,7 +72,7 @@ var BrowserPlugins = (function(){
      * Return version number if plugin installed
      * Return true if plugin is installed but no version number found
      * Return false if plugin not found
-     */ 
+     */
     function msieDetect(name){
         try {
             var active_x_obj = new ActiveXObject(name);

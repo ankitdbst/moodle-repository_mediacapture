@@ -24,9 +24,12 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+require_once(dirname(dirname(__FILE__)) . '/lib.php');
 require_once(dirname(__FILE__) . '/locallib.php');
 
 class repository_mediacapture extends repository {
+
+    static $callbackurl, $recorders;
 
     /**
      * Constructor
@@ -37,17 +40,18 @@ class repository_mediacapture extends repository {
      */
     public function __construct($repositoryid, $context = SITEID, $options = array()) {
         parent::__construct($repositoryid, $context, $options);
+        self::$callbackurl = new moodle_url('/repository/mediacapture/callback.php');
+        self::$recorders = check_installed_recorders();
     }
 
     /**
      * @return array $options Type option names for sub-plugins installed
      */
     public static function get_type_option_names() {
+        self::$recorders = check_installed_recorders();
         $options = array('pluginname');
-        
-        $recorders = get_recorder_list();
-        
-        foreach ($recorders as $recorder) {
+
+        foreach (array_merge(self::$recorders['audio'], self::$recorders['video']) as $recorder) {
             $classname = 'repository_mediacapture_' . $recorder;
             $client = new $classname();
             $options = array_merge($options, $client->get_type_option_names());
@@ -65,9 +69,7 @@ class repository_mediacapture extends repository {
     public static function type_config_form($mform, $classname = 'repository') {
         parent::type_config_form($mform);
 
-        $recorders = get_recorder_list();
-        
-        foreach ($recorders as $recorder) {
+        foreach (array_merge(self::$recorders['audio'], self::$recorders['video']) as $recorder) {
             $classname = 'repository_mediacapture_' . $recorder;
             $client = new $classname();
             $client->get_config_form($mform);
@@ -75,9 +77,9 @@ class repository_mediacapture extends repository {
     }
 
     /**
-     * Plugin doesn't support global search, since we don't have anything to search
+     * Turn search off
      */
-    public function global_search() {        
+    public function global_search() {
         return false;
     }
 
@@ -89,17 +91,15 @@ class repository_mediacapture extends repository {
      * @return array structure of listing information
      */
     public function get_listing($path = null, $page = null) {
-        $callbackurl = get_callback_url();
-        $mimetypesstr = '';
-        
-        $url = new moodle_url('/repository/mediacapture/view.php', array('returnurl' => $callbackurl));
+        $url = new moodle_url('/repository/mediacapture/view.php', array('returnurl' => self::$callbackurl, 'type' => 'init'));
+        // Create listing array
         $list = array();
-        $list['object'] = array();
+        $list['object']         = array();
         $list['object']['type'] = 'text/html';
-        $list['object']['src'] = $url->out(false);
-        $list['nologin']  = true;
-        $list['nosearch'] = true;
-        $list['norefresh'] = true;
+        $list['object']['src']  = $url->out(false);
+        $list['nologin']        = true;
+        $list['nosearch']       = true;
+        $list['norefresh']      = true;
 
         return $list;
     }
@@ -114,18 +114,9 @@ class repository_mediacapture extends repository {
     public function get_file($url, $filename = '') {
         global $USER;
         $path = $this->prepare_file($filename);
-        $url1 = unserialize(base64_decode($url));        
-        $filedata = base64_decode($url1->filedata);
-        // Check whenever raw data is not passed
-        if (empty($filedata)) {
-            $filedata = file_get_contents($url1->url);
-        }
-        file_put_contents($path, $filedata);
-        // Delete the temp file only when raw data is not passed
-        if (empty($filedata)) {
-            unlink($url1->url);
-        }        
-
+        $url1 = unserialize(base64_decode($url));
+        $contents = file_get_contents($url1->url);
+        file_put_contents($path, $contents);
         return array('path'=>$path, 'url'=>$url);
     }
 

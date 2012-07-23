@@ -26,7 +26,7 @@ $string['configplugin'] = 'Media Capture repository configuration';
 $string['repositoryname'] = 'MediaCapture';
 
 $string['startaudio'] = 'Start Audio';
-$string['startvideo'] = 'Start Video'; 
+$string['startvideo'] = 'Start Video';
 
 $string['video_quality'] = 'Video quality';
 $string['video_low'] = 'LowQuality';
@@ -48,7 +48,7 @@ $string['save'] = 'Save';
 $string['name'] = 'Name';
 $string['account'] = 'Account';
 
-$files = init_lang();
+$files = list_files();
 foreach ($files as $file) {
 	require_once($file);
 }

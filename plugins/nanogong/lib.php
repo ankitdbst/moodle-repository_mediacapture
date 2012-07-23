@@ -41,14 +41,11 @@ class repository_mediacapture_nanogong implements mediacapture {
     	return array('audio_format', 'sampling_rate', 'nanogong');
     }
 
-    public function event_binder() {
-        return 'submit_audio';
-    }
     /**
      * Adds the settings configuration needed by the recorder to the plugin
      * @param object $mform
      */
-    public function get_config_form($mform) {    	
+    public function get_config_form($mform) {
         $audioformatoptions = array(
             get_string('audioformatimaadpcm', 'repository_mediacapture'),
             get_string('audioformatspeex', 'repository_mediacapture'),
@@ -67,73 +64,68 @@ class repository_mediacapture_nanogong implements mediacapture {
     }
 
     /**
-     * @param string $callbackurl for the plugin
-     * @return string $recorder HTML for the recorder. 
+     * @param object $mform
      */
-    public function renderer() {
+    public function view($mform) {
     	global $CFG, $PAGE;
-        
-        $url = new moodle_url($CFG->wwwroot . 
-                '/repository/mediacapture/plugins/nanogong/nanogong.jar');        
-        $tmpdir = urlencode(get_temp_dir());
 
-        // Get recorder settings from the config form
+        $url = new moodle_url("$CFG->wwwroot/repository/mediacapture/plugins/nanogong/nanogong.jar");
         $samplingrates = array(
             array(8000, 11025, 22050, 44100),
             array(8000, 16000, 32000, 44100)
         );
         $audioformats = array('ImaADPCM', 'Speex');
-
         $audioformat = get_config('audio_format', 'repository_mediacapture');
         $samplingrate = get_config('sampling_rate', 'repository_mediacapture');
-
         if (empty($audioformat)) {
             $audioformat = 0;
         }
         if (empty($sampling_rate)) {
             $samplingrate = 0;
         }
-
         $samplingrate = $samplingrates[$audioformat][$samplingrate];
         $audioformat = $audioformats[$audioformat];
-
         $javanotfound = get_string('javanotfound', 'repository_mediacapture');
         $save = get_string('save', 'repository_mediacapture');
 
-        $recorder = array(
-            'html' => '<applet id="audio_recorder" name="audio_recorder" code="gong.NanoGong" width="160" height="40" archive="' . $url . '">
+        $tempdir = urlencode(temp_dir());
+        $posturl = new moodle_url("$CFG->wwwroot/repository/mediacapture/plugins/nanogong/record.php");
+        $recorder = '<applet id="audio_recorder" name="audio_recorder" code="gong.NanoGong" width="160" height="40" archive="' . $url . '">
                         <param name="AudioFormat" value="' . $audioformat .'" />
                         <param name="ShowSaveButton" value="false" />
                         <param name="ShowTime" value="true" />
                         <param name="SamplingRate" value="' . $samplingrate . '" />
                         <p>' . $javanotfound . '</p>
-                    </applet>',
-            'filename' => true,
-
-        );
-        return $recorder;
-    }
-
-    public function get_ajax_uri() {
-        global $CFG;
-        $ajaxuri = new moodle_url($CFG->wwwroot . '/repository/mediacapture/plugins/nanogong/record.php');
-        return $ajaxuri;
+                    </applet>';
+        $mform->addElement('html', $recorder);
+        $mform->addElement('hidden', 'posturl', $post_url);
+        $mform->addElement('hidden', 'tempdir', $tempdir);
+        $mform->addElement('hidden', 'filepath', '');
+        $mform->addElement('text', 'filename', get_string('filename', 'repository_mediacapture'));
     }
 
     /**
-     * @return string $stringdefs Array of string definitions used by the recorder.
+     * Javascript event for the recorder upon form submit
      */
-    public function get_string_defs() {
-        return array('audioformat', 'audioformatimaadpcm', 'audioformatspeex',
-                'samplingrate', 'samplingratelow', 'samplingratemedium',
-                'samplingratenormal', 'samplingratehigh'
-                );
+    public function event_binder() {
+        return 'submit_nanogong_audio';
+    }
+
+    /**
+     * @return string $keys Array of string keys used by the recorder.
+     */
+    public function string_keys() {
+        return array(
+            'audioformat', 'audioformatimaadpcm', 'audioformatspeex',
+            'samplingrate', 'samplingratelow', 'samplingratemedium',
+            'samplingratenormal', 'samplingratehigh'
+            );
     }
 
     /**
      * @return array $version Minimum version of $type required by the recorder.
      */
-    public function get_min_version() {
+    public function min_version() {
         return array('java' => 1.5);
     }
 
@@ -145,9 +137,9 @@ class repository_mediacapture_nanogong implements mediacapture {
     }
 
     /**
-     * @return array $type Supported technology by the recorder.
+     * @return array $type Supported type by the recorder.
      */
-    public function supported_technology() {
+    public function supported_types() {
         return array('java');
     }
 }

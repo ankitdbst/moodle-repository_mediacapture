@@ -3,13 +3,14 @@
 * Method to validate the audio recording form and save
 * the recording to temp file
 */
-function submit_audio() {
+function submit_nanogong_audio() {
 
     var filename    = document.getElementById('id_filename'),
         recorder    = document.getElementById('audio_recorder'),
-        fileloc     = document.getElementsByName('fileloc')[0],
-        tmpdir      = document.getElementsByName('tmpdir')[0],
-        posturl     = document.getElementsByName('posturl')[0];    
+        filepath     = document.getElementsByName('filepath')[0],
+        tempdir      = document.getElementsByName('tempdir')[0],
+        posturl     = document.getElementsByName('posturl')[0];
+
     if (!filename.value) {
         alert(mediacapture['nonamefound']);
         return false;
@@ -26,11 +27,11 @@ function submit_audio() {
         return false;
     }
 
-    posturl.value = posturl.value + '?recorder=nanogong&tmp_dir=' + 
-                decodeURIComponent(tmpdir.value);
-    fileloc.value = encodeURIComponent(recorder.sendGongRequest("PostToForm", posturl.value, "repo_upload_audio", "cookie=nanogong", filename.value));
-    
-    if (!fileloc.value) {
+    posturl.value = posturl.value + '?recorder=nanogong&tmp_dir=' +
+                decodeURIComponent(tempdir.value);
+    filepath.value = encodeURIComponent(recorder.sendGongRequest("PostToForm", posturl.value, "repo_upload_audio", "cookie=nanogong", filename.value));
+
+    if (!filepath.value) {
         alert(mediacapture['filenotsaved']);
         return false;
     }
