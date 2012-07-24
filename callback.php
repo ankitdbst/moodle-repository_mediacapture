@@ -30,6 +30,7 @@ require_login();
 
 $filename = required_param('filename', PARAM_TEXT);
 $filepath = required_param('filepath', PARAM_PATH);
+$filetype = required_param('filetype', PARAM_TEXT);
 
 $url        = urldecode($filepath);
 $thumbnail  = '';
@@ -37,6 +38,7 @@ $author     = 'Unknown'; // specify default author here
 $license    = 'None';
 
 $source = base64_encode(serialize((object)array('url'=>$url,'filename'=>$filename);
+$filename = $filename . '.' . $filetype;
 
 $js =<<<EOD
 <html>

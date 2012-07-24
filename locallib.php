@@ -66,18 +66,31 @@ class mediacapture_form extends moodleform {
  * @param object $browserplugins
  */
 function print_recorder($media, $browserplugins) {
+    global $PAGE, $CFG, $OUTPUT;
+
     $recorders = check_installed_recorders();
+    $compatible = true;
 
     foreach($recorders[$media] as $recorder) {
         if (get_config('mediacapture', $recorder)) {
             $classname = 'repository_mediacapture_' . $recorder;
             $client = new $classname();
-            $version = $client->get_min_version();
-            if (array_key_exists($type, $browserplugins) && $browserplugins->$type >= $version[$type]) {
+            $version = $client->min_version();
+            $types = $client->supported_types();
+            foreach ($types as $type) {
+                if ( !(isset($browserplugins->$type) &&
+                     $browserplugins->$type >= $version[$type]) ) {
+                    $compatible = false;
+                    break;
+                }
+            }
+            // check for the compatible plugin-recorder
+            if ($compatible) {
                 $PAGE->requires->css(new moodle_url("$CFG->wwwroot/repository/mediacapture/plugins/$recorder/styles.css"));
+                echo $OUTPUT->header();
                 $PAGE->requires->js(new moodle_url("$CFG->wwwroot/repository/mediacapture/plugins/$recorder/script.js"));
-                $PAGE->requires->data_for_js('mediacapture', list_strings($client->string_keys));
-                $formaction = repository_mediacapture::$callbackurl;
+                $PAGE->requires->data_for_js('mediacapture', list_strings($client->string_keys()));
+                $formaction = new moodle_url('/repository/mediacapture/callback.php');
                 $eventbinder = $client->event_binder();
                 $options = array(
                     'action' => 'display',
@@ -87,13 +100,15 @@ function print_recorder($media, $browserplugins) {
 
                 $mform = new mediacapture_form($formaction, $options);
                 $mform->display();
+                echo $OUTPUT->footer();
                 return;
             }
         }
     }
 
-    // display appropriate message
+    // no recorder selected : display appropriate message
     $options = array('action' => 'nodisplay');
+    $formaction = new moodle_url('/repository/mediacapture/view.php');
     $mform = new mediacapture_form($formaction, $options);
     $mform->display();
 }
@@ -101,15 +116,16 @@ function print_recorder($media, $browserplugins) {
 /**
  * Initializes the recorder
  */
-function init() {
-    global $PAGE, $CFG;
-
+function init($returnurl) {
+    global $PAGE, $CFG, $OUTPUT;
+    echo $OUTPUT->header();
     $PAGE->requires->js(new moodle_url("$CFG->wwwroot/repository/mediacapture/script.js"));
     $PAGE->requires->data_for_js('mediacapture', list_strings(string_keys()));
-    $formaction = new moodle_url('/repository/mediacapture/view.php');
+    $formaction = new moodle_url('/repository/mediacapture/view.php', array('returnurl' => $returnurl));
     // check non-empty list of recorders
     $mform = new mediacapture_form($formaction, array('action' => 'init'));
     $mform->display();
+    echo $OUTPUT->footer();
 }
 
 /**
@@ -118,7 +134,7 @@ function init() {
  */
 function view($mform) {
     $recorders = check_installed_recorders();
-    $eventbinder = 'load_recorder';
+    $eventbinder = 'display_recorder';
     if (sizeof($recorders['audio'])) {
         $mform->addElement('button', 'startaudio', get_string('startaudio', 'repository_mediacapture'),
                             array('onclick' => $eventbinder . '("audio"); return true;'));
@@ -199,7 +215,7 @@ function list_strings($keys) {
 function list_files() {
     global $CFG;
 
-    $recorders = repository_mediacapture::$recorders;
+    $recorders = check_installed_recorders();
     $pluginsdir = "$CFG->dirroot/repository/mediacapture/plugins";
     foreach (array_merge($recorders['audio'], $recorders['video']) as $recorder) {
         $file = "$pluginsdir/$recorder/lang/en/repository_mediacapture_$recorder.php";

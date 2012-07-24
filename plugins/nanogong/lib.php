@@ -98,10 +98,10 @@ class repository_mediacapture_nanogong implements mediacapture {
                         <p>' . $javanotfound . '</p>
                     </applet>';
         $mform->addElement('html', $recorder);
-        $mform->addElement('hidden', 'posturl', $post_url);
+        $mform->addElement('hidden', 'posturl', $posturl);
         $mform->addElement('hidden', 'tempdir', $tempdir);
         $mform->addElement('hidden', 'filepath', '');
-        $mform->addElement('text', 'filename', get_string('filename', 'repository_mediacapture'));
+        $mform->addElement('text', 'filename', get_string('name', 'repository_mediacapture'));
     }
 
     /**

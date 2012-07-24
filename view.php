@@ -35,12 +35,13 @@ $PAGE->set_context(get_context_instance(CONTEXT_SYSTEM));
 $PAGE->set_url('/repository/mediacapture/view.php', array('returnurl'=>$returnurl));
 $PAGE->set_pagelayout('embedded');
 
-$OUTPUT->header();
 switch ($type) {
     case 'init':
-        init(); break;
+        init($returnurl);
+        break;
     default:
-        print_recorder($type, $browserplugins); break;
+        print_recorder($type, json_decode($browserplugins));
+        break;
 }
-$OUTPUT->footer();
+
 ?>

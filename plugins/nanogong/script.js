@@ -7,8 +7,8 @@ function submit_nanogong_audio() {
 
     var filename    = document.getElementById('id_filename'),
         recorder    = document.getElementById('audio_recorder'),
-        filepath     = document.getElementsByName('filepath')[0],
-        tempdir      = document.getElementsByName('tempdir')[0],
+        filepath    = document.getElementsByName('filepath')[0],
+        tempdir     = document.getElementsByName('tempdir')[0],
         posturl     = document.getElementsByName('posturl')[0];
 
     if (!filename.value) {
@@ -36,8 +36,8 @@ function submit_nanogong_audio() {
         return false;
     }
 
-    filename.value = filename.value + '.wav';
     // Submit the form to callback url
     var form = document.getElementById('mform1');
+    //form.action = form.action + '?filetype=' + 'wav';
     form.submit();
 }
