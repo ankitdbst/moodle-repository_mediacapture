@@ -3,10 +3,11 @@
  */
 
 /* General layout rules  */
-#content { 
-    height:320px;    
+#content {
+    width:525px;
+    height:320px;
     /* Firefox */
-    display:-moz-box;
+    display: -moz-inline-box;
     -moz-box-orient:horizontal;
     -moz-box-pack:center;
     -moz-box-align:center;
@@ -18,7 +19,7 @@
     -webkit-box-align:center;
 
     /* W3C */
-    display:box;
+    display: -webkit-inline-box;
     box-orient:horizontal;
     box-pack:center;
     box-align:center;
