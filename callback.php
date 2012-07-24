@@ -37,7 +37,7 @@ $thumbnail  = '';
 $author     = 'Unknown'; // specify default author here
 $license    = 'None';
 
-$source = base64_encode(serialize((object)array('url'=>$url,'filename'=>$filename);
+$source = base64_encode(serialize((object)array('url'=>$url,'filename'=>$filename)));
 $filename = $filename . '.' . $filetype;
 
 $js =<<<EOD

@@ -38,6 +38,6 @@ function submit_nanogong_audio() {
 
     // Submit the form to callback url
     var form = document.getElementById('mform1');
-    //form.action = form.action + '?filetype=' + 'wav';
+    form.action = form.action + '?filetype=' + 'wav';
     form.submit();
 }
