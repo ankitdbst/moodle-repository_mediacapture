@@ -25,44 +25,49 @@ require_once(dirname(__FILE__) . '/locallib.php');
 interface mediacapture {
 
     /**
-     * @return array $options Type option names for the recorder
+     * Type option names for the recorder
+     * @return array $options
      */
     static function get_type_option_names();
 
     /**
      * Admin config settings for the type options defined in
-     * get_type_option_names()
-     *
+     * get_type_option_names()     *
      * @param $mform
      */
     function get_config_form($mform);
 
     /**
+     * The form should contain the following required parameters by the plugin
+     * @param filename : filename for the recorded stream
+     * @param filepath : filepath for the temporary location of the file
+     * @param filetype : filetype associated with the recording viz 'wav', 'mp3', 'flv'
+     *
      * @param object $mform
      */
     function view($mform);
 
     /**
-     * @return array $strings List of all string keys defined by the recorder
+     * List of all string keys defined by the recorder in the lang file
+     * @return array $strings
      */
     function string_keys();
 
     /**
-     * @return array $version Version of $type used.
+     * Min version of supported_type() required by the recorder
+     * @return array $version
      */
     function min_version();
 
     /**
-     * array('audio', 'video')
-     *
-     * @return array $media Supported media.
+     * Supported media viz array('audio', 'video')
+     * @return array $media
      */
     function supported_media();
 
     /**
-     * array('html5', 'flash', 'java')
-     *
-     * @return array $type Supported type
+     * Supported type viz array('html5', 'flash', 'java')
+     * @return array $type
      */
     function supported_types();
 

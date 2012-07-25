@@ -24,12 +24,11 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-require_once(dirname(dirname(__FILE__)) . '/lib.php');
 require_once(dirname(__FILE__) . '/locallib.php');
 
 class repository_mediacapture extends repository {
-
-    static $callbackurl, $recorders;
+    /** @var static object recorders */
+    static $recorders;
 
     /**
      * Constructor
@@ -39,18 +38,16 @@ class repository_mediacapture extends repository {
      * @param array $options
      */
     public function __construct($repositoryid, $context = SITEID, $options = array()) {
-        parent::__construct($repositoryid, $context, $options);
-        self::$callbackurl = new moodle_url('/repository/mediacapture/callback.php');
-        self::$recorders = check_installed_recorders();
+        parent::__construct($repositoryid, $context, $options);;
     }
 
     /**
      * @return array $options Type option names for sub-plugins installed
      */
     public static function get_type_option_names() {
-        self::$recorders = check_installed_recorders();
-        $options = array('pluginname');
+        self::$recorders = installed_recorders(); // Initializes list of installed recorders
 
+        $options = array('pluginname');
         foreach (array_merge(self::$recorders['audio'], self::$recorders['video']) as $recorder) {
             $classname = 'repository_mediacapture_' . $recorder;
             $client = new $classname();
@@ -91,7 +88,8 @@ class repository_mediacapture extends repository {
      * @return array structure of listing information
      */
     public function get_listing($path = null, $page = null) {
-        $url = new moodle_url('/repository/mediacapture/view.php', array('returnurl' => self::$callbackurl, 'type' => 'init'));
+        $url = new moodle_url('/repository/mediacapture/view.php',
+                                array('returnurl' => callback_url(), 'type' => 'init'));
         // Create listing array
         $list = array();
         $list['object']         = array();
