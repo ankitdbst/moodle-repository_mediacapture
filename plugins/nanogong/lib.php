@@ -88,9 +88,7 @@ class repository_mediacapture_nanogong implements mediacapture {
         $javanotfound = get_string('javanotfound', 'repository_mediacapture');
         $save = get_string('save', 'repository_mediacapture');
 
-        $tempdir = urlencode(temp_dir());
-        $posturl = new moodle_url("$CFG->wwwroot/repository/mediacapture/plugins/nanogong/record.php");
-        $recorder = '<applet id="audio_recorder" name="audio_recorder" code="gong.NanoGong" width="160" height="40" archive="' . $url . '">
+        $recorder = '<applet id="nanogong" name="nanogong" code="gong.NanoGong" width="160" height="40" archive="' . $url . '">
                         <param name="AudioFormat" value="' . $audioformat .'" />
                         <param name="ShowSaveButton" value="false" />
                         <param name="ShowTime" value="true" />
@@ -98,17 +96,18 @@ class repository_mediacapture_nanogong implements mediacapture {
                         <p>' . $javanotfound . '</p>
                     </applet>';
         $mform->addElement('html', $recorder);
-        $mform->addElement('hidden', 'posturl', $posturl);
-        $mform->addElement('hidden', 'tempdir', $tempdir);
         $mform->addElement('hidden', 'filepath', '');
+        $mform->addElement('hidden', 'filetype', 'wav');
         $mform->addElement('text', 'filename', get_string('name', 'repository_mediacapture'));
     }
 
     /**
-     * Javascript event for the recorder upon form submit
+     * @return string $url
      */
-    public function event_binder() {
-        return 'submit_nanogong_audio';
+    public function post_url() {
+        global $CFG;
+        $posturl = new moodle_url("$CFG->wwwroot/repository/mediacapture/plugins/nanogong/record.php");
+        return $posturl;
     }
 
     /**

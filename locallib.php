@@ -50,8 +50,7 @@ class mediacapture_form extends moodleform {
                 break;
             case 'display': // displays the form for the recorder selected
                 $this->_customdata['recorder']->view($mform);
-                $mform->addElement('button', 'save', get_string('save', 'repository_mediacapture'),
-                                    array('onclick' => $this->_customdata['eventbinder'].'(); return true;'));
+                $this->add_action_buttons(false, get_string('save', 'repository_mediacapture'));
                 break;
             case 'nodisplay': // in case no recorders are available for client
                 break;
@@ -67,8 +66,7 @@ class mediacapture_form extends moodleform {
 function print_recorder($media, $browserplugins) {
     global $PAGE, $CFG, $OUTPUT;
 
-    $recorders = installed_recorders()
-;
+    $recorders = installed_recorders();
     $compatible = true;
 
     foreach($recorders[$media] as $recorder) {
@@ -88,16 +86,20 @@ function print_recorder($media, $browserplugins) {
             if ($compatible) {
                 $PAGE->requires->css(new moodle_url("$CFG->wwwroot/repository/mediacapture/plugins/$recorder/styles.css"));
                 echo $OUTPUT->header();
-                $PAGE->requires->js(new moodle_url("$CFG->wwwroot/repository/mediacapture/plugins/$recorder/script.js"));
+                $jsmodule = array(
+                    'name' => 'repository_mediacapture_nanogong',
+                    'fullpath' => "/repository/mediacapture/plugins/$recorder/module.js",
+                    'requires' => array('event', 'node'),
+                    'strings' => list_strings($client->string_keys())
+                );
+                $data = array(urlencode($client->post_url()));
+                $PAGE->requires->js_init_call('M.repository_mediacapture_nanogong.init', $data, false, $jsmodule);
                 $PAGE->requires->data_for_js('mediacapture', list_strings($client->string_keys()));
                 $formaction = callback_url();
-                $eventbinder = $client->event_binder();
                 $options = array(
                     'action' => 'display',
-                    'recorder' => $client,
-                    'eventbinder' => $eventbinder
+                    'recorder' => $client
                 );
-
                 $mform = new mediacapture_form($formaction, $options);
                 $mform->display();
                 echo $OUTPUT->footer();
@@ -119,8 +121,13 @@ function print_recorder($media, $browserplugins) {
 function init($returnurl) {
     global $PAGE, $CFG, $OUTPUT;
     echo $OUTPUT->header();
-    $PAGE->requires->js(new moodle_url("$CFG->wwwroot/repository/mediacapture/script.js"));
-    $PAGE->requires->data_for_js('mediacapture', list_strings(string_keys()));
+    $jsmodule = array(
+        'name' => 'repository_mediacapture',
+        'fullpath' => '/repository/mediacapture/module.js',
+        'requires' => array('event', 'node', 'json'),
+        'strings' => list_strings(string_keys())
+    );
+    $PAGE->requires->js_init_call('M.repository_mediacapture.init', array(), false, $jsmodule);
     $formaction = new moodle_url('/repository/mediacapture/view.php', array('returnurl' => $returnurl));
     // check non-empty list of recorders
     $mform = new mediacapture_form($formaction, array('action' => 'init'));
@@ -133,17 +140,17 @@ function init($returnurl) {
  * @param object $mform
  */
 function view($mform) {
-    $recorders = installed_recorders()
-;
-    $eventbinder = 'display_recorder';
+    $recorders = installed_recorders();
+
     if (sizeof($recorders['audio'])) {
-        $mform->addElement('button', 'startaudio', get_string('startaudio', 'repository_mediacapture'),
-                            array('onclick' => $eventbinder . '("audio"); return true;'));
+        $mform->addElement('button', 'startaudio', get_string('startaudio', 'repository_mediacapture'));
     }
     if (sizeof($recorders['video'])) {
-        $mform->addElement('button', 'startvideo', get_string('startvideo', 'repository_mediacapture'),
-                            array('onclick' => $eventbinder . '("video"); return true;'));
+        $mform->addElement('button', 'startvideo', get_string('startvideo', 'repository_mediacapture'));
     }
+    $mform->addElement('hidden', 'type', '');
+    $mform->addElement('hidden', 'browserplugins', '');
+    $mform->addElement('hidden', 'browserdetect', '');
 }
 
 /**
@@ -204,7 +211,7 @@ function list_strings($keys) {
     $strings = array();
 
     foreach ($keys as $key) {
-        $strings[$key] = get_string($key, 'repository_mediacapture');
+        $strings[] = array($key, 'repository_mediacapture');
     }
 
     return $strings;

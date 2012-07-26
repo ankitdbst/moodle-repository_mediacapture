@@ -3,15 +3,28 @@
  * of the mediacapture plugin
  */
 
-/**
- * Load the appropriate recorder
- */
-function display_recorder(type) {
-    var form = document.getElementById('mform1'),
-        params = 'type=' + type + '&browserplugins=' + JSON.stringify(BrowserPlugins) +
-            '&browserdetect=' + JSON.stringify(BrowserDetect);
-    form.action = form.action + '?' + params;
-    form.submit();
+M.repository_mediacapture = {};
+
+M.repository_mediacapture.init = function(Y) {
+    Y.one('*[name="browserplugins"]').set('value', JSON.stringify(BrowserPlugins));
+    Y.one('*[name="browserdetect"]').set('value', JSON.stringify(BrowserDetect));
+
+    var audio = Y.one("#id_startaudio"),
+        video = Y.one("#id_startvideo");
+
+    if (audio) {
+        audio.on("click", function (e) {
+            Y.one('*[name="type"]').set('value', 'audio');
+            Y.one('#mform1').submit();
+        });
+    }
+
+    if (video) {
+        video.on("click", function (e) {
+            Y.one('*[name="type"]').set('value', 'video');
+            Y.one('#mform1').submit();
+        });
+    }
 }
 
 /*
