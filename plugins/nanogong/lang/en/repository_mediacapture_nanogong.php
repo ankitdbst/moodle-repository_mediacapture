@@ -29,3 +29,8 @@ $string['samplingratelow'] = 'Low quality';
 $string['samplingratemedium'] = 'Medium quality';
 $string['samplingratenormal'] = 'Normal quality';
 $string['samplingratehigh'] = 'High quality';
+
+$string['appletnotfound'] = 'The applet was not detected. Please make sure that you have Java Runtime Environment (JRE) installed and the applet loaded properly.';
+$string['norecordingfound'] = 'There is no sound recorded. Please use the red disc button to start recording. Use the black square button to stop recording.';
+$string['nonamefound'] = 'Please provide a name for your recording.';
+$string['filenotsaved'] = 'The file could not be saved! Please try again';

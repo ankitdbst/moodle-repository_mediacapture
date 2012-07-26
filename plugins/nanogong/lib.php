@@ -115,9 +115,10 @@ class repository_mediacapture_nanogong implements mediacapture {
      */
     public function string_keys() {
         return array(
-            'audioformat', 'audioformatimaadpcm', 'audioformatspeex',
-            'samplingrate', 'samplingratelow', 'samplingratemedium',
-            'samplingratenormal', 'samplingratehigh'
+            'appletnotfound', 'norecordingfound', 'nonamefound',
+            'filenotsaved', 'audioformat', 'audioformatimaadpcm',
+            'audioformatspeex', 'samplingrate', 'samplingratelow',
+            'samplingratemedium', 'samplingratenormal', 'samplingratehigh'
             );
     }
 

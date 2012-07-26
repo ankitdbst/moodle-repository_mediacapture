@@ -94,7 +94,6 @@ function print_recorder($media, $browserplugins) {
                 );
                 $data = array(urlencode($client->post_url()));
                 $PAGE->requires->js_init_call('M.repository_mediacapture_nanogong.init', $data, false, $jsmodule);
-                $PAGE->requires->data_for_js('mediacapture', list_strings($client->string_keys()));
                 $formaction = callback_url();
                 $options = array(
                     'action' => 'display',

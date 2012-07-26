@@ -7,30 +7,34 @@
 M.repository_mediacapture_nanogong = {};
 
 M.repository_mediacapture_nanogong.init = function(Y, params) {
-    var posturl = decodeURIComponent(params);
-    Y.one('#mform1').on('submit', function() {
+    var posturl = decodeURIComponent(params),
+        form = Y.one('#mform1');
+
+    form.on('submit', function(e) {
+        e.preventDefault();
         var recorder = Y.one('#nanogong').getDOMNode(),
             filename = Y.one('#id_filename').get('value'),
             filepath = Y.one('*[name="filepath"]');
 
         filename = filename.replace(/^\s+|\s+$/g,"");
         if (!filename) {
-            alert(mediacapture['nonamefound']);
+            alert(M.repository_mediacapture_nanogong.nonamefound);
             return false;
         }
 
         var duration = parseInt(recorder.sendGongRequest("GetMediaDuration", "audio")) || 0
         if (duration <= 0) {
-            alert(mediacapture['norecordingfound']);
+            alert(M.repository_mediacapture_nanogong.norecordingfound);
             return false;
         }
 
         path = encodeURIComponent(recorder.sendGongRequest("PostToForm", posturl, "nanogong", "cookie=nanogong", filename));
         if (!path) {
-            alert(mediacapture['filenotsaved']);
+            alert(M.repository_mediacapture_nanogong.filenotsaved);
             return false;
         }
 
         filepath.set('value', path);
+        form.submit();
     });
 }
