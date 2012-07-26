@@ -18,19 +18,19 @@ M.repository_mediacapture_nanogong.init = function(Y, params) {
 
         filename = filename.replace(/^\s+|\s+$/g,"");
         if (!filename) {
-            alert(M.repository_mediacapture_nanogong.nonamefound);
+            alert(M.str.repository_mediacapture.nonamefound);
             return false;
         }
 
         var duration = parseInt(recorder.sendGongRequest("GetMediaDuration", "audio")) || 0
         if (duration <= 0) {
-            alert(M.repository_mediacapture_nanogong.norecordingfound);
+            alert(M.str.repository_mediacapture.norecordingfound);
             return false;
         }
 
         path = encodeURIComponent(recorder.sendGongRequest("PostToForm", posturl, "nanogong", "cookie=nanogong", filename));
         if (!path) {
-            alert(M.repository_mediacapture_nanogong.filenotsaved);
+            alert(M.str.repository_mediacapture.filenotsaved);
             return false;
         }
 
