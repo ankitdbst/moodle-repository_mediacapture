@@ -87,13 +87,13 @@ function print_recorder($media, $browserplugins) {
                 $PAGE->requires->css(new moodle_url("$CFG->wwwroot/repository/mediacapture/plugins/$recorder/styles.css"));
                 echo $OUTPUT->header();
                 $jsmodule = array(
-                    'name' => 'repository_mediacapture_nanogong',
+                    'name' => 'repository_mediacapture_$recorder',
                     'fullpath' => "/repository/mediacapture/plugins/$recorder/module.js",
-                    'requires' => array('event', 'node'),
+                    'requires' => array('event', 'node', 'io', 'base'),
                     'strings' => list_strings($client->string_keys())
                 );
                 $data = array(urlencode($client->post_url()));
-                $PAGE->requires->js_init_call('M.repository_mediacapture_nanogong.init', $data, false, $jsmodule);
+                $PAGE->requires->js_init_call("M.repository_mediacapture_$recorder.init", $data, false, $jsmodule);
                 $formaction = callback_url();
                 $options = array(
                     'action' => 'display',
@@ -240,7 +240,6 @@ function list_files() {
  */
 function temp_dir() {
     global $USER;
-
     return make_temp_directory('repository/medicapture/' . $USER->id);
 }
 

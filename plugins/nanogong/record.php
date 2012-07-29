@@ -2,14 +2,14 @@
 
 require_once(dirname(__FILE__) . '/lib.php');
 
-$tmp_dir = temp_dir();
+$tmpdir = temp_dir();
 
 $elname = 'nanogong';
-$tmp_file = $_FILES[$elname]['tmp_name'];
-$tmp_name = $_FILES[$elname]['name'];
+$tmpfile = $_FILES[$elname]['tmp_name'];
+$tmpname = $_FILES[$elname]['name'];
 // move the uploaded file to temp dir and return location
-if (!move_uploaded_file($tmp_file, $tmp_dir.'/'.$tmp_name)) {
+if (!move_uploaded_file($tmpfile, $tmpdir.'/'.$tmpname)) {
     echo '';
 } else {
-    echo $tmp_dir.'/'.$tmp_name;
+    echo $tmpdir.'/'.$tmpname;
 }

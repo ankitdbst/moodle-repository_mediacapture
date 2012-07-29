@@ -31,21 +31,26 @@ interface mediacapture {
     static function get_type_option_names();
 
     /**
-     * Admin config settings for the type options defined in
-     * get_type_option_names()     *
+     * Admin config settings for the type options defined in get_type_option_names()
      * @param $mform
      */
     function get_config_form($mform);
 
     /**
-     * The form should contain the following required parameters by the plugin
-     * @param filename : filename for the recorded stream
-     * @param filepath : filepath for the temporary location of the file
-     * @param filetype : filetype associated with the recording viz 'wav', 'mp3', 'flv'
+     * The form should contain the following required parameters by mediacapture
+     * @param $filename : Filename for the recorded stream
+     * @param $filepath : Filepath for the temporary location of the file
+     * @param $filetype : Filetype associated with the recording viz 'wav', 'mp3', 'flv'
      *
      * @param object $mform
      */
     function view($mform);
+
+    /**
+     * Url for submitting the recorded file (via ajax) to temp_dir()
+     * @return string $url
+     */
+    function post_url();
 
     /**
      * List of all string keys defined by the recorder in the lang file
