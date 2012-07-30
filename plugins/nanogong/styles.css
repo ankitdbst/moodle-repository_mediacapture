@@ -4,5 +4,6 @@
 
 /* General layout rules  */
 #id_filename {
-    width:110px;
+    width:80px;
+    float:right;
 }
