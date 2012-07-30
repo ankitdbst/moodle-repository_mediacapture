@@ -27,10 +27,10 @@ require_once(dirname(dirname(dirname(__FILE__))) . '/mediacapture.php');
 
 class repository_mediacapture_red5recorder implements mediacapture {
 
-	/**
-	 * Default constructor
-	 */
-	public function __construct() {
+    /**
+     * Default constructor
+     */
+    public function __construct() {
         global $PAGE, $CFG;
     }
 
