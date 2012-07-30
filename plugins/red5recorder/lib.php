@@ -61,7 +61,7 @@ class repository_mediacapture_red5recorder implements mediacapture {
         $rtmpserver = get_config('mediacapture', 'rtmp_server');
 
         $url        = new moodle_url("$CFG->wwwroot/repository/mediacapture/plugins/red5recorder/assets/red5recorder.swf");
-        $flashvars  = "?server=$rtmpserver/red5recorder";
+        $flashvars  = "?server=$rtmpserver/red5recorder/";
 
         $recorder   = '
                     <object classid="clsid:D27CDB6E-AE6D-11cf-96B8-444553540000"
