@@ -13,6 +13,11 @@ Nanogong
 Nanogong is a Java applet to record and playback the recorded audio stream.
 More about Nanogong project : http://nanogong.ust.hk/
 
+Red5-Recorder
+--------
+Red5 Recorder is a Open Source Red5 video flex recorder and player.
+More about Red5 Recoder project : http://www.red5-recorder.com/
+
 Requirement
 -----------
  Moodle 2.3 onward
