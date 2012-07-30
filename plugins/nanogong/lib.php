@@ -15,9 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * mediacapture class
- * class which handles all the audio/video recording operations
- * of the repostory_mediacapture
+ * repository_mediacapture_nanogong class
  *
  * @copyright  2012 Ankit Gupta <mailtoankitgupta@gmail.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
@@ -88,7 +86,8 @@ class repository_mediacapture_nanogong implements mediacapture {
         $javanotfound = get_string('javanotfound', 'repository_mediacapture');
         $save = get_string('save', 'repository_mediacapture');
 
-        $recorder = '<applet id="nanogong" name="nanogong" code="gong.NanoGong" width="160" height="40" archive="' . $url . '">
+        $recorder = '
+                    <applet id="nanogong" name="nanogong" code="gong.NanoGong" width="160" height="40" archive="' . $url . '">
                         <param name="AudioFormat" value="' . $audioformat .'" />
                         <param name="ShowSaveButton" value="false" />
                         <param name="ShowTime" value="true" />
