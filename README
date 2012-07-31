@@ -18,6 +18,13 @@ Red5-Recorder
 Red5 Recorder is a Open Source Red5 video flex recorder and player.
 More about Red5 Recoder project : http://www.red5-recorder.com/
 
+Steps to activate red5recorder :
+1. Copy red5recorder within plugins/red5recorder/assets/red5recorder-app/ to your {RED5_HOME}/webapps/
+2. Rename it to red5recorder.
+3. Create a link of the streams directory within MOODLE-DATAROOT using 'ln' command in Linux and 'mklink' command in Windows.
+4. Enable the recorder from within admin settings of Mediacapture. 
+5. Enter the rtmp server URL if it is different from 127.0.0.1
+
 Requirement
 -----------
  Moodle 2.3 onward
