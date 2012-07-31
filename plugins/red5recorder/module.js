@@ -31,12 +31,11 @@ M.repository_mediacapture_red5recorder.init = function(Y, params) {
         // Make an HTTP POST request to posturl.
         cfg = {
             method: 'POST',
-            data: 'filepath=' + encodeURIComponent(filepath.get('value')) +
+            data: 'filepath=' + filepath.get('value') +
                   '&filename=' + filename,
             sync:true
         };
         var request = Y.io(posturl, cfg);
-
         if (!path) {
             alert(M.str.repository_mediacapture.norecordingfound);
             return false;

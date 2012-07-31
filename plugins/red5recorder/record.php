@@ -4,7 +4,7 @@ require_once(dirname(__FILE__) . '/lib.php');
 
 $tmpdir = temp_dir();
 
-$tmpfile = required_param('filepath', PARAM_PATH);
+$tmpfile = required_param('filepath', PARAM_RAW);
 $tmpname = required_param('filename', PARAM_TEXT);
 
 $tmpfile = urldecode($tmpfile);
@@ -13,7 +13,7 @@ if (file_exists($tmpfile) && filesize($tmpfile) > 0 &&
          copy($tmpfile, "$tmpdir/$tmpname.flv")) {
     // remove the file from streams dir
     unlink($tmpfile);
-    echo "$tmpdir/$tmpname.flv";
+    echo urlencode("$tmpdir/$tmpname.flv");
 } else {
     echo '';
 }

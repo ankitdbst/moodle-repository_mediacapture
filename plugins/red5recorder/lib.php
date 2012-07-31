@@ -82,7 +82,7 @@ class repository_mediacapture_red5recorder implements mediacapture {
                         </embed>
                     </object>';
         $mform->addElement('html', $recorder);
-        $mform->addElement('hidden', 'filepath', $streampath);
+        $mform->addElement('hidden', 'filepath', urlencode($streampath));
         $mform->addElement('hidden', 'filetype', 'flv');
         $mform->addElement('text', 'filename', get_string('name', 'repository_mediacapture'));
     }
