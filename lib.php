@@ -27,8 +27,6 @@
 require_once(dirname(__FILE__) . '/locallib.php');
 
 class repository_mediacapture extends repository {
-    /** @var static object recorders */
-    static $recorders;
 
     /**
      * Constructor
@@ -45,10 +43,10 @@ class repository_mediacapture extends repository {
      * @return array $options Type option names for sub-plugins installed
      */
     public static function get_type_option_names() {
-        self::$recorders = installed_recorders(); // Initializes list of installed recorders
+        $recorders = installed_recorders(); // Initializes list of installed recorders
 
         $options = array('pluginname');
-        foreach (array_merge(self::$recorders['audio'], self::$recorders['video']) as $recorder) {
+        foreach (array_merge($recorders['audio'], $recorders['video']) as $recorder) {
             $classname = 'repository_mediacapture_' . $recorder;
             $client = new $classname();
             $options = array_merge($options, $client->get_type_option_names());
@@ -66,7 +64,8 @@ class repository_mediacapture extends repository {
     public static function type_config_form($mform, $classname = 'repository') {
         parent::type_config_form($mform);
 
-        foreach (array_merge(self::$recorders['audio'], self::$recorders['video']) as $recorder) {
+        $recorders = installed_recorders(); // Initializes list of installed recorders
+        foreach (array_merge($recorders['audio'], $recorders['video']) as $recorder) {
             $classname = 'repository_mediacapture_' . $recorder;
             $client = new $classname();
             $client->get_config_form($mform);
