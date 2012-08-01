@@ -53,6 +53,7 @@ class mediacapture_form extends moodleform {
                 $this->add_action_buttons(false, get_string('save', 'repository_mediacapture'));
                 break;
             case 'nodisplay': // in case no recorders are available for client
+                display_errors($mform, $this->_customdata['errors']);
                 break;
         }
         $mform->addElement('html', '</div>');
@@ -68,6 +69,7 @@ function print_recorder($media, $browserplugins) {
 
     $recorders = installed_recorders();
     $compatible = true;
+    $errors = array();
 
     foreach($recorders[$media] as $recorder) {
         if (get_config('mediacapture', $recorder)) {
@@ -79,6 +81,10 @@ function print_recorder($media, $browserplugins) {
                 if ( !(isset($browserplugins->$type) &&
                      $browserplugins->$type >= $version[$type]) ) {
                     $compatible = false;
+                    $errors[$type] = array(
+                        'installed' => $browserplugins->$type,
+                        'required' => $version[$type]
+                    );
                     break;
                 }
             }
@@ -108,10 +114,15 @@ function print_recorder($media, $browserplugins) {
     }
 
     // no recorder selected : display appropriate message
-    $options = array('action' => 'nodisplay');
+    echo $OUTPUT->header();
+    $options = array(
+        'action' => 'nodisplay',
+        'errors' => $errors
+    );
     $formaction = new moodle_url('/repository/mediacapture/view.php');
     $mform = new mediacapture_form($formaction, $options);
     $mform->display();
+    echo $OUTPUT->footer();
 }
 
 /**
@@ -222,8 +233,7 @@ function list_strings($keys) {
 function list_files() {
     global $CFG;
 
-    $recorders = installed_recorders()
-;
+    $recorders = installed_recorders();
     $pluginsdir = "$CFG->dirroot/repository/mediacapture/plugins";
     foreach (array_merge($recorders['audio'], $recorders['video']) as $recorder) {
         $file = "$pluginsdir/$recorder/lang/en/repository_mediacapture_$recorder.php";
@@ -233,6 +243,18 @@ function list_files() {
     }
 
     return $files;
+}
+
+/**
+ * @return $errors array structure containing the compatibility errors
+ */
+function display_errors($mform, $errors) {
+    foreach ($errors as $type=>$error) {
+        $msg = get_string($type, 'repository_mediacapture'). ' => ' .
+               get_string('required', 'repository_mediacapture')    . ':' . $error['required']  . ' (' .
+               get_string('installed', 'repository_mediacapture')   . ':' . $error['installed'] . ')';
+        $mform->addElement('html', $msg);
+    }
 }
 
 /**

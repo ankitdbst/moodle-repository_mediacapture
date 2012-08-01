@@ -44,6 +44,11 @@ $string['quicktimenotfound'] = 'Your browser does not have Quicktime player inst
 $string['filenotsaved'] = 'The file could not be saved! Please try again';
 $string['rtmpserver'] = 'RTMP Server URL (for flash video recorder)';
 
+$string['required'] = 'Required';
+$string['installed'] = 'Installed';
+$string['java'] = 'Java';
+$string['flash'] = 'Flash';
+
 $string['save'] = 'Save';
 $string['name'] = 'Name';
 $string['account'] = 'Account';
