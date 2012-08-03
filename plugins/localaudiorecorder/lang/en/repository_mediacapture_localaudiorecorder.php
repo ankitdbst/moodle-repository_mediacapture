@@ -18,7 +18,7 @@
  * This file contains 'repository_mediacapture_nanogong' repository plugin language strings
  */
 
-$string['flashaudio'] = 'Flash Audio';
+$string['localaudiorecorder'] = 'Local Audio Recorder';
 
 $string['flashnotfound'] = 'Your browser does not have Flash support. Consider installing the latest version of <a href="http://www.adobe.com/go/getflashplayer">Adobe Flash Player</a>';
 $string['norecordingfound'] = 'There is no sound recorded. Please use the red disc button to start recording. Use the black square button to stop recording.';
