@@ -10,11 +10,12 @@ M.repository_mediacapture_flashaudio.init = function(Y, params) {
     var posturl = decodeURIComponent(params),
         form = Y.one('#mform1');
 
-    var validate = function(a, b) {
+    var validate = function(filename, filedata) {
         var recorder = Y.one('#onlineaudiorecorder').getDOMNode(),
-            filename = Y.one('*[name="filename"]').set('value', a),
-            filedata = Y.one('*[name="filedata"]').set('value', b),
             filepath = Y.one('*[name="filepath"]');
+
+        Y.one('*[name="filename"]').set('value', filename);
+        Y.one('*[name="filedata"]').set('value', filedata);
 
         filename = filename.replace(/^\s+|\s+$/g,"");
         if (!filename) {
