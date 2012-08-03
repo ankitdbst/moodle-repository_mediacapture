@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * repository_mediacapture_nanogong class
+ * repository_mediacapture_localaudiorecorder class
  *
  * @copyright  2012 Ankit Gupta <mailtoankitgupta@gmail.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
