@@ -54,7 +54,7 @@ class repository_mediacapture_flashaudio implements mediacapture {
     	global $CFG, $PAGE;
 
         $url        = new moodle_url("$CFG->wwwroot/repository/mediacapture/plugins/flashaudio/assets/recorder.swf?gateway=form");
-        $js         = urlencode("(function(a,b) { M.repository_mediacapture_flashaudio.init.validate(a,b); })");
+        $js         = urlencode("(function(a,b) { M.repository_mediacapture_flashaudio.validate(a,b); })");
         $flashvars  = "&callback={$js}&filename=Untitled";
 
         $recorder   = '
@@ -72,7 +72,6 @@ class repository_mediacapture_flashaudio implements mediacapture {
                     </object>';
         $mform->addElement('html', $recorder);
         $mform->addElement('hidden', 'filepath', '');
-        $mform->addElement('hidden', 'filedata', '');
         $mform->addElement('hidden', 'filename', '');
         $mform->addElement('hidden', 'filetype', 'mp3');
     }

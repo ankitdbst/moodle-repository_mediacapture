@@ -67,7 +67,6 @@ function print_recorder($media, $browserplugins) {
     global $PAGE, $CFG, $OUTPUT;
 
     $recorders = installed_recorders();
-    $compatible = true;
     $errors = array();
 
     foreach($recorders[$media] as $recorder) {
@@ -76,6 +75,7 @@ function print_recorder($media, $browserplugins) {
             $client = new $classname();
             $version = $client->min_version();
             $types = $client->supported_types();
+            $compatible = true;
             foreach ($types as $type) {
                 if ( !(isset($browserplugins->$type) &&
                      $browserplugins->$type >= $version[$type]) ) {
@@ -84,9 +84,9 @@ function print_recorder($media, $browserplugins) {
                         'installed' => $browserplugins->$type,
                         'required' => $version[$type]
                     );
-                    break;
                 }
             }
+
             // check for the compatible plugin-recorder
             if ($compatible) {
                 $PAGE->requires->css(new moodle_url("$CFG->wwwroot/repository/mediacapture/plugins/$recorder/styles.css"));
