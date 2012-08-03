@@ -1,0 +1,9 @@
+/**
+ * @file CSS file to manage the layout elements of nanogong
+ */
+
+/* General layout rules  */
+#id_filename {
+    width:80px;
+    float:right;
+}

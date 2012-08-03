@@ -85,6 +85,7 @@ class repository_mediacapture_red5recorder implements mediacapture {
         $mform->addElement('hidden', 'filepath', urlencode($streampath));
         $mform->addElement('hidden', 'filetype', 'flv');
         $mform->addElement('text', 'filename', get_string('name', 'repository_mediacapture'));
+        $mform->addElement('submit', 'save', get_string('save', 'repository_mediacapture'));
     }
 
     /**
@@ -103,7 +104,7 @@ class repository_mediacapture_red5recorder implements mediacapture {
         return array(
             'red5recorder', 'rtmpserver', 'filenotsaved',
             'norecordingfound', 'nonamefound'
-            );
+        );
     }
 
     /**

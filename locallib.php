@@ -50,7 +50,6 @@ class mediacapture_form extends moodleform {
                 break;
             case 'display': // displays the form for the recorder selected
                 $this->_customdata['recorder']->view($mform);
-                $this->add_action_buttons(false, get_string('save', 'repository_mediacapture'));
                 break;
             case 'nodisplay': // in case no recorders are available for client
                 display_errors($mform, $this->_customdata['errors']);
@@ -172,7 +171,7 @@ function installed_recorders() {
     $recorders = array(
         'audio' => array(),
         'video' => array()
-        );
+    );
 
     $pluginsdir = "$CFG->dirroot/repository/mediacapture/plugins";
     if ($handle = opendir($pluginsdir)) {
@@ -218,8 +217,6 @@ function string_keys() {
  * @return array $strings Array of string definitions to be used by javascript.
  */
 function list_strings($keys) {
-    $strings = array();
-
     foreach ($keys as $key) {
         $strings[] = array($key, 'repository_mediacapture');
     }

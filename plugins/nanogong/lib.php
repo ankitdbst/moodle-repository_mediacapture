@@ -72,19 +72,18 @@ class repository_mediacapture_nanogong implements mediacapture {
             array(8000, 11025, 22050, 44100),
             array(8000, 16000, 32000, 44100)
         );
-        $audioformats = array('ImaADPCM', 'Speex');
-        $audioformat = get_config('audio_format', 'repository_mediacapture');
-        $samplingrate = get_config('sampling_rate', 'repository_mediacapture');
+        $audioformats   = array('ImaADPCM', 'Speex');
+        $audioformat    = get_config('audio_format', 'repository_mediacapture');
+        $samplingrate   = get_config('sampling_rate', 'repository_mediacapture');
         if (empty($audioformat)) {
             $audioformat = 0;
         }
         if (empty($sampling_rate)) {
             $samplingrate = 0;
         }
-        $samplingrate = $samplingrates[$audioformat][$samplingrate];
-        $audioformat = $audioformats[$audioformat];
-        $javanotfound = get_string('javanotfound', 'repository_mediacapture');
-        $save = get_string('save', 'repository_mediacapture');
+        $samplingrate   = $samplingrates[$audioformat][$samplingrate];
+        $audioformat    = $audioformats[$audioformat];
+        $javanotfound   = get_string('javanotfound', 'repository_mediacapture');
 
         $recorder = '
                     <applet id="nanogong" name="nanogong" code="gong.NanoGong" width="160" height="40" archive="' . $url . '">
@@ -98,6 +97,7 @@ class repository_mediacapture_nanogong implements mediacapture {
         $mform->addElement('hidden', 'filepath', '');
         $mform->addElement('hidden', 'filetype', 'wav');
         $mform->addElement('text', 'filename', get_string('name', 'repository_mediacapture'));
+        $mform->addElement('submit', 'save', get_string('save', 'repository_mediacapture'));
     }
 
     /**
@@ -118,7 +118,7 @@ class repository_mediacapture_nanogong implements mediacapture {
             'filenotsaved', 'audioformat', 'audioformatimaadpcm',
             'audioformatspeex', 'samplingrate', 'samplingratelow',
             'samplingratemedium', 'samplingratenormal', 'samplingratehigh'
-            );
+        );
     }
 
     /**
