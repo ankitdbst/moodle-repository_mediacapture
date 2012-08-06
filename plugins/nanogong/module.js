@@ -1,4 +1,3 @@
-
 /**
 * Method to validate the audio recording form and save
 * the recording to temp file

@@ -36,7 +36,7 @@ class repository_mediacapture_nanogong implements mediacapture {
      * @return array $options Array of type options used by the recorder
      */
     public static function get_type_option_names() {
-    	return array('audio_format', 'sampling_rate', 'nanogong');
+        return array('audio_format', 'sampling_rate', 'nanogong');
     }
 
     /**
@@ -65,7 +65,7 @@ class repository_mediacapture_nanogong implements mediacapture {
      * @param object $mform
      */
     public function view($mform) {
-    	global $CFG, $PAGE;
+        global $CFG, $PAGE;
 
         $url = new moodle_url("$CFG->wwwroot/repository/mediacapture/plugins/nanogong/nanogong.jar");
         $samplingrates = array(

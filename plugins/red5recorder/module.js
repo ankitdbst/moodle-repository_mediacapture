@@ -1,4 +1,3 @@
-
 /**
 * @Javascript file to validate the red5 video recording form
 */

@@ -43,5 +43,3 @@ switch ($type) {
         print_recorder($type, json_decode($browserplugins));
         break;
 }
-
-?>

@@ -45,13 +45,13 @@ class mediacapture_form extends moodleform {
         $this->action = $this->_customdata['action'];
         $mform->addElement('html', '<div class="mediacontainer" id="mediacontainer">');
         switch ($this->action) {
-            case 'init': // initial form for selection from audio/video recorders
+            case 'init': // Initial form for selection from audio/video recorders.
                 view($mform);
                 break;
-            case 'display': // displays the form for the recorder selected
+            case 'display': // Displays the form for the recorder selected.
                 $this->_customdata['recorder']->view($mform);
                 break;
-            case 'nodisplay': // in case no recorders are available for client
+            case 'nodisplay': // In case no recorders are available for client.
                 display_errors($mform, $this->_customdata['errors']);
                 break;
         }
@@ -69,7 +69,7 @@ function print_recorder($media, $browserplugins) {
     $recorders = installed_recorders();
     $errors = array();
 
-    foreach($recorders[$media] as $recorder) {
+    foreach ($recorders[$media] as $recorder) {
         if (get_config('mediacapture', $recorder)) {
             $classname = 'repository_mediacapture_' . $recorder;
             $client = new $classname();
@@ -87,7 +87,7 @@ function print_recorder($media, $browserplugins) {
                 }
             }
 
-            // check for the compatible plugin-recorder
+            // Check for the compatible plugin-recorder.
             if ($compatible) {
                 $PAGE->requires->css(new moodle_url("$CFG->wwwroot/repository/mediacapture/plugins/$recorder/styles.css"));
                 echo $OUTPUT->header();
@@ -112,7 +112,7 @@ function print_recorder($media, $browserplugins) {
         }
     }
 
-    // no recorder selected : display appropriate message
+    // No recorder selected : display appropriate message.
     echo $OUTPUT->header();
     $options = array(
         'action' => 'nodisplay',
@@ -138,7 +138,6 @@ function init($returnurl) {
     );
     $PAGE->requires->js_init_call('M.repository_mediacapture.init', array(), false, $jsmodule);
     $formaction = new moodle_url('/repository/mediacapture/view.php', array('returnurl' => $returnurl));
-    // check non-empty list of recorders
     $mform = new mediacapture_form($formaction, array('action' => 'init'));
     $mform->display();
     echo $OUTPUT->footer();
@@ -151,10 +150,10 @@ function init($returnurl) {
 function view($mform) {
     $recorders = installed_recorders();
 
-    if (sizeof($recorders['audio'])) {
+    if (count($recorders['audio'])) {
         $mform->addElement('button', 'startaudio', get_string('startaudio', 'repository_mediacapture'));
     }
-    if (sizeof($recorders['video'])) {
+    if (count($recorders['video'])) {
         $mform->addElement('button', 'startvideo', get_string('startvideo', 'repository_mediacapture'));
     }
     $mform->addElement('hidden', 'type', '');
@@ -185,11 +184,11 @@ function installed_recorders() {
                         $media = array_intersect($client->supported_media(), array('audio', 'video'));
                         $types = array_intersect($client->supported_types(), array('html5', 'flash', 'java'));
                         if ($media && $types) {
-                            for ($i = 0; $i < sizeof($media); $i++) {
+                            for ($i = 0; $i < count($media); $i++) {
                                 array_push($recorders[$media[$i]], $pluginname);
                             }
                         } else {
-                            throw new moodle_exception('error'); // incompatible plugin
+                            throw new moodle_exception('error'); // Incompatible plugin.
                         }
                     }
                 } else {
@@ -246,7 +245,7 @@ function list_files() {
  * @return $errors array structure containing the compatibility errors
  */
 function display_errors($mform, $errors) {
-    foreach ($errors as $type=>$error) {
+    foreach ($errors as $type => $error) {
         $msg = get_string($type, 'repository_mediacapture'). ' => ' .
                get_string('required', 'repository_mediacapture')    . ':' . $error['required']  . ' (' .
                get_string('installed', 'repository_mediacapture')   . ':' . $error['installed'] . ')';

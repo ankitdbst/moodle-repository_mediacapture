@@ -43,7 +43,7 @@ class repository_mediacapture extends repository {
      * @return array $options Type option names for sub-plugins installed
      */
     public static function get_type_option_names() {
-        $recorders = installed_recorders(); // Initializes list of installed recorders
+        $recorders = installed_recorders(); // Initializes list of installed recorders.
 
         $options = array('pluginname');
         foreach (array_merge($recorders['audio'], $recorders['video']) as $recorder) {
@@ -64,7 +64,7 @@ class repository_mediacapture extends repository {
     public static function type_config_form($mform, $classname = 'repository') {
         parent::type_config_form($mform);
 
-        $recorders = installed_recorders(); // Initializes list of installed recorders
+        $recorders = installed_recorders(); // Initializes list of installed recorders.
         foreach (array_merge($recorders['audio'], $recorders['video']) as $recorder) {
             $classname = 'repository_mediacapture_' . $recorder;
             $client = new $classname();
@@ -89,7 +89,7 @@ class repository_mediacapture extends repository {
     public function get_listing($path = null, $page = null) {
         $url = new moodle_url('/repository/mediacapture/view.php',
                                 array('returnurl' => callback_url(), 'type' => 'init'));
-        // Create listing array
+        // Create listing array.
         $list = array();
         $list['object']         = array();
         $list['object']['type'] = 'text/html';

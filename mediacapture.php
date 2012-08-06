@@ -28,13 +28,13 @@ interface mediacapture {
      * Type option names for the recorder
      * @return array $options
      */
-    static function get_type_option_names();
+    public static function get_type_option_names();
 
     /**
      * Admin config settings for the type options defined in get_type_option_names()
      * @param $mform
      */
-    function get_config_form($mform);
+    public function get_config_form($mform);
 
     /**
      * The form should contain the following required parameters by mediacapture
@@ -44,36 +44,36 @@ interface mediacapture {
      *
      * @param object $mform
      */
-    function view($mform);
+    public function view($mform);
 
     /**
      * Url for submitting the recorded file (via ajax) to temp_dir()
      * @return string $url
      */
-    function post_url();
+    public function post_url();
 
     /**
      * List of all string keys defined by the recorder in the lang file
      * @return array $strings
      */
-    function string_keys();
+    public function string_keys();
 
     /**
      * Min version of supported_type() required by the recorder
      * @return array $version
      */
-    function min_version();
+    public function min_version();
 
     /**
      * Supported media viz array('audio', 'video')
      * @return array $media
      */
-    function supported_media();
+    public function supported_media();
 
     /**
      * Supported type viz array('html5', 'flash', 'java')
      * @return array $type
      */
-    function supported_types();
+    public function supported_types();
 
 }

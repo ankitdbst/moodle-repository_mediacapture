@@ -36,7 +36,7 @@ class repository_mediacapture_localaudiorecorder implements mediacapture {
      * @return array $options Array of type options used by the recorder
      */
     public static function get_type_option_names() {
-    	return array('localaudiorecorder');
+        return array('localaudiorecorder');
     }
 
     /**
@@ -44,18 +44,19 @@ class repository_mediacapture_localaudiorecorder implements mediacapture {
      * @param object $mform
      */
     public function get_config_form($mform) {
-        $mform->addElement('advcheckbox', 'localaudiorecorder', get_string('localaudiorecorder', 'repository_mediacapture'), null, array('group' => 1));
+        $mform->addElement('advcheckbox', 'localaudiorecorder', get_string('localaudiorecorder', 'repository_mediacapture'),
+                             null, array('group' => 1));
     }
 
     /**
      * @param object $mform
      */
     public function view($mform) {
-    	global $CFG, $PAGE;
+        global $CFG, $PAGE;
 
-        $url        = new moodle_url("$CFG->wwwroot/repository/mediacapture/plugins/localaudiorecorder/assets/recorder.swf?gateway=form");
-        $js         = urlencode("(function(a,b) { M.repository_mediacapture_localaudiorecorder.validate(a,b); })");
-        $flashvars  = "&callback={$js}&filename=Untitled";
+        $url = new moodle_url("$CFG->wwwroot/repository/mediacapture/plugins/localaudiorecorder/assets/recorder.swf?gateway=form");
+        $js = urlencode("(function(a,b) { M.repository_mediacapture_localaudiorecorder.validate(a,b); })");
+        $flashvars = "&callback={$js}&filename=Untitled";
 
         $recorder   = '
                     <object id="onlineaudiorecorder" classid="clsid:D27CDB6E-AE6D-11cf-96B8-444553540000" width="225" height="138">
@@ -65,7 +66,8 @@ class repository_mediacapture_localaudiorecorder implements mediacapture {
                         <object type="application/x-shockwave-flash" data="' . $url . $flashvars . '" width="215" height="138">
                         <!--<![endif]-->
                         <div><p><a href="http://www.adobe.com/go/getflashplayer">
-                        <img src="http://www.adobe.com/images/shared/download_buttons/get_flash_player.gif" alt="Get Adobe Flash player" />
+                        <img src="http://www.adobe.com/images/shared/download_buttons/get_flash_player.gif"
+                                alt="Get Adobe Flash player" />
                         </a></p></div>
                         </object>
                         <!--<![endif]-->
@@ -116,4 +118,3 @@ class repository_mediacapture_localaudiorecorder implements mediacapture {
         return array('flash');
     }
 }
-

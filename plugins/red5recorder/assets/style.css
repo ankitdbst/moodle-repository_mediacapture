@@ -1,20 +1,20 @@
 /* CSS file */
-.playButton { 
-down-icon: Embed(source="assets/player_pause.png"); 
-over-icon: Embed(source="assets/player_pause.png"); 
-up-icon: Embed(source="assets/player_pause.png"); 
+.playButton {
+down-icon: Embed(source="assets/player_pause.png");
+over-icon: Embed(source="assets/player_pause.png");
+up-icon: Embed(source="assets/player_pause.png");
 
-selected-disabled-icon: Embed(source="assets/player_play.png"); 
+selected-disabled-icon: Embed(source="assets/player_play.png");
 selected-over-icon: Embed(source="assets/player_play.png");
 selected-up-icon: Embed(source="assets/player_play.png");
 }
 
 .scrollBar {
-	thumb-icon: Embed(source="assets/circle.png"); 
-	thumb-up-skin: Embed(source="assets/circle.png"); 
-	thumb-down-skin: Embed(source="assets/circle.png"); 
-	thumb-over-skin: Embed(source="assets/circle.png"); 
-}	
+	thumb-icon: Embed(source="assets/circle.png");
+	thumb-up-skin: Embed(source="assets/circle.png");
+	thumb-down-skin: Embed(source="assets/circle.png");
+	thumb-over-skin: Embed(source="assets/circle.png");
+}
 
 ToolTip {
     backgroundAlpha: 1.0;
@@ -34,7 +34,7 @@ HSlider {
     font-weight: normal;
     fontFamily: ArialEmbedded;
 }
-        
+
 .arial16E {
     fontFamily: "ArialEmbedded";
     fontSize: 16;
@@ -42,7 +42,7 @@ HSlider {
 .arial14E {
     fontFamily: "ArialEmbedded";
     fontSize: 14;
-}        
+}
 .arial12E {
     fontFamily: "ArialEmbedded";
     fontSize: 12;
@@ -51,10 +51,8 @@ HSlider {
     fontFamily: "ArialEmbedded";
     fontSize: 10;
 }
-            
+
 ToolTip {
     fontFamily: ArialEmbedded;
     font-size:13;
 }
-        
-        

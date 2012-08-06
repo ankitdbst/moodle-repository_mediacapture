@@ -36,7 +36,7 @@ class repository_mediacapture_red5recorder implements mediacapture {
      * @return array $options Array of type options used by the recorder
      */
     public static function get_type_option_names() {
-    	return array('rtmp_server', 'red5recorder');
+        return array('rtmp_server', 'red5recorder');
     }
 
     /**
@@ -44,8 +44,10 @@ class repository_mediacapture_red5recorder implements mediacapture {
      * @param object $mform
      */
     public function get_config_form($mform) {
-        $mform->addElement('advcheckbox', 'red5recorder', get_string('red5recorder', 'repository_mediacapture'), null, array('group' => 1));
-        $mform->addElement('text', 'rtmp_server', get_string('rtmpserver', 'repository_mediacapture'), 'maxlength="100" size="25" ');
+        $mform->addElement('advcheckbox', 'red5recorder', get_string('red5recorder', 'repository_mediacapture'), null,
+                            array('group' => 1));
+        $mform->addElement('text', 'rtmp_server', get_string('rtmpserver', 'repository_mediacapture'),
+                            'maxlength="100" size="25" ');
         $mform->setType('rtmp_server', PARAM_NOTAGS);
         $mform->setDefault('rtmp_server', 'rtmp://127.0.0.1');
     }
@@ -55,9 +57,9 @@ class repository_mediacapture_red5recorder implements mediacapture {
      * @return string $recorder HTML for the recorder.
      */
     public function view($mform) {
-    	global $CFG, $PAGE;
+        global $CFG, $PAGE;
 
-        $streampath = "$CFG->dataroot/streams/video.flv"; // path to the streams directory of red5recorder app
+        $streampath = "$CFG->dataroot/streams/video.flv"; // Path to the streams directory of red5recorder app.
         $rtmpserver = get_config('mediacapture', 'rtmp_server');
 
         $url        = new moodle_url("$CFG->wwwroot/repository/mediacapture/plugins/red5recorder/assets/red5recorder.swf");
@@ -98,8 +100,8 @@ class repository_mediacapture_red5recorder implements mediacapture {
     }
 
     /**
-    * @return string $keys Array of string keys used by the recorder.
-    */
+     * @return string $keys Array of string keys used by the recorder.
+     */
     public function string_keys() {
         return array(
             'red5recorder', 'rtmpserver', 'filenotsaved',
