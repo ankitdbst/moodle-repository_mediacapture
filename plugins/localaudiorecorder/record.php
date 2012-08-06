@@ -21,7 +21,8 @@
 
 require_once(dirname(__FILE__) . '/lib.php');
 
-$tmpdir = temp_dir();
+$client = new repository_mediacapture_localaudiorecorder();
+$tmpdir = $client->temp_dir();
 
 $tmpdata = required_param('filedata', PARAM_RAW);
 $tmpname = required_param('filename', PARAM_TEXT);

@@ -21,7 +21,8 @@
 
 require_once(dirname(__FILE__) . '/lib.php');
 
-$tmpdir = temp_dir();
+$client = new repository_mediacapture_red5recorder();
+$tmpdir = $client->temp_dir();
 
 $tmpfile = required_param('filepath', PARAM_RAW);
 $tmpname = required_param('filename', PARAM_TEXT);

@@ -23,7 +23,7 @@
 
 require_once(dirname(dirname(dirname(__FILE__))) . '/mediacapture.php');
 
-class repository_mediacapture_localaudiorecorder implements mediacapture {
+class repository_mediacapture_localaudiorecorder extends mediacapture {
 
     /**
      * Default constructor

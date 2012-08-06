@@ -20,9 +20,9 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-require_once(dirname(__FILE__) . '/locallib.php');
+require_once(dirname(dirname(dirname(__FILE__))) . '/config.php');
 
-interface mediacapture {
+interface mediacapture_interface {
 
     /**
      * Type option names for the recorder
@@ -75,5 +75,18 @@ interface mediacapture {
      * @return array $type
      */
     public function supported_types();
+
+}
+
+
+abstract class mediacapture implements mediacapture_interface {
+
+    /**
+     * @return string $path Path of the temp directory
+     */
+    public function temp_dir() {
+        global $USER;
+        return make_temp_directory('repository/mediacapture/' . $USER->id);
+    }
 
 }

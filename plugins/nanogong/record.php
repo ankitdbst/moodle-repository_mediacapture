@@ -21,7 +21,8 @@
 
 require_once(dirname(__FILE__) . '/lib.php');
 
-$tmpdir = temp_dir();
+$client = new repository_mediacapture_nanogong();
+$tmpdir = $client->temp_dir();
 
 $elname = 'nanogong';
 $tmpfile = $_FILES[$elname]['tmp_name'];

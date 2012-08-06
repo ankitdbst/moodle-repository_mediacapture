@@ -23,7 +23,7 @@
 
 require_once(dirname(dirname(dirname(__FILE__))) . '/mediacapture.php');
 
-class repository_mediacapture_nanogong implements mediacapture {
+class repository_mediacapture_nanogong extends mediacapture {
 
     /**
      * Default constructor

@@ -23,7 +23,7 @@
 
 require_once(dirname(dirname(dirname(__FILE__))) . '/mediacapture.php');
 
-class repository_mediacapture_red5recorder implements mediacapture {
+class repository_mediacapture_red5recorder extends mediacapture {
 
     /**
      * Default constructor
