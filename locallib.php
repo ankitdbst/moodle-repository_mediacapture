@@ -29,13 +29,6 @@ class mediacapture_recorder {
     private $installedrecorders;
 
     /**
-     * Populate list of installed recorders
-     */
-    public function __construct() {
-        $this->installedrecorders = $this->installed_recorders();
-    }
-
-    /**
      * @param string $media Type of recorder ('audio', 'video')
      * @param object $browserplugins
      */
@@ -181,6 +174,10 @@ class mediacapture_recorder {
      * @return array of recorders corresponding to the media type
      */
     public function get_installed_recorders($media = null) {
+        if (!isset($this->installedrecorders)) {
+            $this->installedrecorders = $this->installed_recorders();
+        }
+
         if ($media == null) {
             return $this->installedrecorders;
         } else {
