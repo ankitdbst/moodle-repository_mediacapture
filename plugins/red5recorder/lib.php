@@ -60,10 +60,10 @@ class repository_mediacapture_red5recorder extends mediacapture {
         global $CFG, $PAGE;
 
         $rtmpserver = get_config('mediacapture', 'rtmp_server');
-        $streampath = "http://$rtmpserver:5080/red5recorder/streams/video.flv";
+        $tmpname = sha1(uniqid(rand(), true));
+        $streampath = "http://$rtmpserver:5080/red5recorder/streams/$tmpname.flv";
 
         $url = new moodle_url("$CFG->wwwroot/repository/mediacapture/plugins/red5recorder/assets/red5recorder.swf");
-        $tmpname = sha1(uniqid(rand(), true));
         $flashvars = "?server=rtmp://$rtmpserver/red5recorder/&fileName=$tmpname";
 
         $recorder   = '
