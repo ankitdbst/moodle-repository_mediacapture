@@ -28,12 +28,15 @@ $tmpfile = required_param('filepath', PARAM_RAW);
 $tmpname = required_param('filename', PARAM_TEXT);
 
 $tmpfile = urldecode($tmpfile);
-// Copy the uploaded file to temp dir and return location.
-if (file_exists($tmpfile) && filesize($tmpfile) > 0 &&
-         copy($tmpfile, "$tmpdir/$tmpname.flv")) {
-    // Remove the file from streams dir.
-    unlink($tmpfile);
-    echo urlencode("$tmpdir/$tmpname.flv");
-} else {
-    echo '';
-}
+$path = "$tmpdir/$tmpname.flv";
+
+$fp = fopen($path, 'w');
+$ch = curl_init($tmpfile);
+curl_setopt($ch, CURLOPT_FILE, $fp);
+curl_setopt($ch, CURLOPT_HEADER, 0);
+curl_exec($ch);
+curl_close($ch);
+// Close file handler.
+fclose($fp);
+
+echo $path;

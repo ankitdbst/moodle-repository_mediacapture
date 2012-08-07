@@ -11,6 +11,7 @@ M.repository_mediacapture_red5recorder.init = function(Y, params) {
     form.on('submit', function(e) {
         e.preventDefault();
         var filename = Y.one('#id_filename').get('value'),
+            tmpname = Y.one('*[name="tmpname"]').get('value'),
             filepath = Y.one('*[name="filepath"]');
 
         filename = filename.replace(/^\s+|\s+$/g,"");
@@ -25,16 +26,18 @@ M.repository_mediacapture_red5recorder.init = function(Y, params) {
             var data = o.responseText; // Response data.
             path = data;
         };
+
         // Subscribe to event "io:complete"
         Y.on('io:complete', complete, Y);
         // Make an HTTP POST request to posturl.
         cfg = {
             method: 'POST',
             data: 'filepath=' + filepath.get('value') +
-                  '&filename=' + filename,
+                  '&filename=' + tmpname,
             sync:true
         };
         var request = Y.io(posturl, cfg);
+
         if (!path) {
             alert(M.str.repository_mediacapture.norecordingfound);
             return false;

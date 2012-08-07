@@ -49,7 +49,7 @@ class repository_mediacapture_red5recorder extends mediacapture {
         $mform->addElement('text', 'rtmp_server', get_string('rtmpserver', 'repository_mediacapture'),
                             'maxlength="100" size="25" ');
         $mform->setType('rtmp_server', PARAM_NOTAGS);
-        $mform->setDefault('rtmp_server', 'rtmp://127.0.0.1');
+        $mform->setDefault('rtmp_server', '127.0.0.1');
     }
 
     /**
@@ -59,11 +59,12 @@ class repository_mediacapture_red5recorder extends mediacapture {
     public function view($mform) {
         global $CFG, $PAGE;
 
-        $streampath = "$CFG->dataroot/streams/video.flv"; // Path to the streams directory of red5recorder app.
         $rtmpserver = get_config('mediacapture', 'rtmp_server');
+        $streampath = "http://$rtmpserver:5080/red5recorder/streams/video.flv";
 
-        $url        = new moodle_url("$CFG->wwwroot/repository/mediacapture/plugins/red5recorder/assets/red5recorder.swf");
-        $flashvars  = "?server=$rtmpserver/red5recorder/";
+        $url = new moodle_url("$CFG->wwwroot/repository/mediacapture/plugins/red5recorder/assets/red5recorder.swf");
+        $tmpname = sha1(uniqid(rand(), true));
+        $flashvars = "?server=rtmp://$rtmpserver/red5recorder/&fileName=$tmpname";
 
         $recorder   = '
                     <object classid="clsid:D27CDB6E-AE6D-11cf-96B8-444553540000"
@@ -86,6 +87,7 @@ class repository_mediacapture_red5recorder extends mediacapture {
         $mform->addElement('html', $recorder);
         $mform->addElement('hidden', 'filepath', urlencode($streampath));
         $mform->addElement('hidden', 'filetype', 'flv');
+        $mform->addElement('hidden', 'tmpname', $tmpname);
         $mform->addElement('text', 'filename', get_string('name', 'repository_mediacapture'));
         $mform->addElement('submit', 'save', get_string('save', 'repository_mediacapture'));
     }

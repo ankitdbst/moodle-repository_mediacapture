@@ -42,7 +42,6 @@ $string['javanotfound'] = 'Your browser does not have Java support. Consider ins
 $string['flashnotfound'] = 'Your browser does not have Flash support. Consider installing the latest version of <a href="http://www.adobe.com/go/getflashplayer">Adobe Flash Player</a>';
 $string['quicktimenotfound'] = 'Your browser does not have Quicktime player installed. Consider installing the latest version of <a href="https://www.apple.com/quicktime/download">Quicktime Player</a>';
 $string['filenotsaved'] = 'The file could not be saved! Please try again';
-$string['rtmpserver'] = 'RTMP Server URL (for flash video recorder)';
 
 $string['required'] = 'Required';
 $string['installed'] = 'Installed';
@@ -53,7 +52,8 @@ $string['save'] = 'Save';
 $string['name'] = 'Name';
 $string['account'] = 'Account';
 
-$files = list_files();
+$client = new mediacapture_recorder();
+$files = $client->list_files();
 foreach ($files as $file) {
     require_once($file);
 }

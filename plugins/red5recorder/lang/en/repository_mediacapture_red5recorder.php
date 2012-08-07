@@ -18,7 +18,7 @@
  * This file contains 'repository_mediacapture_nanogong' repository plugin language strings
  */
 
-$string['rtmpserver'] = 'RTMP Server URL';
+$string['rtmpserver'] = 'RTMP Server IP';
 $string['red5recorder'] = 'Red5Recorder';
 
 $string['norecordingfound'] = 'There is no sound recorded. Please use the red disc button to start recording. Use the black square button to stop recording.';
