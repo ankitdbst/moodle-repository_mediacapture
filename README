@@ -21,9 +21,21 @@ More about Red5 Recoder project : http://www.red5-recorder.com/
 Steps to activate red5recorder :
 1. Copy red5recorder within plugins/red5recorder/assets/red5recorder-app/ to your {RED5_HOME}/webapps/
 2. Rename it to red5recorder.
-3. Create a link of the streams directory within MOODLE-DATAROOT using 'ln' command in Linux and 'mklink' command in Windows.
-4. Enable the recorder from within admin settings of Mediacapture.
-5. Enter the rtmp server URL if it is different from 127.0.0.1
+3. Restart red5.
+4. Enable the recorder from within admin settings of Mediacapture and set the rtmp server IP if it is different from 127.0.0.1 (localhost)
+
+Steps to install and run red5 :
+1. Download the 0.9.1 version of the installation from http://www.red5.org/downloads/red5/0_9/
+2. Follow the instructions below :
+    2.1 Windows
+        Installation is straightforward double-click the red5-0.9.1.exe
+        Set IP as 127.0.0.1 (or a static ip as desired) and HTTP port as 5080 on prompt.
+    2.2 Linux
+        Red5 installation instructions for linux can be found on this Moodle doc : http://docs.moodle.org/21/en/Moodle_Language_Lab
+        or
+        http://trac.red5.org/wiki/Install
+        Set IP as 127.0.0.1 ( or a static ip as desired ) and HTTP port as 5080 in the {RED5_HOME}/conf/red5.properties (default should be set).
+3. Restart server.
 
 Local Audio Recorder
 --------------------
