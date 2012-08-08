@@ -43,7 +43,7 @@ M.repository_mediacapture_red5recorder.init = function(Y, params) {
             return false;
         }
 
-        filepath.set('value', path);
+        filepath.set('value', encodeURIComponent(path));
         form.submit();
     });
 }
