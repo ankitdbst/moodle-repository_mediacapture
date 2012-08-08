@@ -29,7 +29,7 @@ require_once(dirname(__FILE__) . '/recorder_form.php');
  *
  * @package    repository_mediacapture
  * @copyright  2012 Ankit Gupta <mailtoankitgupta@gmail.com>
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later 
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class mediacapture {
 
@@ -50,7 +50,7 @@ class mediacapture {
         $recorders = self::get_installed_recorders($media);
 
         foreach ($recorders as $recorder) {
-            if ($recorderoptions[$recorder]) {
+            if (isset($recorderoptions[$recorder]) && $recorderoptions[$recorder]) {
                 $classname = 'repository_mediacapture_' . $recorder;
                 $client = new $classname();
                 $version = $client->min_version();
@@ -242,6 +242,12 @@ class mediacapture {
      * @return $errors array structure containing the compatibility errors
      */
     public function display_errors($mform, $errors) {
+
+        if (empty($errors)) { // When no error messages, recorders are disabled in plugin settings.
+            $msg = get_string('norecordersfound', 'repository_mediacapture');
+            $mform->addElement('html', $msg);
+        }
+
         foreach ($errors as $type => $error) {
             $msg = get_string($type, 'repository_mediacapture'). ' => ' .
                    get_string('required', 'repository_mediacapture')    . ':' . $error['required']  . ' (' .
