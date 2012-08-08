@@ -21,17 +21,9 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-require_once(dirname(dirname(dirname(__FILE__))) . '/mediacapture.php');
+require_once(dirname(dirname(dirname(__FILE__))) . '/recorder.php');
 
-class repository_mediacapture_localaudiorecorder extends mediacapture {
-
-    /**
-     * Default constructor
-     */
-    public function __construct() {
-        global $PAGE, $CFG;
-    }
-
+class repository_mediacapture_localaudiorecorder extends recorder {
     /**
      * @return array $options Array of type options used by the recorder
      */
@@ -43,7 +35,7 @@ class repository_mediacapture_localaudiorecorder extends mediacapture {
      * Adds the settings configuration needed by the recorder to the plugin
      * @param object $mform
      */
-    public function get_config_form($mform) {
+    public function add_config_form($mform) {
         $mform->addElement('advcheckbox', 'localaudiorecorder', get_string('localaudiorecorder', 'repository_mediacapture'),
                              null, array('group' => 1));
     }
@@ -51,7 +43,7 @@ class repository_mediacapture_localaudiorecorder extends mediacapture {
     /**
      * @param object $mform
      */
-    public function view($mform) {
+    public function view($mform, $options) {
         global $CFG, $PAGE;
 
         $url = new moodle_url("$CFG->wwwroot/repository/mediacapture/plugins/localaudiorecorder/assets/recorder.swf?gateway=form");

@@ -15,8 +15,8 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
+ * Recorder form will show recorder in filepicker
  * @package    repository_mediacapture
- * @category   repository
  * @copyright  2012 Ankit Gupta <mailtoankitgupta@gmail.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -30,7 +30,7 @@ require_once("$CFG->libdir/formslib.php");
 /**
  * This is a class used to define a mediacapture form for the recorders
  */
-class mediacapture_form extends moodleform {
+class recorder_form extends moodleform {
     /** @var string action */
     protected $action;
 
@@ -40,7 +40,7 @@ class mediacapture_form extends moodleform {
     public function definition() {
         global $CFG;
 
-        $client = new mediacapture_recorder();
+        $mediacapture = new mediacapture();
 
         $mform =& $this->_form;
 
@@ -48,13 +48,13 @@ class mediacapture_form extends moodleform {
         $mform->addElement('html', '<div class="mediacontainer" id="mediacontainer">');
         switch ($this->action) {
             case 'init': // Initial form for selection from audio/video recorders.
-                $client->view($mform);
+                $mediacapture->view($mform);
                 break;
             case 'display': // Displays the form for the recorder selected.
-                $this->_customdata['recorder']->view($mform);
+                $this->_customdata['recorder']->view($mform, $this->_customdata['recorderoptions']);
                 break;
             case 'nodisplay': // In case no recorders are available for client.
-                $client->display_errors($mform, $this->_customdata['errors']);
+                $mediacapture->display_errors($mform, $this->_customdata['errors']);
                 break;
         }
         $mform->addElement('html', '</div>');

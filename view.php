@@ -30,17 +30,18 @@ $returnurl      = required_param('returnurl', PARAM_URL);
 $type           = required_param('type', PARAM_TEXT);
 $browserplugins = optional_param('browserplugins', '', PARAM_TEXT);
 $browserdetect  = optional_param('browserdetect', '', PARAM_TEXT);
+$options        = optional_param('options', null, PARAM_RAW_TRIMMED);
 
 $PAGE->set_context(get_context_instance(CONTEXT_SYSTEM));
 $PAGE->set_url('/repository/mediacapture/view.php', array('returnurl'=>$returnurl));
 $PAGE->set_pagelayout('embedded');
 
-$client = new mediacapture_recorder();
+$mediacapture = new mediacapture();
 switch ($type) {
     case 'init':
-        $client->init($returnurl);
+        $mediacapture->init($returnurl, $options);
         break;
     default:
-        $client->print_recorder($type, json_decode($browserplugins));
+        $mediacapture->print_recorder($type, json_decode($browserplugins), unserialize($options));
         break;
 }

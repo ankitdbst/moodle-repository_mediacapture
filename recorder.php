@@ -15,14 +15,16 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Interface mediacapture that every sub-plugin should implement
+ * Recorder interface
+ * All mediacapture recorders should implement this interface
+ * @package repository_mediacapture
  * @copyright  2012 Ankit Gupta <mailtoankitgupta@gmail.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 require_once(dirname(dirname(dirname(__FILE__))) . '/config.php');
 
-interface mediacapture_interface {
+interface recorder_interface {
 
     /**
      * Type option names for the recorder
@@ -34,17 +36,15 @@ interface mediacapture_interface {
      * Admin config settings for the type options defined in get_type_option_names()
      * @param $mform
      */
-    public function get_config_form($mform);
+    public function add_config_form($mform);
 
     /**
      * The form should contain the following required parameters by mediacapture
-     * @param $filename : Filename for the recorded stream
-     * @param $filepath : Filepath for the temporary location of the file
-     * @param $filetype : Filetype associated with the recording viz 'wav', 'mp3', 'flv'
      *
-     * @param object $mform
+     * @param moodleform $mform instance of recoder form
+     * @param array $options recorder options
      */
-    public function view($mform);
+    public function view($mform, $options);
 
     /**
      * Url for submitting the recorded file (via ajax) to temp_dir()
@@ -78,11 +78,18 @@ interface mediacapture_interface {
 
 }
 
-
-abstract class mediacapture implements mediacapture_interface {
+/**
+ * Recoder abstarct class
+ * All recorders should extend recorder abstract class
+ * @package repository_mediacapture
+ * @copyright  2012 Ankit Gupta <mailtoankitgupta@gmail.com>
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+abstract class recorder implements recorder_interface {
 
     /**
-     * @return string $path Path of the temp directory
+     * Returns name of temperory directory, where recording should be saved.
+     * @return string Path of the temp directory
      */
     public function temp_dir() {
         global $USER;

@@ -21,17 +21,9 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-require_once(dirname(dirname(dirname(__FILE__))) . '/mediacapture.php');
+require_once(dirname(dirname(dirname(__FILE__))) . '/recorder.php');
 
-class repository_mediacapture_nanogong extends mediacapture {
-
-    /**
-     * Default constructor
-     */
-    public function __construct() {
-        global $PAGE, $CFG;
-    }
-
+class repository_mediacapture_nanogong extends recorder {
     /**
      * @return array $options Array of type options used by the recorder
      */
@@ -43,7 +35,7 @@ class repository_mediacapture_nanogong extends mediacapture {
      * Adds the settings configuration needed by the recorder to the plugin
      * @param object $mform
      */
-    public function get_config_form($mform) {
+    public function add_config_form($mform) {
         $audioformatoptions = array(
             get_string('audioformatimaadpcm', 'repository_mediacapture'),
             get_string('audioformatspeex', 'repository_mediacapture'),
@@ -64,17 +56,17 @@ class repository_mediacapture_nanogong extends mediacapture {
     /**
      * @param object $mform
      */
-    public function view($mform) {
+    public function view($mform, $options) {
         global $CFG, $PAGE;
 
-        $url = new moodle_url("$CFG->wwwroot/repository/mediacapture/plugins/nanogong/nanogong.jar");
+        $url = new moodle_url("$CFG->wwwroot/repository/mediacapture/recorders/nanogong/nanogong.jar");
         $samplingrates = array(
             array(8000, 11025, 22050, 44100),
             array(8000, 16000, 32000, 44100)
         );
         $audioformats   = array('ImaADPCM', 'Speex');
-        $audioformat    = get_config('audio_format', 'repository_mediacapture');
-        $samplingrate   = get_config('sampling_rate', 'repository_mediacapture');
+        $audioformat    = $options['audio_format'];
+        $samplingrate   = $options['sampling_rate'];
         if (empty($audioformat)) {
             $audioformat = 0;
         }
@@ -105,7 +97,7 @@ class repository_mediacapture_nanogong extends mediacapture {
      */
     public function post_url() {
         global $CFG;
-        $posturl = new moodle_url("$CFG->wwwroot/repository/mediacapture/plugins/nanogong/record.php");
+        $posturl = new moodle_url("$CFG->wwwroot/repository/mediacapture/recorders/nanogong/record.php");
         return $posturl;
     }
 
@@ -125,7 +117,7 @@ class repository_mediacapture_nanogong extends mediacapture {
      * @return array $version Minimum version of $type required by the recorder.
      */
     public function min_version() {
-        return array('java' => 1.5);
+        return array('java' => 1.2);
     }
 
     /**

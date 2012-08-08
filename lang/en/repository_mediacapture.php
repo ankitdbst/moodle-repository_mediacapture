@@ -52,8 +52,8 @@ $string['save'] = 'Save';
 $string['name'] = 'Name';
 $string['account'] = 'Account';
 
-$client = new mediacapture_recorder();
-$files = $client->list_files();
+$mediacapture = new mediacapture();
+$files = $mediacapture->list_recorder_string_files();
 foreach ($files as $file) {
     require_once($file);
 }

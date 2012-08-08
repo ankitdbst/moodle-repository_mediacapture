@@ -16,53 +16,63 @@
 
 /**
  * @package    repository_mediacapture
- * @category   repository
  * @copyright  2012 Ankit Gupta <mailtoankitgupta@gmail.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 require_once(dirname(dirname(dirname(__FILE__))) . '/config.php');
-require_once(dirname(__FILE__) . '/mediacapture_form.php');
+require_once(dirname(__FILE__) . '/recorder_form.php');
 
-class mediacapture_recorder {
+/**
+ * Mediacapture class
+ * This will take care of loading appropriate recorder
+ *
+ * @package    repository_mediacapture
+ * @copyright  2012 Ankit Gupta <mailtoankitgupta@gmail.com>
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later 
+ */
+class mediacapture {
 
-    private $installedrecorders;
+    /**
+     * Keep list of all installed recorders
+     * @var array
+     */
+    private static $installedrecorders;
 
     /**
      * @param string $media Type of recorder ('audio', 'video')
      * @param object $browserplugins
      */
-    public function print_recorder($media, $browserplugins) {
+    public function print_recorder($media, $browserplugins, $recorderoptions) {
         global $PAGE, $CFG, $OUTPUT;
 
         $errors = array();
-        $recorders = $this->get_installed_recorders($media);
+        $recorders = self::get_installed_recorders($media);
 
         foreach ($recorders as $recorder) {
-            if (get_config('mediacapture', $recorder)) {
+            if ($recorderoptions[$recorder]) {
                 $classname = 'repository_mediacapture_' . $recorder;
                 $client = new $classname();
                 $version = $client->min_version();
                 $types = $client->supported_types();
                 $compatible = true;
                 foreach ($types as $type) {
-                    if ( !(isset($browserplugins->$type) &&
-                         $browserplugins->$type >= $version[$type]) ) {
+                    if (!(isset($browserplugins->$type) && ($browserplugins->$type >= $version[$type]))) {
                         $compatible = false;
                         $errors[$type] = array(
                             'installed' => $browserplugins->$type,
                             'required' => $version[$type]
-                        );
+                            );
                     }
                 }
 
                 // Check for the compatible plugin-recorder.
                 if ($compatible) {
-                    $PAGE->requires->css(new moodle_url("$CFG->wwwroot/repository/mediacapture/plugins/$recorder/styles.css"));
+                    $PAGE->requires->css(new moodle_url("$CFG->wwwroot/repository/mediacapture/recorders/$recorder/styles.css"));
                     echo $OUTPUT->header();
                     $jsmodule = array(
                         'name' => 'repository_mediacapture_$recorder',
-                        'fullpath' => "/repository/mediacapture/plugins/$recorder/module.js",
+                        'fullpath' => "/repository/mediacapture/recorders/$recorder/module.js",
                         'requires' => array('event', 'node', 'io', 'base'),
                         'strings' => $this->list_strings($client->string_keys())
                     );
@@ -71,9 +81,10 @@ class mediacapture_recorder {
                     $formaction = $this->callback_url();
                     $options = array(
                         'action' => 'display',
-                        'recorder' => $client
+                        'recorder' => $client,
+                        'recorderoptions' => $recorderoptions
                     );
-                    $mform = new mediacapture_form($formaction, $options);
+                    $mform = new recorder_form($formaction, $options);
                     $mform->display();
                     echo $OUTPUT->footer();
                     return;
@@ -88,15 +99,17 @@ class mediacapture_recorder {
             'errors' => $errors
         );
         $formaction = new moodle_url('/repository/mediacapture/view.php');
-        $mform = new mediacapture_form($formaction, $options);
+        $mform = new recorder_form($formaction, $options);
         $mform->display();
         echo $OUTPUT->footer();
     }
 
     /**
      * Initializes the recorder
+     *
+     * @param string $returnurl
      */
-    public function init($returnurl) {
+    public function init($returnurl, $options) {
         global $PAGE, $CFG, $OUTPUT;
         echo $OUTPUT->header();
         $jsmodule = array(
@@ -105,18 +118,19 @@ class mediacapture_recorder {
             'requires' => array('event', 'node', 'json')
         );
         $PAGE->requires->js_init_call('M.repository_mediacapture.init', array(), false, $jsmodule);
-        $formaction = new moodle_url('/repository/mediacapture/view.php', array('returnurl' => $returnurl));
-        $mform = new mediacapture_form($formaction, array('action' => 'init'));
+        $formaction = new moodle_url('/repository/mediacapture/view.php', array('returnurl' => $returnurl, 'options' => $options));
+        $mform = new recorder_form($formaction, array('action' => 'init'));
         $mform->display();
         echo $OUTPUT->footer();
     }
 
     /**
      * View for the plugin
+     *
      * @param object $mform
      */
     public function view($mform) {
-        $recorders = $this->get_installed_recorders();
+        $recorders = self::get_installed_recorders();
 
         if (count($recorders['audio'])) {
             $mform->addElement('button', 'startaudio', get_string('startaudio', 'repository_mediacapture'));
@@ -130,9 +144,11 @@ class mediacapture_recorder {
     }
 
     /**
+     * Return list of installed recorders
+     *
      * @return array $recorders array structure containing list of recorders installed.
      */
-    public function installed_recorders() {
+    public static function installed_recorders() {
         global $CFG;
 
         $recorders = array(
@@ -140,20 +156,20 @@ class mediacapture_recorder {
             'video' => array()
         );
 
-        $pluginsdir = "$CFG->dirroot/repository/mediacapture/plugins";
-        if ($handle = opendir($pluginsdir)) {
-            while (false !== ($pluginname = readdir($handle))) {
-                if ($pluginname != "." && $pluginname != "..") {
-                    if (file_exists("$pluginsdir/$pluginname/lib.php")) {
-                        require_once("$pluginsdir/$pluginname/lib.php");
-                        $classname = 'repository_mediacapture_' . $pluginname;
+        $recordersdir = "$CFG->dirroot/repository/mediacapture/recorders";
+        if ($handle = opendir($recordersdir)) {
+            while (false !== ($recordername = readdir($handle))) {
+                if ($recordername != "." && $recordername != "..") {
+                    if (file_exists("$recordersdir/$recordername/lib.php")) {
+                        require_once("$recordersdir/$recordername/lib.php");
+                        $classname = 'repository_mediacapture_' . $recordername;
                         if (class_exists($classname)) {
-                            $client = new $classname();
-                            $media = array_intersect($client->supported_media(), array('audio', 'video'));
-                            $types = array_intersect($client->supported_types(), array('html5', 'flash', 'java'));
+                            $recorder = new $classname();
+                            $media = array_intersect($recorder->supported_media(), array('audio', 'video'));
+                            $types = array_intersect($recorder->supported_types(), array('html5', 'flash', 'java'));
                             if ($media && $types) {
                                 for ($i = 0; $i < count($media); $i++) {
-                                    array_push($recorders[$media[$i]], $pluginname);
+                                    array_push($recorders[$media[$i]], $recordername);
                                 }
                             } else {
                                 throw new moodle_exception('error'); // Incompatible plugin.
@@ -171,21 +187,26 @@ class mediacapture_recorder {
     }
 
     /**
+     * Return list of installed recorders
+     *
+     * @param string $media name of media 'audio', 'video', 'image'
      * @return array of recorders corresponding to the media type
      */
-    public function get_installed_recorders($media = null) {
-        if (!isset($this->installedrecorders)) {
-            $this->installedrecorders = $this->installed_recorders();
+    public static function get_installed_recorders($media = null) {
+        if (!isset(self::$installedrecorders)) {
+           self::$installedrecorders = self::installed_recorders();
         }
 
         if ($media == null) {
-            return $this->installedrecorders;
+            return self::$installedrecorders;
         } else {
-            return $this->installedrecorders[$media];
+            return self::$installedrecorders[$media];
         }
     }
 
     /**
+     * Return list of strings used in JS
+     *
      * @return array $strings Array of string definitions to be used by javascript.
      */
     public function list_strings($keys) {
@@ -196,15 +217,17 @@ class mediacapture_recorder {
     }
 
     /**
-     * @return arrray $files List of the required language files of the sub-plugins
+     * Return list of language files for each installed recorder
+     *
+     * @return arrray $files List of the required language files of the recorders
      */
-    public function list_files() {
+    public function list_recorder_string_files() {
         global $CFG;
 
-        $recorders = $this->get_installed_recorders();
-        $pluginsdir = "$CFG->dirroot/repository/mediacapture/plugins";
+        $recorders = self::get_installed_recorders();
+        $recordersdir = "$CFG->dirroot/repository/mediacapture/recorders";
         foreach (array_merge($recorders['audio'], $recorders['video']) as $recorder) {
-            $file = "$pluginsdir/$recorder/lang/en/repository_mediacapture_$recorder.php";
+            $file = "$recordersdir/$recorder/lang/en/repository_mediacapture_$recorder.php";
             if (file_exists($file)) {
                 $files[] = $file;
             }
@@ -214,6 +237,8 @@ class mediacapture_recorder {
     }
 
     /**
+     * Return array of possible error messages
+     *
      * @return $errors array structure containing the compatibility errors
      */
     public function display_errors($mform, $errors) {
@@ -226,9 +251,11 @@ class mediacapture_recorder {
     }
 
     /**
+     * Path for callback url, which will upload file
+     *
      * @return Repository callback url
      */
-    public function callback_url() {
+    public static function callback_url() {
         return new moodle_url('/repository/mediacapture/callback.php');
     }
 }

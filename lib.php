@@ -36,17 +36,18 @@ class repository_mediacapture extends repository {
      * @param array $options
      */
     public function __construct($repositoryid, $context = SITEID, $options = array()) {
-        parent::__construct($repositoryid, $context, $options);;
+        parent::__construct($repositoryid, $context, $options);
     }
 
     /**
+     * Return list of config options for all installed recorders
+     *
      * @return array $options Type option names for sub-plugins installed
      */
-    public static function get_type_option_names() {
-        $client = new mediacapture_recorder();
-        $recorders = $client->get_installed_recorders();
+    public static function get_instance_option_names() {
+        $recorders = mediacapture::get_installed_recorders();
 
-        $options = array('pluginname');
+        $options = array();
         foreach (array_merge($recorders['audio'], $recorders['video']) as $recorder) {
             $classname = 'repository_mediacapture_' . $recorder;
             $client = new $classname();
@@ -62,21 +63,20 @@ class repository_mediacapture extends repository {
      * @param object $mform
      * @param string $classname
      */
-    public static function type_config_form($mform, $classname = 'repository') {
-        parent::type_config_form($mform);
-
-        $client = new mediacapture_recorder();
-        $recorders = $client->get_installed_recorders();
+    public static function instance_config_form($mform) {
+        $recorders = mediacapture::get_installed_recorders();
 
         foreach (array_merge($recorders['audio'], $recorders['video']) as $recorder) {
             $classname = 'repository_mediacapture_' . $recorder;
             $client = new $classname();
-            $client->get_config_form($mform);
+            $client->add_config_form($mform);
         }
     }
 
     /**
      * Turn search off
+     *
+     * @return bool false
      */
     public function global_search() {
         return false;
@@ -90,9 +90,9 @@ class repository_mediacapture extends repository {
      * @return array structure of listing information
      */
     public function get_listing($path = null, $page = null) {
-        $client = new mediacapture_recorder();
         $url = new moodle_url('/repository/mediacapture/view.php',
-                                array('returnurl' => $client->callback_url(), 'type' => 'init'));
+                                array('returnurl' => mediacapture::callback_url(),
+                                    'type' => 'init', 'options' => serialize($this->get_option())));
         // Create listing array.
         $list = array();
         $list['object']         = array();
@@ -122,6 +122,8 @@ class repository_mediacapture extends repository {
     }
 
     /**
+     * Return list of supported filetypes.
+     *
      * @return array of supported file types and extensions.
      */
     public function supported_filetypes() {

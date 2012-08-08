@@ -21,17 +21,9 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-require_once(dirname(dirname(dirname(__FILE__))) . '/mediacapture.php');
+require_once(dirname(dirname(dirname(__FILE__))) . '/recorder.php');
 
-class repository_mediacapture_red5recorder extends mediacapture {
-
-    /**
-     * Default constructor
-     */
-    public function __construct() {
-        global $PAGE, $CFG;
-    }
-
+class repository_mediacapture_red5recorder extends recorder {
     /**
      * @return array $options Array of type options used by the recorder
      */
@@ -43,7 +35,7 @@ class repository_mediacapture_red5recorder extends mediacapture {
      * Adds the settings configuration needed by the recorder to the plugin
      * @param object $mform
      */
-    public function get_config_form($mform) {
+    public function add_config_form($mform) {
         $mform->addElement('advcheckbox', 'red5recorder', get_string('red5recorder', 'repository_mediacapture'), null,
                             array('group' => 1));
         $mform->addElement('text', 'rtmp_server', get_string('rtmpserver', 'repository_mediacapture'),
@@ -56,14 +48,14 @@ class repository_mediacapture_red5recorder extends mediacapture {
      * @param string $callbackurl for the plugin
      * @return string $recorder HTML for the recorder.
      */
-    public function view($mform) {
-        global $CFG, $PAGE;
+    public function view($mform, $options) {
+        global $CFG;
 
-        $rtmpserver = get_config('mediacapture', 'rtmp_server');
+        $rtmpserver = $options['rtmp_server'];
         $tmpname = sha1(uniqid(rand(), true));
         $streampath = "http://$rtmpserver:5080/red5recorder/streams/$tmpname.flv";
 
-        $url = new moodle_url("$CFG->wwwroot/repository/mediacapture/plugins/red5recorder/assets/red5recorder.swf");
+        $url = new moodle_url("$CFG->wwwroot/repository/mediacapture/recorders/red5recorder/assets/red5recorder.swf");
         $flashvars = "?server=rtmp://$rtmpserver/red5recorder/&fileName=$tmpname";
 
         $recorder   = '
@@ -97,7 +89,7 @@ class repository_mediacapture_red5recorder extends mediacapture {
      */
     public function post_url() {
         global $CFG;
-        $posturl = new moodle_url("$CFG->wwwroot/repository/mediacapture/plugins/red5recorder/record.php");
+        $posturl = new moodle_url("$CFG->wwwroot/repository/mediacapture/recorders/red5recorder/record.php");
         return $posturl;
     }
 
