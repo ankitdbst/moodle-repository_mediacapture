@@ -24,3 +24,4 @@ $string['red5recorder'] = 'Red5Recorder';
 $string['norecordingfound'] = 'There is no sound recorded. Please use the red disc button to start recording. Use the black square button to stop recording.';
 $string['nonamefound'] = 'Please provide a name for your recording.';
 $string['filenotsaved'] = 'The file could not be saved! Please try again';
+$string['maxlength'] = 'Max Length (in secs)';

@@ -28,7 +28,7 @@ class repository_mediacapture_red5recorder extends recorder {
      * @return array $options Array of type options used by the recorder
      */
     public static function get_type_option_names() {
-        return array('rtmp_server', 'red5recorder');
+        return array('rtmp_server', 'max_length', 'red5recorder');
     }
 
     /**
@@ -42,6 +42,10 @@ class repository_mediacapture_red5recorder extends recorder {
                             'maxlength="100" size="25" ');
         $mform->setType('rtmp_server', PARAM_NOTAGS);
         $mform->setDefault('rtmp_server', '127.0.0.1');
+        $mform->addElement('text', 'max_length', get_string('maxlength', 'repository_mediacapture'), null,
+                            array('group' => 1));
+        $mform->setType('max_length', PARAM_INT);
+        $mform->setDefault('max_length', 90);
     }
 
     /**
@@ -51,12 +55,13 @@ class repository_mediacapture_red5recorder extends recorder {
     public function view($mform, $options) {
         global $CFG;
 
+        $tmpname    = sha1(uniqid(rand(), true));
         $rtmpserver = $options['rtmp_server'];
-        $tmpname = sha1(uniqid(rand(), true));
+        $maxlength  = $options['max_length'];
         $streampath = "http://$rtmpserver:5080/red5recorder/streams/$tmpname.flv";
 
         $url = new moodle_url("$CFG->wwwroot/repository/mediacapture/recorders/red5recorder/assets/red5recorder.swf");
-        $flashvars = "?server=rtmp://$rtmpserver/red5recorder/&fileName=$tmpname";
+        $flashvars = "?server=rtmp://$rtmpserver/red5recorder/&fileName=$tmpname&maxLength=$maxlength";
 
         $recorder   = '
                     <object classid="clsid:D27CDB6E-AE6D-11cf-96B8-444553540000"
