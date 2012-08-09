@@ -48,7 +48,7 @@ class recorder_form extends moodleform {
         $mform->addElement('html', '<div class="mediacontainer" id="mediacontainer">');
         switch ($this->action) {
             case 'init': // Initial form for selection from audio/video recorders.
-                $mediacapture->viewrecorderselection($mform, $this->_customdata['enabledrecorders']);
+                $mediacapture->viewrecorderselection($mform, $this->_customdata['enabledrecorders'], $this->_customdata['autodetect']);
                 break;
             case 'display': // Displays the form for the recorder selected.
                 $this->_customdata['recorder']->view($mform, $this->_customdata['recorderoptions']);

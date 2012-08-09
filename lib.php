@@ -47,7 +47,7 @@ class repository_mediacapture extends repository {
     public static function get_instance_option_names() {
         $recorders = mediacapture::get_installed_recorders();
 
-        $options = array();
+        $options = array('mediacaptureautodetect');
         foreach (array_merge($recorders['audio'], $recorders['video']) as $recorder) {
             $classname = 'repository_mediacapture_' . $recorder;
             $client = new $classname();
@@ -65,7 +65,7 @@ class repository_mediacapture extends repository {
      */
     public static function instance_config_form($mform) {
         $recorders = mediacapture::get_installed_recorders();
-
+        $mform->addElement('advcheckbox', 'mediacaptureautodetect', get_string('mediacaptureautodetect', 'repository_mediacapture'), null);
         foreach (array_merge($recorders['audio'], $recorders['video']) as $recorder) {
             $classname = 'repository_mediacapture_' . $recorder;
             $client = new $classname();

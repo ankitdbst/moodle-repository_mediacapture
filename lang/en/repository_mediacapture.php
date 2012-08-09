@@ -54,11 +54,12 @@ $string['save'] = 'Save';
 $string['name'] = 'Name';
 $string['nonamefound'] = 'Please provide a name for your recording.';
 $string['account'] = 'Account';
-
+$string['mediacaptureautodetect'] = 'Auto detect best recorder for user';
 // Local Audio recorder
-$string['flashaudiorecorder'] = 'Flash Audio Recorder';
+$string['flashaudiorecorder'] = 'Flash audio recorder';
 $string['flashnotfound'] = 'Your browser does not have Flash support. Consider installing the latest version of <a href="http://www.adobe.com/go/getflashplayer">Adobe Flash Player</a>';
 $string['noflashaudiofound'] = 'There is no sound recorded. Please use the red disc button to start recording. Use the black square button to stop recording.';
+$string['flashaudiorecordersubmit'] = 'Flash audio recorder';
 
 // Nanogong Java applet audio recorder
 $string['nanogongaudioformat'] = 'Audio format';
@@ -69,11 +70,13 @@ $string['nanogongsamplingratelow'] = 'Low quality';
 $string['nanogongsamplingratemedium'] = 'Medium quality';
 $string['nanogongsamplingratenormal'] = 'Normal quality';
 $string['nanogongsamplingratehigh'] = 'High quality';
-$string['nanogong'] = 'Nanogong';
+$string['nanogong'] = 'Java audio';
 $string['nonanogongrecordingfound'] = 'There is no sound recorded. Please use the red disc button to start recording. Use the black square button to stop recording.';
+$string['nanogongsubmit'] = 'Java audio recorder';
 
 // red5-recorder Flash video recorder
-$string['red5rtmpserver'] = 'RTMP Server IP';
-$string['red5recorder'] = 'Red5Recorder';
+$string['red5rtmpserver'] = 'RTMP server ip';
+$string['red5recorder'] = 'Flash video recorder';
 $string['nored5recordingfound'] = 'There is no video recorded. Please use the red disc button to start recording and click again to stop recording.';
-$string['red5maxlength'] = 'Max Length (in secs)';
+$string['red5maxlength'] = 'Max length (in secs)';
+$string['red5recordersubmit'] = 'Flash video recorder';

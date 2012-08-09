@@ -27,11 +27,11 @@
 require_once(dirname(__FILE__) . '/locallib.php');
 
 $returnurl      = required_param('returnurl', PARAM_URL);
-$type           = required_param('type', PARAM_TEXT);
+$type           = optional_param('type', '', PARAM_TEXT);
 $browserplugins = optional_param('browserplugins', '', PARAM_TEXT);
 $browserdetect  = optional_param('browserdetect', '', PARAM_TEXT);
-$repositoryid   = optional_param('repositoryid', null, PARAM_INT);
-$contextid      = optional_param('contextid', null, PARAM_INT);
+$repositoryid   = required_param('repositoryid', PARAM_INT);
+$contextid      = required_param('contextid', PARAM_INT);
 
 $PAGE->set_context(get_context_instance(CONTEXT_SYSTEM));
 $PAGE->set_url('/repository/mediacapture/view.php', array('returnurl'=>$returnurl));
@@ -41,11 +41,28 @@ require_sesskey();
 require_login();
 
 $mediacapture = new mediacapture();
-switch ($type) {
-    case 'init':
-        $mediacapture->init($returnurl, $repositoryid, $contextid);
-        break;
-    default:
-        $mediacapture->display_recorder($type, $repositoryid, $contextid, json_decode($browserplugins));
-        break;
+$mediacaptureoptions = $mediacapture->get_mediacapture_instance_options($repositoryid, $contextid);
+$enabledrecorders = $mediacapture->get_enabled_recorders($mediacaptureoptions);
+$recordername = null;
+if (empty($type)) {
+    foreach ($enabledrecorders as $rectype => $recorders) {
+        foreach ($recorders as $recorder) {
+            $sentrecorder = optional_param($recorder, '', PARAM_TEXT);
+            if (!empty($sentrecorder)) {
+                $type = $rectype;
+                $recordername = $recorder;
+                break;
+            }
+        }
+    }
+    $mediacapture->display_recorder($type, $repositoryid, $contextid, json_decode($browserplugins), $recordername);
+} else {
+    switch ($type) {
+        case 'init':
+            $mediacapture->init($returnurl, $repositoryid, $contextid);
+            break;
+        default:
+            $mediacapture->display_recorder($type, $repositoryid, $contextid, json_decode($browserplugins));
+            break;
+    }
 }

@@ -59,7 +59,7 @@ class mediacapture {
         $recorders = $recorders[$media];
         $client = null;
         // If browserplugin is given then check best suitable media recorder
-        if (!empty($browserplugins) && empty($recordername)) {
+        if (!empty($browserplugins) && empty($recordername) && !empty($mediacaptureoptions['mediacaptureautodetect'])) {
             foreach ($recorders as $recordername) {
                 if (!empty($mediacaptureoptions[$recordername])) {
                     $classname = 'repository_mediacapture_' . $recordername;
@@ -76,6 +76,9 @@ class mediacapture {
                                 );
                         }
                     }
+                }
+                if ($compatible) {
+                    break;
                 }
             }
         } else if (!empty($recordername)){
@@ -152,7 +155,9 @@ class mediacapture {
             $formaction = new moodle_url('/repository/mediacapture/view.php', array('returnurl' => $returnurl,
                 'repositoryid' => $repositoryid,
                 'contextid' => $contextid));
-            $mform = new recorder_form($formaction, array('action' => 'init', 'enabledrecorders' => $enabledrecorders));
+            $mform = new recorder_form($formaction, array('action' => 'init',
+                        'enabledrecorders' => $enabledrecorders,
+                        'autodetect' => $mediacaptureoptions['mediacaptureautodetect']));
             $mform->display();
             echo $OUTPUT->footer();
         } else {
@@ -168,12 +173,20 @@ class mediacapture {
      *
      * @param object $mform
      */
-    public function viewrecorderselection($mform, $enabledrecorders) {
-        if (count($enabledrecorders['audio'])) {
-            $mform->addElement('button', 'startaudio', get_string('startaudio', 'repository_mediacapture'));
-        }
-        if (count($enabledrecorders['video'])) {
-            $mform->addElement('button', 'startvideo', get_string('startvideo', 'repository_mediacapture'));
+    public function viewrecorderselection($mform, $enabledrecorders, $autodetect) {
+        if ($autodetect) {
+            if (count($enabledrecorders['audio'])) {
+                $mform->addElement('button', 'startaudio', get_string('startaudio', 'repository_mediacapture'));
+            }
+            if (count($enabledrecorders['video'])) {
+                $mform->addElement('button', 'startvideo', get_string('startvideo', 'repository_mediacapture'));
+            }
+        } else {
+            foreach ($enabledrecorders as $type => $recorders) {
+                foreach ($recorders as $recorder) {
+                    $mform->addElement('submit', $recorder, get_string($recorder.'submit', 'repository_mediacapture'));
+                }
+            }
         }
         $mform->addElement('hidden', 'type', '');
         $mform->addElement('hidden', 'browserplugins', '');
