@@ -31,14 +31,13 @@ Steps to install and run red5 :
 2. Follow the instructions below :
     2.1 Windows
         2.1.1 Installation is straightforward double-click the red5-0.9.1.exe
-        2.1.2 Set IP as 127.0.0.1 (or a static ip as desired) and HTTP port as 5080 on prompt.
+        2.1.2 Set IP as 127.0.0.1 (or a static ip as desired) and HTTP port as 5080
+              on prompt.
     2.2 Linux
-        2.2.1 Red5 installation instructions for linux can be found on this Moodle doc :
-        http://docs.moodle.org/21/en/Moodle_Language_Lab
-        or
-        http://trac.red5.org/wiki/Install
-        2.2.2 Set IP as 127.0.0.1 ( or a static ip as desired ) and HTTP port as 5080 in
-        the {RED5_HOME}/conf/red5.properties (default should be set).
+        2.2.1 Red5 installation instructions for linux can be found on this Moodle
+              doc : http://docs.moodle.org/21/en/Moodle_Language_Lab
+        2.2.2 Set IP as 127.0.0.1 (or a static ip as desired) and HTTP port as
+              5080 in the {RED5_HOME}/conf/red5.properties (default should be set).
 3. Restart server.
 
 Local Audio Recorder
