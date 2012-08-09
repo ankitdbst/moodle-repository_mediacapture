@@ -23,7 +23,7 @@ M.repository_mediacapture_nanogong.init = function(Y, params) {
 
         var duration = parseInt(recorder.sendGongRequest("GetMediaDuration", "audio")) || 0
         if (duration <= 0) {
-            alert(M.str.repository_mediacapture.norecordingfound);
+            alert(M.str.repository_mediacapture.nonanogongrecordingfound);
             return false;
         }
 

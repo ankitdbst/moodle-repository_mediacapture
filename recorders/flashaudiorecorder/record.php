@@ -15,12 +15,23 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * This file contains 'repository_mediacapture_nanogong' repository plugin language strings
+ * @copyright  2012 Ankit Gupta <mailtoankitgupta@gmail.com>
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-$string['localaudiorecorder'] = 'Local Audio Recorder';
+require_once(dirname(__FILE__) . '/lib.php');
 
-$string['flashnotfound'] = 'Your browser does not have Flash support. Consider installing the latest version of <a href="http://www.adobe.com/go/getflashplayer">Adobe Flash Player</a>';
-$string['norecordingfound'] = 'There is no sound recorded. Please use the red disc button to start recording. Use the black square button to stop recording.';
-$string['nonamefound'] = 'Please provide a name for your recording.';
-$string['filenotsaved'] = 'The file could not be saved! Please try again';
+$client = new repository_mediacapture_flashaudiorecorder();
+$tmpdir = $client->temp_dir();
+
+$tmpdata = required_param('filedata', PARAM_RAW);
+$tmpname = required_param('filename', PARAM_TEXT);
+
+$tmpdata = base64_decode($tmpdata);
+// Copy the uploaded file to temp dir and return location.
+if ($tmpdata) {
+    file_put_contents("$tmpdir/$tmpname.mp3", $tmpdata);
+    echo urlencode("$tmpdir/$tmpname.mp3");
+} else {
+    echo '';
+}

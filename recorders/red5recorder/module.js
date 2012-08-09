@@ -39,7 +39,7 @@ M.repository_mediacapture_red5recorder.init = function(Y, params) {
         var request = Y.io(posturl, cfg);
 
         if (!path) {
-            alert(M.str.repository_mediacapture.norecordingfound);
+            alert(M.str.repository_mediacapture.nored5recordingfound);
             return false;
         }
 

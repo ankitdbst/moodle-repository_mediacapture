@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * repository_mediacapture_localaudiorecorder class
+ * repository_mediacapture_flashaudiorecorder class
  *
  * @copyright  2012 Ankit Gupta <mailtoankitgupta@gmail.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
@@ -23,12 +23,12 @@
 
 require_once(dirname(dirname(dirname(__FILE__))) . '/recorder.php');
 
-class repository_mediacapture_localaudiorecorder extends recorder {
+class repository_mediacapture_flashaudiorecorder extends recorder {
     /**
      * @return array $options Array of type options used by the recorder
      */
     public static function get_type_option_names() {
-        return array('localaudiorecorder');
+        return array('flashaudiorecorder');
     }
 
     /**
@@ -36,7 +36,7 @@ class repository_mediacapture_localaudiorecorder extends recorder {
      * @param object $mform
      */
     public function add_config_form($mform) {
-        $mform->addElement('advcheckbox', 'localaudiorecorder', get_string('localaudiorecorder', 'repository_mediacapture'),
+        $mform->addElement('advcheckbox', 'flashaudiorecorder', get_string('flashaudiorecorder', 'repository_mediacapture'),
                              null, array('group' => 1));
     }
 
@@ -46,8 +46,8 @@ class repository_mediacapture_localaudiorecorder extends recorder {
     public function view($mform, $options) {
         global $CFG, $PAGE;
 
-        $url = new moodle_url("$CFG->wwwroot/repository/mediacapture/plugins/localaudiorecorder/assets/recorder.swf?gateway=form");
-        $js = urlencode("(function(a,b) { M.repository_mediacapture_localaudiorecorder.validate(a,b); })");
+        $url = new moodle_url("$CFG->wwwroot/repository/mediacapture/plugins/flashaudiorecorder/assets/recorder.swf?gateway=form");
+        $js = urlencode("(function(a,b) { M.repository_mediacapture_flashaudiorecorder.validate(a,b); })");
         $flashvars = "&callback={$js}&filename=Untitled";
 
         $recorder   = '
@@ -75,7 +75,7 @@ class repository_mediacapture_localaudiorecorder extends recorder {
      */
     public function post_url() {
         global $CFG;
-        $posturl = new moodle_url("$CFG->wwwroot/repository/mediacapture/plugins/localaudiorecorder/record.php");
+        $posturl = new moodle_url("$CFG->wwwroot/repository/mediacapture/recorders/flashaudiorecorder/record.php");
         return $posturl;
     }
 
@@ -84,7 +84,7 @@ class repository_mediacapture_localaudiorecorder extends recorder {
      */
     public function string_keys() {
         return array(
-            'flashnotfound', 'norecordingfound',
+            'flashnotfound', 'noflashaudiofound',
             'nonamefound', 'filenotsaved'
         );
     }

@@ -217,26 +217,6 @@ class mediacapture {
     }
 
     /**
-     * Return list of language files for each installed recorder
-     *
-     * @return arrray $files List of the required language files of the recorders
-     */
-    public function list_recorder_string_files() {
-        global $CFG;
-
-        $recorders = self::get_installed_recorders();
-        $recordersdir = "$CFG->dirroot/repository/mediacapture/recorders";
-        foreach (array_merge($recorders['audio'], $recorders['video']) as $recorder) {
-            $file = "$recordersdir/$recorder/lang/en/repository_mediacapture_$recorder.php";
-            if (file_exists($file)) {
-                $files[] = $file;
-            }
-        }
-
-        return $files;
-    }
-
-    /**
      * Return array of possible error messages
      *
      * @return $errors array structure containing the compatibility errors

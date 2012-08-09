@@ -28,7 +28,7 @@ class repository_mediacapture_nanogong extends recorder {
      * @return array $options Array of type options used by the recorder
      */
     public static function get_type_option_names() {
-        return array('audio_format', 'sampling_rate', 'nanogong');
+        return array('nanogong_audio_format', 'nanogong_sampling_rate', 'nanogong');
     }
 
     /**
@@ -37,19 +37,19 @@ class repository_mediacapture_nanogong extends recorder {
      */
     public function add_config_form($mform) {
         $audioformatoptions = array(
-            get_string('audioformatimaadpcm', 'repository_mediacapture'),
-            get_string('audioformatspeex', 'repository_mediacapture'),
+            get_string('nanogongaudioformatimaadpcm', 'repository_mediacapture'),
+            get_string('nanogongaudioformatspeex', 'repository_mediacapture'),
         );
 
         $samplingrateoptions = array(
-            get_string('samplingratelow', 'repository_mediacapture'),
-            get_string('samplingratemedium', 'repository_mediacapture'),
-            get_string('samplingratenormal', 'repository_mediacapture'),
-            get_string('samplingratehigh', 'repository_mediacapture'),
+            get_string('nanogongsamplingratelow', 'repository_mediacapture'),
+            get_string('nanogongsamplingratemedium', 'repository_mediacapture'),
+            get_string('nanogongsamplingratenormal', 'repository_mediacapture'),
+            get_string('nanogongsamplingratehigh', 'repository_mediacapture'),
         );
 
-        $mform->addElement('select', 'audio_format', get_string('audioformat', 'repository_mediacapture'), $audioformatoptions);
-        $mform->addElement('select', 'sampling_rate', get_string('samplingrate', 'repository_mediacapture'), $samplingrateoptions);
+        $mform->addElement('select', 'nanogong_audio_format', get_string('nanogongaudioformat', 'repository_mediacapture'), $audioformatoptions);
+        $mform->addElement('select', 'nanogong_sampling_rate', get_string('nanogongsamplingrate', 'repository_mediacapture'), $samplingrateoptions);
         $mform->addElement('advcheckbox', 'nanogong', get_string('nanogong', 'repository_mediacapture'), null, array('group' => 1));
     }
 
@@ -65,8 +65,8 @@ class repository_mediacapture_nanogong extends recorder {
             array(8000, 16000, 32000, 44100)
         );
         $audioformats   = array('ImaADPCM', 'Speex');
-        $audioformat    = $options['audio_format'];
-        $samplingrate   = $options['sampling_rate'];
+        $audioformat    = $options['nanogong_audio_format'];
+        $samplingrate   = $options['nanogong_sampling_rate'];
         if (empty($audioformat)) {
             $audioformat = 0;
         }
@@ -106,10 +106,10 @@ class repository_mediacapture_nanogong extends recorder {
      */
     public function string_keys() {
         return array(
-            'appletnotfound', 'norecordingfound', 'nonamefound',
-            'filenotsaved', 'audioformat', 'audioformatimaadpcm',
-            'audioformatspeex', 'samplingrate', 'samplingratelow',
-            'samplingratemedium', 'samplingratenormal', 'samplingratehigh'
+            'appletnotfound', 'nonanogongrecordingfound', 'nonamefound',
+            'filenotsaved', 'nanogongaudioformat', 'nanogongaudioformatimaadpcm',
+            'nanogongaudioformatspeex', 'nanogongsamplingrate', 'nanogongsamplingratelow',
+            'nanogongsamplingratemedium', 'nanogongsamplingratenormal', 'nanogongsamplingratehigh'
         );
     }
 

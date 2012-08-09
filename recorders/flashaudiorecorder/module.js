@@ -3,16 +3,16 @@
 * the recording to temp file
 */
 
-M.repository_mediacapture_localaudiorecorder = {};
+M.repository_mediacapture_flashaudiorecorder = {};
 
 var posturl, Y;
 
-M.repository_mediacapture_localaudiorecorder.init = function(innerY, params) {
+M.repository_mediacapture_flashaudiorecorder.init = function(innerY, params) {
     posturl = decodeURIComponent(params);
     Y = innerY;
 }
 
-M.repository_mediacapture_localaudiorecorder.validate = function (filename, filedata) {
+M.repository_mediacapture_flashaudiorecorder.validate = function (filename, filedata) {
     var recorder    = Y.one('#onlineaudiorecorder').getDOMNode(),
         filepath    = Y.one('*[name="filepath"]'),
         form        = Y.one('#mform1');
@@ -44,7 +44,7 @@ M.repository_mediacapture_localaudiorecorder.validate = function (filename, file
     var request = Y.io(posturl, cfg);
 
     if (!path) {
-        alert(M.str.repository_mediacapture.norecordingfound);
+        alert(M.str.repository_mediacapture.noflashaudiofound);
         return false;
     }
 
