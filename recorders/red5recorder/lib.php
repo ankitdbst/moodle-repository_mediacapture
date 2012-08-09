@@ -28,7 +28,7 @@ class repository_mediacapture_red5recorder extends recorder {
      * @return array $options Array of type options used by the recorder
      */
     public static function get_type_option_names() {
-        return array('red5_rtmp_server', 'max_length', 'red5recorder');
+        return array('red5_rtmp_server', 'red5_max_length', 'red5recorder');
     }
 
     /**

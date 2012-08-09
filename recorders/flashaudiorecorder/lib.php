@@ -46,7 +46,7 @@ class repository_mediacapture_flashaudiorecorder extends recorder {
     public function view($mform, $options) {
         global $CFG, $PAGE;
 
-        $url = new moodle_url("$CFG->wwwroot/repository/mediacapture/plugins/flashaudiorecorder/assets/recorder.swf?gateway=form");
+        $url = new moodle_url("$CFG->wwwroot/repository/mediacapture/recorders/flashaudiorecorder/assets/recorder.swf?gateway=form");
         $js = urlencode("(function(a,b) { M.repository_mediacapture_flashaudiorecorder.validate(a,b); })");
         $flashvars = "&callback={$js}&filename=Untitled";
 

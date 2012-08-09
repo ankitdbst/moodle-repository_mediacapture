@@ -37,63 +37,78 @@ class mediacapture {
      * Keep list of all installed recorders
      * @var array
      */
-    private static $installedrecorders;
+    public static $installedrecorders;
 
     /**
-     * @param string $media Type of recorder ('audio', 'video')
-     * @param object $browserplugins
+     * Renders appropriate recorder
+     *
+     * @param string $media name of the media type
+     * @param int $repositoryid repository id
+     * @param int $contextid context id in which reposity was initalised
+     * @param object $browserplugins client browser information
+     * @param string $recordername name of recorder to display
+     * @return type 
      */
-    public function print_recorder($media, $browserplugins, $recorderoptions) {
+    public function display_recorder($media, $repositoryid, $contextid, $browserplugins = null, $recordername = null) {
         global $PAGE, $CFG, $OUTPUT;
 
         $errors = array();
-        $recorders = self::get_installed_recorders($media);
-
-        foreach ($recorders as $recorder) {
-            if (isset($recorderoptions[$recorder]) && $recorderoptions[$recorder]) {
-                $classname = 'repository_mediacapture_' . $recorder;
-                $client = new $classname();
-                $version = $client->min_version();
-                $types = $client->supported_types();
-                $compatible = true;
-                foreach ($types as $type) {
-                    if (!(isset($browserplugins->$type) && ($browserplugins->$type >= $version[$type]))) {
-                        $compatible = false;
-                        $errors[$type] = array(
-                            'installed' => $browserplugins->$type,
-                            'required' => $version[$type]
-                            );
+        // Check if only one recorder is enabled, if no then try show options
+        $mediacaptureoptions = $this->get_mediacapture_instance_options($repositoryid, $contextid);
+        $recorders = $this->get_enabled_recorders($mediacaptureoptions);
+        $recorders = $recorders[$media];
+        $client = null;
+        // If browserplugin is given then check best suitable media recorder
+        if (!empty($browserplugins) && empty($recordername)) {
+            foreach ($recorders as $recordername) {
+                if (!empty($mediacaptureoptions[$recordername])) {
+                    $classname = 'repository_mediacapture_' . $recordername;
+                    $client = new $classname();
+                    $compatible = true;
+                    $version = $client->min_version();
+                    $types = $client->supported_types();
+                    foreach ($types as $type) {
+                        if (!(isset($browserplugins->$type) && ($browserplugins->$type >= $version[$type]))) {
+                            $compatible = false;
+                            $errors[$type] = array(
+                                'installed' => $browserplugins->$type,
+                                'required' => $version[$type]
+                                );
+                        }
                     }
                 }
-
-                // Check for the compatible plugin-recorder.
-                if ($compatible) {
-                    $PAGE->requires->css(new moodle_url("$CFG->wwwroot/repository/mediacapture/recorders/$recorder/styles.css"));
-                    echo $OUTPUT->header();
-                    $jsmodule = array(
-                        'name' => 'repository_mediacapture_$recorder',
-                        'fullpath' => "/repository/mediacapture/recorders/$recorder/module.js",
-                        'requires' => array('event', 'node', 'io', 'base'),
-                        'strings' => $this->list_strings($client->string_keys())
-                    );
-                    $data = array(urlencode($client->post_url()));
-                    $PAGE->requires->js_init_call("M.repository_mediacapture_$recorder.init", $data, false, $jsmodule);
-                    $formaction = $this->callback_url();
-                    $options = array(
-                        'action' => 'display',
-                        'recorder' => $client,
-                        'recorderoptions' => $recorderoptions
-                    );
-                    $mform = new recorder_form($formaction, $options);
-                    $mform->display();
-                    echo $OUTPUT->footer();
-                    return;
-                }
             }
+        } else if (!empty($recordername)){
+            $classname = 'repository_mediacapture_' . $recordername;
+            $client = new $classname();
         }
-
-        // No recorder selected : display appropriate message.
+        
+        // Check for the compatible plugin-recorder.
+        if ($client) {
+            $PAGE->requires->css(new moodle_url("$CFG->wwwroot/repository/mediacapture/recorders/$recordername/styles.css"));
+            $jsmodule = array(
+                'name' => 'repository_mediacapture_$recorder',
+                'fullpath' => "/repository/mediacapture/recorders/$recordername/module.js",
+                'requires' => array('event', 'node', 'io', 'base'),
+                'strings' => $this->list_strings($client->string_keys())
+            );
+            $data = array(urlencode($client->post_url()));
+            echo $OUTPUT->header();
+            $PAGE->requires->js_init_call("M.repository_mediacapture_$recordername.init", $data, false, $jsmodule);
+            $formaction = $this->callback_url();
+            $options = array(
+                'action' => 'display',
+                'recorder' => $client,
+                'recorderoptions' => $mediacaptureoptions
+            );
+            $mform = new recorder_form($formaction, $options);
+            $mform->display();
+            echo $OUTPUT->footer();
+            return;
+        }
+            
         echo $OUTPUT->header();
+        // No recorder selected : display appropriate message.
         $options = array(
             'action' => 'nodisplay',
             'errors' => $errors
@@ -109,33 +124,55 @@ class mediacapture {
      *
      * @param string $returnurl
      */
-    public function init($returnurl, $options) {
+    public function init($returnurl, $repositoryid, $contextid) {
         global $PAGE, $CFG, $OUTPUT;
-        echo $OUTPUT->header();
-        $jsmodule = array(
-            'name' => 'repository_mediacapture',
-            'fullpath' => '/repository/mediacapture/module.js',
-            'requires' => array('event', 'node', 'json')
-        );
-        $PAGE->requires->js_init_call('M.repository_mediacapture.init', array(), false, $jsmodule);
-        $formaction = new moodle_url('/repository/mediacapture/view.php', array('returnurl' => $returnurl, 'options' => $options));
-        $mform = new recorder_form($formaction, array('action' => 'init'));
-        $mform->display();
-        echo $OUTPUT->footer();
+        // Check if only one recorder is enabled, if no then try show options
+        $mediacaptureoptions = $this->get_mediacapture_instance_options($repositoryid, $contextid);
+        $enabledrecorders = $this->get_enabled_recorders($mediacaptureoptions);
+        
+        if (!empty($enabledrecorders)) {
+            // If count is 1 then only audio or video is there, so show it.
+            if (count($enabledrecorders) == 1) {
+                $mediatype = array_keys($enabledrecorders);
+                $mediatype = $mediatype[0];
+                if (count($enabledrecorders[$mediatype]) == 1) {
+                    // Show recorder, else show options
+                    $this->display_recorder($mediatype, $repositoryid, $contextid, null, $enabledrecorders[$mediatype][0]);
+                    return;
+                }
+            }
+            // Else we need to show options now.
+            echo $OUTPUT->header();
+            $jsmodule = array(
+                'name' => 'repository_mediacapture',
+                'fullpath' => '/repository/mediacapture/module.js',
+                'requires' => array('event', 'node', 'json')
+            );
+            $PAGE->requires->js_init_call('M.repository_mediacapture.init', array(), false, $jsmodule);
+            $formaction = new moodle_url('/repository/mediacapture/view.php', array('returnurl' => $returnurl,
+                'repositoryid' => $repositoryid,
+                'contextid' => $contextid));
+            $mform = new recorder_form($formaction, array('action' => 'init', 'enabledrecorders' => $enabledrecorders));
+            $mform->display();
+            echo $OUTPUT->footer();
+        } else {
+            echo $OUTPUT->header();
+            $mform = new recorder_form($formaction, array('action' => 'nodisplay'));
+            $mform->display();
+            echo $OUTPUT->footer();
+        }
     }
 
     /**
-     * View for the plugin
+     * View recorder selection options
      *
      * @param object $mform
      */
-    public function view($mform) {
-        $recorders = self::get_installed_recorders();
-
-        if (count($recorders['audio'])) {
+    public function viewrecorderselection($mform, $enabledrecorders) {
+        if (count($enabledrecorders['audio'])) {
             $mform->addElement('button', 'startaudio', get_string('startaudio', 'repository_mediacapture'));
         }
-        if (count($recorders['video'])) {
+        if (count($enabledrecorders['video'])) {
             $mform->addElement('button', 'startvideo', get_string('startvideo', 'repository_mediacapture'));
         }
         $mform->addElement('hidden', 'type', '');
@@ -202,6 +239,48 @@ class mediacapture {
         } else {
             return self::$installedrecorders[$media];
         }
+    }
+    
+    /**
+     * Return list of enabled recorders for this instance of mediacapture
+     *
+     * @param array $recorders list of installed recorders
+     * @param array $mediacaptureoptions mediacapture options
+     * @return array of enabled recorders
+     */
+    public function get_enabled_recorders($mediacaptureoptions, $recordertypes = null) {
+        $enabledrecorders = array();
+        // Get all installed recorders if no recorder list is passed
+        if (empty($recordertypes)) {
+            $recordertypes = self::get_installed_recorders();
+        }
+        // Find if it's enabled else unset it.
+        foreach ($recordertypes as $type => $recorders) {
+            foreach ($recorders as $key => $recorder) {
+                if (!empty($mediacaptureoptions[$recorder])) {
+                    // Initalize array if not available
+                    if (empty($enabledrecorders[$type])) {
+                        $enabledrecorders[$type] = array();
+                    }
+                    $enabledrecorders[$type][] = $recorder;
+                }
+            }
+        }
+        return $enabledrecorders;
+    }
+    
+    /**
+     * Get mediacapture instace options
+     *
+     * @param int $repositoryid instance id of repository.
+     */
+    public function get_mediacapture_instance_options($repositoryid, $context) {
+        GLOBAL $CFG;
+        require_once(dirname(__FILE__) . '/../lib.php');
+        require_once(dirname(__FILE__) . '/lib.php');
+        
+        $mediacapturerepo = new repository_mediacapture($repositoryid, $context);
+        return $mediacapturerepo->get_option();
     }
 
     /**

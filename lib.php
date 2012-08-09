@@ -90,9 +90,16 @@ class repository_mediacapture extends repository {
      * @return array structure of listing information
      */
     public function get_listing($path = null, $page = null) {
+        $contextid = $this->context;
+        if (is_object($contextid)) {
+            $contextid = $contextid->id;
+        }
         $url = new moodle_url('/repository/mediacapture/view.php',
                                 array('returnurl' => mediacapture::callback_url(),
-                                    'type' => 'init', 'options' => serialize($this->get_option())));
+                                    'type' => 'init',
+                                    'repositoryid' => $this->id,
+                                    'contextid' => $contextid,
+                                    'sesskey' => sesskey()));
         // Create listing array.
         $list = array();
         $list['object']         = array();
