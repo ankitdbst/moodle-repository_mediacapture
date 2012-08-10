@@ -3,7 +3,7 @@ Mediacapture plugin
 
 Introduction
 ------------
-This is a Moodle repository plugin for recording media directly using the filepicker. The plugin is built as a framework and provides a recorder class which every recorder must extend. Plugin automatically checks for the installed recorders and sets the config for the recorders in the admin settings. The recorders are loaded based on the client browser requirements.
+This is a Moodle repository plugin for recording media directly using the filepicker. The plugin is built as a framework and provides a recorder class which every recorder must extend. Plugin automatically checks for the installed recorders and sets the config for the recorders in the admin settings. The plugin provides feature to either autodetect best recorder for client (by checking his browser configurations) or manually select from a list of installed recorders.
 
 If you are looking to make a recorder for mediacapture. Please follow :
 http://docs.moodle.org/dev/Mediacapture_plugin_recorders
