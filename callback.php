@@ -38,7 +38,7 @@ $author     = 'Unknown'; // Specify default author here.
 $license    = 'None';
 
 $source = base64_encode(serialize((object)array('url'=>$url, 'filename'=>$filename)));
-$filename = $filename . '.' . $filetype;
+$filename = $filename . $filetype;
 
 $js =<<<EOD
 <html>

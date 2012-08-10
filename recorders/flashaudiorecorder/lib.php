@@ -24,16 +24,20 @@
 require_once(dirname(dirname(dirname(__FILE__))) . '/recorder.php');
 
 class repository_mediacapture_flashaudiorecorder extends recorder {
+
     /**
-     * @return array $options Array of type options used by the recorder
+     * Type option names for the recorder
+     *
+     * @return array $options
      */
     public static function get_type_option_names() {
         return array('flashaudiorecorder');
     }
 
     /**
-     * Adds the settings configuration needed by the recorder to the plugin
-     * @param object $mform
+     * Admin config settings for the type options defined in get_type_option_names()
+     *
+     * @param $mform
      */
     public function add_config_form($mform) {
         $mform->addElement('advcheckbox', 'flashaudiorecorder', get_string('flashaudiorecorder', 'repository_mediacapture'),
@@ -41,7 +45,10 @@ class repository_mediacapture_flashaudiorecorder extends recorder {
     }
 
     /**
-     * @param object $mform
+     * The form should contain the following required parameters by mediacapture
+     *
+     * @param moodleform $mform instance of recoder form
+     * @param array $options recorder options
      */
     public function view($mform, $options) {
         global $CFG, $PAGE;
@@ -67,10 +74,12 @@ class repository_mediacapture_flashaudiorecorder extends recorder {
         $mform->addElement('html', $recorder);
         $mform->addElement('hidden', 'filepath', '');
         $mform->addElement('hidden', 'filename', '');
-        $mform->addElement('hidden', 'filetype', 'mp3');
+        $mform->addElement('hidden', 'filetype', $this->supported_filetype());
     }
 
     /**
+     * Url for submitting the recorded file (via ajax) to temp_dir()
+     *
      * @return string $url
      */
     public function post_url() {
@@ -80,7 +89,9 @@ class repository_mediacapture_flashaudiorecorder extends recorder {
     }
 
     /**
-     * @return string $keys Array of string keys used by the recorder.
+     * List of all string keys defined by the recorder in the lang file
+     *
+     * @return array $strings
      */
     public function string_keys() {
         return array(
@@ -90,23 +101,38 @@ class repository_mediacapture_flashaudiorecorder extends recorder {
     }
 
     /**
-     * @return array $version Minimum version of $type required by the recorder.
+     * Min version of supported_mediatypes() required by the recorder
+     *
+     * @return array $version
      */
     public function min_version() {
         return array('flash' => 10.1);
     }
 
     /**
-     * @return array $media Supported media by the recorder.
+     * Supported media viz array('audio', 'video')
+     *
+     * @return array $media
      */
     public function supported_media() {
         return array('audio');
     }
 
     /**
-     * @return array $type Supported type by the recorder.
+     * Supported type viz array('html5', 'flash', 'java')
+     *
+     * @return array $type
      */
-    public function supported_types() {
+    public function supported_mediatypes() {
         return array('flash');
+    }
+
+    /**
+     * Return string of supported filetype associated with the recording
+     *
+     * @return string of supported file types/extensions.
+     */
+    public function supported_filetype() {
+        return '.mp3';
     }
 }

@@ -28,12 +28,14 @@ interface recorder_interface {
 
     /**
      * Type option names for the recorder
+     *
      * @return array $options
      */
     public static function get_type_option_names();
 
     /**
      * Admin config settings for the type options defined in get_type_option_names()
+     *
      * @param $mform
      */
     public function add_config_form($mform);
@@ -48,38 +50,49 @@ interface recorder_interface {
 
     /**
      * Url for submitting the recorded file (via ajax) to temp_dir()
+     *
      * @return string $url
      */
     public function post_url();
 
     /**
      * List of all string keys defined by the recorder in the lang file
+     *
      * @return array $strings
      */
     public function string_keys();
 
     /**
      * Min version of supported_type() required by the recorder
+     *
      * @return array $version
      */
     public function min_version();
 
     /**
      * Supported media viz array('audio', 'video')
+     *
      * @return array $media
      */
     public function supported_media();
 
     /**
      * Supported type viz array('html5', 'flash', 'java')
+     *
      * @return array $type
      */
-    public function supported_types();
+    public function supported_mediatypes();
 
+    /**
+     * Return string of supported filetype associated with the recording
+     *
+     * @return string of supported file types/extensions.
+     */
+    public function supported_filetype();
 }
 
 /**
- * Recoder abstarct class
+ * Recorder abstract class
  * All recorders should extend recorder abstract class
  * @package repository_mediacapture
  * @copyright  2012 Ankit Gupta <mailtoankitgupta@gmail.com>
@@ -89,6 +102,7 @@ abstract class recorder implements recorder_interface {
 
     /**
      * Returns name of temperory directory, where recording should be saved.
+     *
      * @return string Path of the temp directory
      */
     public function temp_dir() {

@@ -72,7 +72,7 @@ $string['nanogongsamplingratenormal'] = 'Normal quality';
 $string['nanogongsamplingratehigh'] = 'High quality';
 $string['nanogong'] = 'Java audio';
 $string['nonanogongrecordingfound'] = 'There is no sound recorded. Please use the red disc button to start recording. Use the black square button to stop recording.';
-$string['nanogongsubmit'] = 'Java audio recorder';
+$string['nanogongsubmit'] = 'Java audio recorder ';
 
 // red5-recorder Flash video recorder
 $string['red5rtmpserver'] = 'RTMP server ip';

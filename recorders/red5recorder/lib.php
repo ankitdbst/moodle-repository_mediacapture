@@ -24,16 +24,20 @@
 require_once(dirname(dirname(dirname(__FILE__))) . '/recorder.php');
 
 class repository_mediacapture_red5recorder extends recorder {
+
     /**
-     * @return array $options Array of type options used by the recorder
+     * Type option names for the recorder
+     *
+     * @return array $options
      */
     public static function get_type_option_names() {
         return array('red5_rtmp_server', 'red5_max_length', 'red5recorder');
     }
 
     /**
-     * Adds the settings configuration needed by the recorder to the plugin
-     * @param object $mform
+     * Admin config settings for the type options defined in get_type_option_names()
+     *
+     * @param $mform
      */
     public function add_config_form($mform) {
         $mform->addElement('advcheckbox', 'red5recorder', get_string('red5recorder', 'repository_mediacapture'), null,
@@ -49,8 +53,10 @@ class repository_mediacapture_red5recorder extends recorder {
     }
 
     /**
-     * @param string $callbackurl for the plugin
-     * @return string $recorder HTML for the recorder.
+     * The form should contain the following required parameters by mediacapture
+     *
+     * @param moodleform $mform instance of recoder form
+     * @param array $options recorder options
      */
     public function view($mform, $options) {
         global $CFG;
@@ -83,13 +89,15 @@ class repository_mediacapture_red5recorder extends recorder {
                     </object>';
         $mform->addElement('html', $recorder);
         $mform->addElement('hidden', 'filepath', urlencode($streampath));
-        $mform->addElement('hidden', 'filetype', 'flv');
+        $mform->addElement('hidden', 'filetype', $this->supported_filetype());
         $mform->addElement('hidden', 'tmpname', $tmpname);
         $mform->addElement('text', 'filename', get_string('name', 'repository_mediacapture'));
         $mform->addElement('submit', 'save', get_string('save', 'repository_mediacapture'));
     }
 
     /**
+     * Url for submitting the recorded file (via ajax) to temp_dir()
+     *
      * @return string $url
      */
     public function post_url() {
@@ -99,7 +107,9 @@ class repository_mediacapture_red5recorder extends recorder {
     }
 
     /**
-     * @return string $keys Array of string keys used by the recorder.
+     * List of all string keys defined by the recorder in the lang file
+     *
+     * @return array $strings
      */
     public function string_keys() {
         return array(
@@ -109,23 +119,38 @@ class repository_mediacapture_red5recorder extends recorder {
     }
 
     /**
-     * @return array $version Minimum version of $type required by the recorder.
+     * Min version of supported_mediatypes() required by the recorder
+     *
+     * @return array $version
      */
     public function min_version() {
         return array('flash' => 9);
     }
 
     /**
-     * @return array $media Supported media by the recorder.
+     * Supported media viz array('audio', 'video')
+     *
+     * @return array $media
      */
     public function supported_media() {
         return array('video');
     }
 
     /**
-     * @return array $type Supported technology by the recorder.
+     * Supported type viz array('html5', 'flash', 'java')
+     *
+     * @return array $type
      */
-    public function supported_types() {
+    public function supported_mediatypes() {
         return array('flash');
+    }
+
+    /**
+     * Return string of supported filetype associated with the recording
+     *
+     * @return string of supported file types/extensions.
+     */
+    public function supported_filetype() {
+        return '.flv';
     }
 }

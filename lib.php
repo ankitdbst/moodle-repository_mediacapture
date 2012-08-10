@@ -134,6 +134,12 @@ class repository_mediacapture extends repository {
      * @return array of supported file types and extensions.
      */
     public function supported_filetypes() {
-        return array('web_audio', 'web_video');
+        $recorders = mediacapture::get_installed_recorders();
+        foreach (array_merge($recorders['audio'], $recorders['video']) as $recorder) {
+            $classname = 'repository_mediacapture_' . $recorder;
+            $client = new $classname();
+            $filetypes[] = $client->supported_filetype();
+        }
+        return $filetypes;
     }
 }

@@ -26,6 +26,7 @@
 }
 
 #mediacontainer fieldset {
+    min-width:175px;
     padding:0px;
     margin:0px;
 }
