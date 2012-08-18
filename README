@@ -3,12 +3,13 @@ Mediacapture plugin
 
 Introduction
 ------------
-This is a Moodle repository plugin for recording media directly using the filepicker. The plugin is built as a framework and provides a recorder class which every recorder must extend. Plugin automatically checks for the installed recorders and sets the config for the recorders in the admin settings. The plugin provides feature to either autodetect best recorder for client (by checking his browser configurations) or manually select from a list of installed recorders.
+This is a Moodle repository plugin for recording media directly using the filepicker.  The plugin currently comes with 3 recorders built in viz Nanogong (Java Audio recorder), Red5Recorder (Flash Red5 Video recorder) and Flash Audio Recorder.
+The plugin automatically selects the appropriate recorder to display according to client configurations in the Auto detect mode. In the manual mode you can select from a list of available compatible recorders.
 
 If you are looking to make a recorder for mediacapture. Please follow :
 http://docs.moodle.org/dev/Mediacapture_plugin_recorders
 
-About the sub-plugins
+About the recorders
 ---------------------
 Nanogong
 --------
@@ -16,18 +17,18 @@ Nanogong is a Java applet to record and playback the recorded audio stream.
 More about Nanogong project : http://nanogong.ust.hk/
 
 Red5-Recorder
---------
+-------------
 Red5 Recorder is a Open Source Red5 video flex recorder and player.
 More about Red5 Recoder project : http://www.red5-recorder.com/
 
 Steps to activate red5recorder :
-1. Copy red5recorder within plugins/red5recorder/assets/red5recorder-app/ to your {RED5_HOME}/webapps/
+1. Copy red5recorder-app within {repository_mediacapture}/recorders/red5recorder/assets/ to your {RED5_HOME}/webapps/
 2. Rename it to red5recorder.
 3. Restart red5.
 4. Enable the recorder from within admin settings of Mediacapture and set the rtmp server IP if it is different from 127.0.0.1 (localhost)
 
 Steps to install and run red5 :
-1. Download the 0.9.1 version of the installation from http://www.red5.org/downloads/red5/0_9/
+1. Download the v0.9.1 (red5 recorder is not supported in higher versions) of the installation from http://www.red5.org/downloads/red5/0_9/
 2. Follow the instructions below :
     2.1 Windows
         2.1.1 Installation is straightforward double-click the red5-0.9.1.exe
@@ -40,10 +41,10 @@ Steps to install and run red5 :
               5080 in the {RED5_HOME}/conf/red5.properties (default should be set).
 3. Restart server.
 
-Local Audio Recorder
+Flash Audio Recorder
 --------------------
-A local audio recorder (no streaming server required). Requires Flash Player 10.1 or above.
-More about Local Audio Recorder : https://github.com/MaxThrax/local-audio-recorder
+A flash audio recorder (no streaming server required). Requires Flash Player 10.1 or above.
+More about Flash Audio Recorder : https://github.com/MaxThrax/local-audio-recorder
 
 Requirement
 -----------
