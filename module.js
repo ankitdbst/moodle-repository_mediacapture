@@ -9,8 +9,8 @@ M.repository_mediacapture.init = function(Y) {
     Y.one('*[name="browserplugins"]').set('value', JSON.stringify(BrowserPlugins));
     Y.one('*[name="browserdetect"]').set('value', JSON.stringify(BrowserDetect));
 
-    var audio = Y.one("#id_startaudio"),
-        video = Y.one("#id_startvideo");
+    var audio = Y.one("#id_recordaudio"),
+        video = Y.one("#id_recordvideo");
 
     if (audio) {
         audio.on("click", function (e) {
