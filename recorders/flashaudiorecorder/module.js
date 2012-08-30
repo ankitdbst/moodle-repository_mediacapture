@@ -37,12 +37,11 @@ M.repository_mediacapture_flashaudiorecorder.validate = function (filename, file
     // Make an HTTP POST request to posturl.
     cfg = {
         method: 'POST',
-        data: 'filedata=' + filedata +
+        data: 'filedata=' + encodeURIComponent(filedata) +
               '&filename=' + filename,
         sync:true
     };
     var request = Y.io(posturl, cfg);
-
     if (!path) {
         alert(M.str.repository_mediacapture.noflashaudiofound);
         return false;

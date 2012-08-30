@@ -176,10 +176,10 @@ class mediacapture {
     public function viewrecorderselection($mform, $enabledrecorders, $autodetect) {
         if ($autodetect) {
             if (count($enabledrecorders['audio'])) {
-                $mform->addElement('button', 'startaudio', get_string('startaudio', 'repository_mediacapture'));
+                $mform->addElement('button', 'recordaudio', get_string('recordaudio', 'repository_mediacapture'));
             }
             if (count($enabledrecorders['video'])) {
-                $mform->addElement('button', 'startvideo', get_string('startvideo', 'repository_mediacapture'));
+                $mform->addElement('button', 'recordvideo', get_string('recordvideo', 'repository_mediacapture'));
             }
         } else {
             foreach ($enabledrecorders as $type => $recorders) {
