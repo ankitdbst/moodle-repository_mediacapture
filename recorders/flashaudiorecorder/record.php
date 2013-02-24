@@ -24,10 +24,14 @@ require_once(dirname(__FILE__) . '/lib.php');
 $client = new repository_mediacapture_flashaudiorecorder();
 $tmpdir = $client->temp_dir();
 
-$tmpdata = required_param('filedata', PARAM_RAW);
 $tmpname = required_param('filename', PARAM_TEXT);
+$tmpdata = required_param('filedata', PARAM_RAW);
 
-$tmpdata = urldecode(base64_decode($tmpdata));
+// While posting the media content, the data is urlencoded which replaces '+' with ' '
+// which breaks the recording when it is played back in multimedia filter
+$tmpdata = str_replace(' ', '+', $tmpdata);
+$tmpdata = base64_decode($tmpdata);
+
 // Copy the uploaded file to temp dir and return location.
 if ($tmpdata) {
     file_put_contents("$tmpdir/$tmpname.mp3", $tmpdata);

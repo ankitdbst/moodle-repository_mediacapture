@@ -16,7 +16,7 @@ M.repository_mediacapture_flashaudiorecorder.validate = function (filename, file
     var recorder    = Y.one('#onlineaudiorecorder').getDOMNode(),
         filepath    = Y.one('*[name="filepath"]'),
         form        = Y.one('#mform1');
-
+    
     filename = filename.replace(/^\s+|\s+$/g,"");
     filename = filename.replace(".mp3", "");
     if (!filename) {
@@ -37,10 +37,11 @@ M.repository_mediacapture_flashaudiorecorder.validate = function (filename, file
     // Make an HTTP POST request to posturl.
     cfg = {
         method: 'POST',
-        data: 'filedata=' + encodeURIComponent(filedata) +
-              '&filename=' + filename,
-        sync:true
+        data:   'filedata='     + filedata +
+                '&filename='    + filename,
+        sync: true
     };
+    //Y.io.header('Content-type', 'application/octet-stream');
     var request = Y.io(posturl, cfg);
     if (!path) {
         alert(M.str.repository_mediacapture.noflashaudiofound);
