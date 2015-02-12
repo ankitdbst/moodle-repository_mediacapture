@@ -94,8 +94,11 @@ class repository_mediacapture_nanogong extends recorder {
                     </applet>';
         $mform->addElement('html', $recorder);
         $mform->addElement('hidden', 'filepath', '');
+        $mform->setType('filepath', PARAM_PATH);
         $mform->addElement('hidden', 'filetype', $this->supported_filetype());
+        $mform->setType('filetype', PARAM_FILE);
         $mform->addElement('text', 'filename', get_string('name', 'repository_mediacapture'));
+        $mform->setType('filename', PARAM_FILE);
         $mform->addElement('submit', 'save', get_string('save', 'repository_mediacapture'));
     }
 

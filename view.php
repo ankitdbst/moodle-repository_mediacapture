@@ -33,7 +33,7 @@ $browserdetect  = optional_param('browserdetect', '', PARAM_TEXT);
 $repositoryid   = required_param('repositoryid', PARAM_INT);
 $contextid      = required_param('contextid', PARAM_INT);
 
-$PAGE->set_context(get_context_instance(CONTEXT_SYSTEM));
+$PAGE->set_context(context_system::instance());
 $PAGE->set_url('/repository/mediacapture/view.php', array('returnurl'=>$returnurl));
 $PAGE->set_pagelayout('embedded');
 

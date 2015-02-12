@@ -73,8 +73,11 @@ class repository_mediacapture_flashaudiorecorder extends recorder {
                     </object>';
         $mform->addElement('html', $recorder);
         $mform->addElement('hidden', 'filepath', '');
+        $mform->setType('filepath', PARAM_PATH);
         $mform->addElement('hidden', 'filename', '');
+        $mform->setType('filename', PARAM_FILE);
         $mform->addElement('hidden', 'filetype', $this->supported_filetype());
+        $mform->setType('filetype', PARAM_FILE);
     }
 
     /**
